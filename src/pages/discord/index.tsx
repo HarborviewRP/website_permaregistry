@@ -12,16 +12,8 @@ interface Props {
 
 
 export default function DiscordAuth({ user }: Props) {
-
-
-
   return (
     <>
-     <Head>
-       <title>{user?.username || "Login with discord"}</title>
-       <link rel="shortcut icon" href={user?.avatar || "https://brandlogos.net/wp-content/uploads/2021/11/discord-logo.png"} />
-     </Head>
-     <body>
      <div className="w-screen h-screen flex justify-center items-center">
       <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4 backdrop-blur">
         {!user && (
@@ -63,7 +55,6 @@ export default function DiscordAuth({ user }: Props) {
         )}
       </div>
     </div>
-     </body>
     </>
   );
 }

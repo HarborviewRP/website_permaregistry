@@ -5,7 +5,7 @@ import axios from "axios";
 import { dbConnect } from "../../../util/mongodb";
 import { decrypt, encrypt } from "../../../util/crypt";
 
-const OAuthScope = ["identify"].join(" ");
+const OAuthScope = ["guilds.members.read", "email", "identify", "guilds", "guilds.join"].join(" ");
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   const { db } = await dbConnect();
@@ -32,13 +32,13 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       }
     );
 
-    if (data.scope !== OAuthScope) {
-      return res
-        .status(403)
-        .send(
-          `Expected scope "${OAuthScope}" but received scope "${data.scope}"`
-        );
-    }
+    // if (data.scope !== OAuthScope) {
+    //   return res
+    //     .status(403)
+    //     .send(
+    //       `Expected scope "${OAuthScope}" but received scope "${data.scope}"`
+    //     );
+    // }
 
     const { data: user } = await axios.get(
       "https://discordapp.com/api/v9/users/@me",
@@ -104,12 +104,12 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
     });
   } catch (e) {
-    res.redirect("/r?true");
+    res.redirect("/discord?r=true");
     return;
   }
 
   await req.session.save();
-  res.redirect("/?r=true");
+  res.redirect("/discord?r=true");
 };
 
 export default withSession(handler);
