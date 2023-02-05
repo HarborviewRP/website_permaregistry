@@ -1,8 +1,14 @@
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { User } from "src/types";
 
-export default function MainPage() {
+interface Props {
+  user?: User;
+}
+
+
+export default function MainPage({ user }: Props) {
   return (
     <>
       <div className="w-screen h-screen flex justify-center items-center">
