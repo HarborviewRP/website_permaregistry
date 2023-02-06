@@ -1,7 +1,10 @@
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { User } from "src/types";
+import { developerRoute } from "src/util/redirects";
+import { withSession } from "src/util/session";
 
 interface Props {
   user?: User;
@@ -35,3 +38,5 @@ export default function MainPage({ user }: Props) {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps = withSession(developerRoute)

@@ -2,6 +2,8 @@ import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 import { User, UserData } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
