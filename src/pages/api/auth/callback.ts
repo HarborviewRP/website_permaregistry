@@ -82,6 +82,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         discriminator: user.discriminator,
         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
         ip: [req.headers["cf-connecting-ip"]],
+        access_level: 0,
       });
     }
 

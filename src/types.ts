@@ -35,3 +35,23 @@ export interface PageProps {
 	user?: User;
 }
 
+export enum ACCESS_LEVEL {
+	VISITOR = 0,
+	FTA = 1,
+	FTO = 2,
+	ADMIN = 3,
+}
+
+export enum APP_INTERVIEW_STATUS {
+	PENDING = 0,
+	PASSED = 1,
+	FAILED = 2,
+}
+
+export interface Appllication {
+	id: string;
+	discordId: string;
+	status: number;
+	claimedById: string | undefined;
+	notes: string | undefined;
+}

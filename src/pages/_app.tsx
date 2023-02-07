@@ -1,5 +1,6 @@
 import { AppProps } from "next/app";
 import Head from "next/head";
+import Layout from "src/components/layout";
 import '../styles/globals.css'
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -16,8 +17,9 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta property="og:image:width" content="64" />
         <meta property="og:image:height" content="64" />
       </Head>
-
-      <Component {...pageProps} />
+      <Layout>
+        <Component {...pageProps} />
+      </Layout>
     </>
   );
 }

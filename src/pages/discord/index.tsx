@@ -12,12 +12,15 @@ interface Props {
   user?: User;
 }
 
-
 export default function DiscordAuth({ user }: Props) {
+  const router = useRouter();
+  useEffect(() => {
+    if (!user) router.push('/')
+  })
   return (
     <>
      <div className="w-screen h-screen flex justify-center items-center">
-      <div className="p-6 max-w-sm mx-auto bg-white rounded-xl shadow-md flex items-center space-x-4 backdrop-blur">
+      <div className="p-6 max-w-sm mx-auto bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md flex items-center space-x-4 backdrop-blur">
         {!user && (
           <>
             <div className="flex-shrink-0">
@@ -45,7 +48,7 @@ export default function DiscordAuth({ user }: Props) {
                 width={56}
               />
             </div>
-            <h1 className="px-5 py-1 text-1xl font-semibold flex justify-center items-center text-black-500  border-indigo-500 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
+            <h1 className="px-5 py-1 text-1xl font-semibold flex justify-center items-center text-white  border-indigo-500 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
               {user.username}#{user.discriminator}
             </h1>
             <Link href="/api/auth/logout" passHref>
