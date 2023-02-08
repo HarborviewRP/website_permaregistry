@@ -67,6 +67,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
             email: user.email,
             name: user.username,
             discriminator: user.discriminator,
+            banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
             avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
           },
           $addToSet: {
@@ -80,6 +81,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         email: user.email,
         name: user.username,
         discriminator: user.discriminator,
+        banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
         ip: [req.headers["cf-connecting-ip"]],
         access_level: 0,
@@ -93,6 +95,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         { _id: user.id },
         {
           $set: {
+            banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
             avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
           },
         }
@@ -102,6 +105,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     await req.session.set("user", {
       ...user,
       token: encrypt(user.id),
+      banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
       avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
     });
   } catch (e) {

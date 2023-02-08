@@ -22,14 +22,14 @@ export default function MainPage({ user }: Props) {
   return (
     <>
     {!id && (
-      <div className="w-screen h-screen flex justify-center items-center">
+      <div className="h-screen flex justify-center items-center">
       <div className="p-6 max-w-sm mx-auto bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
         List of applications
       </div>
     </div>
     )}
     {id && (
-      <div className="w-screen h-screen flex justify-center items-center">
+      <div className="h-screen flex justify-center items-center">
       <div className="p-6 max-w-sm mx-auto bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
         Application ID: {id}
       </div>

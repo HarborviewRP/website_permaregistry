@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
+import NoAuthLayout from "src/components/no-auth-layout";
 import { User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
@@ -45,5 +46,10 @@ export default function MainPage({ user }: Props) {
     </>
   );
 }
+
+MainPage.getLayout = function(page: any) {
+  return <NoAuthLayout>{page}</NoAuthLayout>
+}
+
 
 export const getServerSideProps: GetServerSideProps = withSession(developerRoute)

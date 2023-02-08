@@ -3,8 +3,8 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
-import { User, UserData } from "src/types";
+import React, { useEffect } from "react";
+import { User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 
@@ -17,31 +17,16 @@ export default function DiscordAuth({ user }: Props) {
   useEffect(() => {
     if (!user) router.push('/')
   })
+
   return (
     <>
-     <div className="w-screen h-screen flex justify-center items-center">
+     <div className="h-screen flex justify-center items-center">
       <div className="p-6 max-w-sm mx-auto bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md flex items-center space-x-4 backdrop-blur">
-        {!user && (
-          <>
-            <div className="flex-shrink-0">
-              <Image
-                src="https://brandlogos.net/wp-content/uploads/2021/11/discord-logo.png"
-                alt="Discord Logo"
-                height={56}
-                width={56}
-              />
-            </div>
-            <Link href="/api/auth/login" passHref>
-              <button className="px-4 py-1 text-sm text-indigo-500 font-semibold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
-                Login with discord
-              </button>
-            </Link>
-          </>
-        )}
         {user && (
           <>
             <div className="flex-shrink-0">
               <Image
+              className="rounded-full"
                 src={user.avatar}
                 alt="User Avatar"
                 height={56}
