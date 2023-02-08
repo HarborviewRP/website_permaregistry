@@ -36,18 +36,18 @@ export default function DiscordAuth({ user }: Props) {
             <div className="h-64 min-h-full"></div>
             <div className="h-32 min-h-full w-64 min-w-full bg-slate-900 backdrop-blur-3xl bg-opacity-50 flex items-center">
               <div className="px-8">
-                <p className="text-center text-2xl font-semibold text-white">
+                <p className="text-center text-xl font-semibold text-white">
                   {`${user.username}#${user.discriminator}`}
-                  <span className="font-light text-lg italic"> ({user.id})</span>
+                  <span className="font-light text-sm italic"> ({user.id})</span>
                   </p>
               </div>
             </div>
             <Image
-              className="rounded-full absolute my-20"
+              className="rounded-full absolute my-16"
               src={user.avatar + "?size=512"}
               alt="User Avatar"
-              height={256}
-              width={256}
+              height={200}
+              width={200}
             />
             <div className="w-full bg-slate-900 backdrop-blur-3xl bg-opacity-50"></div>
           </div>
