@@ -36,7 +36,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               <div>
                 <h1 className="text-3xl">PGN ATS</h1>
                 {user ? (
-                  <Link href="/settings/profile" passHref>
+                  <Link href="/profile" passHref>
                   <div className="flex justify-center mt-3 ">
                     <Image
                       className="rounded-full mr-2"
@@ -68,7 +68,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
               </div>
               <div>
                 <Link href="/api/auth/logout">
-                  <button className="bg-red-500 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
+                  <button className="bg-transparent border-2 border-red-700/40 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
                     Logout
                   </button>
                 </Link>
