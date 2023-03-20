@@ -1,15 +1,10 @@
 import { NextApiResponse } from "next";
 import { dbConnect } from "src/util/mongodb";
-import { NextIronRequest, withSession } from "../../../util/session";
+import { NextIronRequest, withAuth, withSession } from "../../../util/session";
+import { middleware } from "../auth.middleware";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
-    const { db } = await dbConnect();
-    
-	const user = req.session.get('user');
-    if (!user) {
-        res.status(403);
-        return;
-    }
+    res.json({message: "Hello s"})
 };
 
-export default withSession(handler);
+export default withAuth(handler);

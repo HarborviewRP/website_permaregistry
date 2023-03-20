@@ -85,6 +85,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
         ip: [req.headers["cf-connecting-ip"]],
         access_level: 0,
+        token: encrypt(user.id),
       });
     }
 
