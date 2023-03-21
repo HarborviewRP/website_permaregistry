@@ -32,3 +32,8 @@ export async function dbConnect() {
 
   return { client, db };
 }
+
+export const getApplicationCollection = async () => {
+  const client = await dbConnect();
+  return client.db.collection("applications");
+};

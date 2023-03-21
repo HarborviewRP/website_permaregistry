@@ -1,0 +1,33 @@
+.content {
+  text-align: center;
+  position: relative;
+  padding-top: 5%;
+  height: 80vh;
+}
+
+.content h1 {
+  font-size: 2.5em;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
+.content h2 {
+  font-size: 1.5em;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
+.content p {
+  font-size: 1em;
+  font-style: italic;
+  color: #ffffff;
+  margin-bottom: 20px;
+}
+
+.imagewrapper {
+  position: absolute;
+  top: 50%; /* Position the image at the bottom half of the page */
+  width: 100vw; /* Fill the entire viewport width */
+  height: 60vh; /* Fill only the bottom half of the viewport height */
+  overflow: hidden;
+}

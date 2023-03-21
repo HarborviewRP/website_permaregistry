@@ -5,7 +5,8 @@ module.exports = {
       'brandlogos.net',
       'robohash.org',
       'seeklogo.com',
-      'cdn.discordapp.com'
+      'cdn.discordapp.com',
+      'static.tvtropes.org'
     ]
   }
 }

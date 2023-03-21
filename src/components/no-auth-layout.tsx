@@ -12,22 +12,6 @@ interface Props {
 }
 
 export default function NoAuthLayout({ children, user }: Props) {
-  const router = useRouter();
-
-  const menuItems = [
-    {
-      href: "/dashboard",
-      title: "Dashboard",
-    },
-    {
-      href: "/applications",
-      title: "Applications",
-    },
-    {
-      href: "/roster",
-      title: "Staff Roster",
-    },
-  ];
   return (
     <>
       <main className="flex-1">{children}</main>

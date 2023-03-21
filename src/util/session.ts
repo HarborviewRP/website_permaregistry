@@ -22,7 +22,7 @@ export function withSession(handler: NextIronHandler | NextRoute) {
 	return withIronSession(handler, {
 		password: process.env.COOKIE_SECRET as string | 'owosecretneedstobelongeruwuhaha123412341234',
 		cookieName: "session",
-		ttl: 15 * 24 * 3600,
+		ttl: 43200,
 		cookieOptions: {
 			secure: process.env.NODE_ENV === "production",
 			sameSite: "strict",
@@ -38,7 +38,7 @@ export function withAuth(handler: NextIronHandler | NextRoute) {
 
 			const user = req.session.get("user");
 			if (!user) {
-				res.statusCode = 403;
+				res.redirect("/403")
 				res.end();
 				return;
 			}
@@ -48,7 +48,7 @@ export function withAuth(handler: NextIronHandler | NextRoute) {
 				.countDocuments({ token: encrypt(user.id) });
 
 			if (exists < 1) {
-				res.statusCode = 403;
+				res.redirect("/403")
 				res.end();
 				return;
 			}
@@ -58,7 +58,7 @@ export function withAuth(handler: NextIronHandler | NextRoute) {
 		{
 			password: process.env.COOKIE_SECRET as string | 'owosecretneedstobelongeruwuhaha123412341234',
 			cookieName: "session",
-			ttl: 15 * 24 * 3600,
+			ttl: 43200,
 			cookieOptions: {
 				secure: process.env.NODE_ENV === "production",
 				sameSite: "strict",
