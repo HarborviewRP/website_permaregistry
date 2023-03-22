@@ -20,7 +20,7 @@ export default function MainPage({ user }: Props) {
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<Map<String, User>>();
   const [page, setPage] = useState(1);
-  const [pageLength, setPageLength] = useState(10);
+  const [pageLength, setPageLength] = useState(12);
   const [sortStatus, setSortStatus] = useState<string | null>("asc");
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
 
@@ -66,45 +66,6 @@ export default function MainPage({ user }: Props) {
   }, [page, pageLength, sortStatus]);
 
   useEffect(() => {
-    const getApplications = async () => {
-      if (!loading) return;
-      try {
-        const queryParams = new URLSearchParams({
-          page: page.toString(),
-          pageLength: pageLength.toString(),
-          ...(sortStatus ? { sortStatus: sortStatus.toString() } : {}),
-        });
-
-        const res = await fetch(
-          `/api/application/get-applications?${queryParams}`
-        );
-        if (res.ok) {
-          const applications: Application[] = await res.json();
-          setApplications(applications);
-          const map = new Map<String, User>();
-          for (const app of applications) {
-            if (map.has(app.applicantId)) continue;
-
-            const users = await fetch(`/api/user/${app.applicantId}`);
-            if (users.ok) {
-              const user = await users.json();
-              map.set(app!!.applicantId, user);
-            }
-          }
-          setUsers(map);
-          setLoading(false);
-        } else {
-          setLoading(false);
-        }
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-      }
-    };
-    getApplications();
-  }, [loading, page, pageLength, sortStatus]);
-
-  useEffect(() => {
     fetchApplications();
   }, [fetchApplications]);
 
@@ -136,29 +97,36 @@ export default function MainPage({ user }: Props) {
 
   return (
     <>
+      <div className="mx-28 my-10">
+        <h1 className="text-white text-3xl">Applications</h1>
+        <button onClick={toggleSortStatus} className="text-gray-400">
+          Sort by {" "}
+          {sortStatus === "asc" ? (
+            <span className="text-green-500">pending</span>
+          ) : (
+            <span className="text-red-500">reviewed</span>
+          )}
+        </button>
+      </div>
       {loading ? (
-        <Loader />
+        <>
+          <div className="flex flex-wrap justify-center items-center">
+            <Loader center={false} />
+          </div>
+        </>
       ) : applications.length > 0 ? (
         <>
-          <div className="mx-28 my-10">
-            <h1 className="text-white text-3xl">Applications</h1>
-            <button onClick={toggleSortStatus} className="text-white">
-              Sort by status
-            </button>
-          </div>
-          <div className="mx-32">
-            <div className="flex flex-wrap justify-between">
-              {applications.map((app) => (
-                <Link href={`/applications/${(app as any)._id}`}>
-                  <div className="px-2">
-                    <ApplicationBar
-                      application={app}
-                      applicant={users!!.get(app.applicantId)!!}
-                    />
-                  </div>
-                </Link>
-              ))}
-            </div>
+          <div className="flex flex-wrap justify-center items-center">
+            {applications.map((app) => (
+              <Link href={`/applications/${(app as any)._id}`}>
+                <div className="px-2">
+                  <ApplicationBar
+                    application={app}
+                    applicant={users!!.get(app.applicantId)!!}
+                  />
+                </div>
+              </Link>
+            ))}
           </div>
           <div className="mx-32 my-4 flex justify-between">
             <button onClick={prevPage} className="text-white">
@@ -175,7 +143,9 @@ export default function MainPage({ user }: Props) {
         </>
       ) : (
         <>
-          <h1>No applications...</h1>
+          <div className="flex flex-wrap mx-28">
+            <h1 className="text-gray-400 text-xl font-thin">There are no applications</h1>
+          </div>
         </>
       )}
     </>

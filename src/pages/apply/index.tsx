@@ -266,7 +266,7 @@ export default function DiscordAuth({ user }: Props) {
       });
 
       if (response.ok) {
-        router.push('/')
+        router.push(`/applications/${(await response.json()).application._id}`)
       } else {
         alert(
           "There was an error submitting your application. Please try again later."
@@ -467,7 +467,7 @@ export default function DiscordAuth({ user }: Props) {
                     disabled={currentStep === 1}
                     className={`py-2 px-4 rounded text-white ${
                       currentStep === 1
-                        ? "bg-slate-700"
+                        ? "bg-slate-700 text-gray-500"
                         : "bg-slate-500 hover:bg-slate-400"
                     }`}
                   >
@@ -487,7 +487,7 @@ export default function DiscordAuth({ user }: Props) {
                       disabled={hasValidationErrors()}
                       className={`py-2 px-4 bg-slate-500 ${
                         hasValidationErrors()
-                          ? "bg-opacity-50 cursor-not-allowed"
+                          ? "bg-opacity-50 bg-slate-700 cursor-not-allowed text-gray-500"
                           : "hover:bg-slate-400"
                       } text-white rounded`}
                     >

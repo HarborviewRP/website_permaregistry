@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { Application, convertStatus, User } from "src/types";
+import moment from "moment";
 
 interface ApplicationProps {
   application: Application;
@@ -11,16 +12,16 @@ const ApplicationBar: React.FC<ApplicationProps> = ({
   application,
   applicant,
 }) => {
-function truncate(str: string, maxLength = 19) {
+  function truncate(str: string, maxLength = 19) {
     if (str.length <= maxLength) {
-        return str;
+      return str;
     }
     return str.slice(0, maxLength - 3) + "...";
-    }
-      
+  }
+
   return (
     <>
-      <div className="p-4 my-3 w-max bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
+      <div className="p-4 my-3 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-lg items-center space-x-1 backdrop-blur">
         <div className="flex flex-row justify-between">
           <div className="flex flex-row items-center p-1 w-64">
             <div
@@ -44,7 +45,11 @@ function truncate(str: string, maxLength = 19) {
             </div>
           </div>
           <div className="flex flex-row items-center">
-            <h1 className="text-gray-500 text-sm">{(applicant as any)._id}</h1>
+            <h1 className="text-gray-500 text-sm">
+              {moment
+                .unix(application!!.submissionDate / 1000)
+                .format("MMMM Do YYYY, h:mm:ss A")}
+            </h1>
           </div>
 
           <div className="flex flex-row items-center px-8">

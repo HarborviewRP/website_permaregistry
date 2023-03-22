@@ -1,10 +1,12 @@
 import React from "react";
 
-interface LoaderProps {}
+interface LoaderProps {
+  center?: boolean;
+}
 
-const Loader: React.FC<LoaderProps> = () => {
-  return (
-    <div className="h-screen flex justify-center items-center">
+const Loader: React.FC<LoaderProps> = ({ center = true }) => {
+  const element = (
+    <>
       <div role="status">
         <svg
           aria-hidden="true"
@@ -24,7 +26,13 @@ const Loader: React.FC<LoaderProps> = () => {
         </svg>
         <span className="sr-only">Loading...</span>
       </div>
-    </div>
+    </>
+  );
+
+  return center ? (
+    <div className="h-screen flex justify-center items-center">{element}</div>
+  ) : (
+    element
   );
 };
 

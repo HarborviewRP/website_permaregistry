@@ -1,9 +1,11 @@
+import moment from "moment";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import CommentBox from "src/components/application/CommentBox";
 import Loader from "src/components/Loader";
 import {
   Application,
@@ -26,7 +28,6 @@ export default function MainPage({ user }: Props) {
   const [applicant, setApplicant] = useState<User | null>(null);
   const [applicantExists, setApplicantExists] = useState<boolean>(false);
   const [isStaff, setIsStaff] = useState<boolean>(false);
-  const [commentUsers, setCommentUsers] = useState<Map<String, User>>();
   const [loading, setLoading] = useState<boolean>(true);
   const [formData, setFormData] = useState({
     statusReason: "",
@@ -40,7 +41,6 @@ export default function MainPage({ user }: Props) {
   });
 
   useEffect(() => {
-    console.log(user);
     const getApplication = async () => {
       if (applicationExists && applicantExists) return;
       if (!loading) return;
@@ -54,15 +54,6 @@ export default function MainPage({ user }: Props) {
           const checkUserExists = await fetch(
             `/api/user/${application.applicantId}`
           );
-          const map = new Map<String, User>();
-          for (const note of application.notes) {
-            const author = await fetch(`/api/user/${application.applicantId}`);
-            if (author.ok) {
-              const user = await author.json();
-              map.set(note!!.authorId, user);
-            }
-          }
-          setCommentUsers(map);
           if (checkUserExists.ok) {
             const user = await checkUserExists.json();
             if (user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
@@ -173,26 +164,7 @@ export default function MainPage({ user }: Props) {
           {isStaff && (
             <div className="fixed right-0 m-20 max-w-4xl w-96">
               <h1 className="text-white text-xl font-semibold">Comments</h1>
-              <div className="p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-                {application!!.notes.map((note) => (
-                  <div key={note!!.noteId} className="my-3">
-                    <div className="flex flex-row">
-                      <Image
-                        className="rounded-full mr-2"
-                        src={commentUsers!!.get(note!!.authorId!!)!!.avatar}
-                        alt="User Avatar"
-                        height={24}
-                        width={24}
-                      />
-                      <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">
-                        {commentUsers!!.get(note!!.authorId!!)!!.username}#
-                        {commentUsers!!.get(note!!.authorId!!)!!.discriminator}
-                      </h1>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">{note!!.text}</p>
-                  </div>
-                ))}
-              </div>
+              <CommentBox application={application!!} />
             </div>
           )}
           <div className="flex flex-row">
@@ -226,20 +198,41 @@ export default function MainPage({ user }: Props) {
               {applicant?.email}
             </p>
           </div>
-          {isStaff && (
-            <div className="flex flex-col">
-              <div className="flex flex-row justify-between max-w-md">
-                <h1 className="text-gray-400 font-thin pb-6">
-                  Last modfied by: {application?.updatedById}
-                </h1>
-              </div>
-              <div className="flex flex-col">
-                {application!!.status === 0
-                  ? staffElement
-                  : user!!.access_level > 0 && staffElement}
-              </div>
+          <div className="flex flex-col">
+            <div className="flex flex-row justify-between max-w-xl">
+              {isStaff ? (
+                <>
+                  <h1 className="text-gray-400 font-thin pb-6">
+                    Last modfied by: {application?.updatedById}
+                  </h1>
+                  <h1 className="text-gray-400 font-thin pb-6">
+                    Submitted:{" "}
+                    {moment
+                      .unix(application!!.submissionDate / 1000)
+                      .format("MMMM Do YYYY, h:mm:ss A")}
+                  </h1>
+                </>
+              ) : (
+                <>
+                  <h1 className="text-gray-400 font-thin pb-6">
+                    Submitted:{" "}
+                    {moment
+                      .unix(application!!.submissionDate / 1000)
+                      .format("MMMM Do YYYY, h:mm:ss A")}
+                  </h1>
+                </>
+              )}
             </div>
-          )}
+            {isStaff && (
+              <>
+                <div className="flex flex-col">
+                  {application!!.status === 0
+                    ? staffElement
+                    : user!!.access_level > 0 && staffElement}
+                </div>
+              </>
+            )}
+          </div>
           {application!!.statusReason && (
             <>
               <div className="p-6 my-4 max-w-4xl bg-slate-700 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
