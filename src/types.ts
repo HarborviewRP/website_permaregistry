@@ -110,7 +110,6 @@ export interface Application {
   
   export const convertStatus = (status: number) => {
     let str: string;
-    console.log(status);
     switch (status) {
       case 0:
         str = "pending";
