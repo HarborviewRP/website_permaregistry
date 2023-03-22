@@ -1,38 +1,36 @@
 import { NextApiResponse } from "next";
+import { DISCORD } from "src/types";
 import { dbConnect } from "src/util/mongodb";
-import { NextIronRequest, withSession } from "../../../util/session";
+import { NextIronRequest, withAuth, withSession } from "../../../util/session";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
-    const { db } = await dbConnect();
-	const user = req.session.get('user');
-    if (!user) {
-        res.status(404);
-        res.json({ status: 403, message: 'Not authenticated'});
-        return;
-    }
-
-    const { slug } = req.query;
+  const { db } = await dbConnect();
+  const user = req.session.get("user");
+  const { slug } = req.query;
+  try {
     const newUser = await db.collection("users").findOne({
-        _id: slug
-    })
+      _id: slug,
+    });
 
     if (!newUser) {
-        res.json({ status: 404, message: 'User not found' });
+      return res.json({ status: 404, message: "User not found" });
     }
 
-    if (user.id === newUser?._id) {
-        return res.json({ status: 200, user: user });
+    if (
+      user.id === newUser?._id ||
+      user.roles.includes(DISCORD.STAFF_ROLE_ID)
+    ) {
+      return res.status(200).json(newUser);
     }
 
-    return res.json({ status: 200, user: {
-        id: newUser?.id,
-        username: newUser?.username,
-        discriminator: newUser?.discriminator,
-        avatar: newUser?.avatar,
-        banner: newUser?.banner,
-        banner_color: newUser?.banner_color,
-        accent_color: newUser?.accent_color
-    }})
+    delete newUser.email;
+    delete newUser.token;
+    delete newUser.ip;
+
+    return res.status(200).json(newUser);
+  } catch (err) {
+    res.status(500).send("Internal Server Error");
+  }
 };
 
-export default withSession(handler);
+export default withAuth(handler);

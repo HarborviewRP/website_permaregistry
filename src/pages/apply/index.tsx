@@ -5,17 +5,18 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ChangeEvent, useEffect, useState } from "react";
-import NoAuthLayout from "src/components/no-auth-layout";
+import NoSidebar from "src/components/no-auth-layout";
 import { User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
-import { Application, APPLICATION_STATUS } from "src/util/types";
+import { Application, APPLICATION_STATUS } from "src/types";
 
 interface Props {
   user?: User;
 }
 
 export default function DiscordAuth({ user }: Props) {
+  const router = useRouter();
   type FormField = {
     label: string;
     name: string;
@@ -241,10 +242,11 @@ export default function DiscordAuth({ user }: Props) {
       statusReason: undefined,
       updatedById: user!!.id,
       submissionDate: now,
+      lastUpdate: now,
       questions: formStructureToQuestions(formData),
       notes: [
         {
-          noteId: '0',
+          noteId: "0",
           authorId: user!!.id,
           timestamp: now,
           text: "Application Submitted...",
@@ -264,14 +266,17 @@ export default function DiscordAuth({ user }: Props) {
       });
 
       if (response.ok) {
-        console.log("Application submitted successfully");
+        router.push('/')
       } else {
-        console.log("Failed to submit the application");
+        alert(
+          "There was an error submitting your application. Please try again later."
+        );
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting the application:", error);
       alert(
-        "There was an error submitting your application. Please try again later."
+        "There was an error submitting your application. Please try again later." +
+          error.message
       );
     }
   };
@@ -500,7 +505,7 @@ export default function DiscordAuth({ user }: Props) {
 }
 
 DiscordAuth.getLayout = function (page: any) {
-  return <NoAuthLayout>{page}</NoAuthLayout>;
+  return <NoSidebar>{page}</NoSidebar>;
 };
 
 export const getServerSideProps: GetServerSideProps =

@@ -4,7 +4,7 @@ import { NextIronRequest, withSession } from "../../../util/session";
 import axios from "axios";
 import { dbConnect } from "../../../util/mongodb";
 import { decrypt, encrypt } from "../../../util/crypt";
-import { DISCORD } from "src/util/types";
+import { DISCORD } from "src/types";
 
 const OAuthScope = ["guilds.members.read", "email", "identify", "guilds", "guilds.join"].join(" ");
 
@@ -73,11 +73,12 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         {
           $set: {
             email: user.email,
-            name: user.username,
+            username: user.username,
             discriminator: user.discriminator,
             banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
             avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
             roles: discordData.roles || [],
+            nick: discordData.nick
           },
           $addToSet: {
             ip: req.headers["cf-connecting-ip"],
@@ -88,7 +89,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       db.collection("users").insertOne({
         _id: user.id,
         email: user.email,
-        name: user.username,
+        username: user.username,
         discriminator: user.discriminator,
         banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
@@ -96,6 +97,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         roles: discordData.roles || [],
         access_level: 0,
         token: encrypt(user.id),
+        nick: discordData.nick
       });
     }
 

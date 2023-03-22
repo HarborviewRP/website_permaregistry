@@ -1,7 +1,7 @@
 import { NextApiResponse } from "next";
 import { createApplication } from "src/util/database";
 import { dbConnect } from "src/util/mongodb";
-import { Application } from "src/util/types";
+import { Application } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
