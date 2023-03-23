@@ -9,7 +9,7 @@ import NoSidebar from "src/components/no-auth-layout";
 import { User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
-import { Application, APPLICATION_STATUS } from "src/types";
+import { Application, STATUS } from "src/types";
 
 interface Props {
   user?: User;
@@ -238,7 +238,7 @@ export default function DiscordAuth({ user }: Props) {
     const now = Date.now();
     const application: Application = {
       applicantId: user!!.id, // Replace this with the actual applicant ID
-      status: APPLICATION_STATUS.PENDING, // Replace with the actual status enum value
+      status: STATUS.PENDING, // Replace with the actual status enum value
       statusReason: undefined,
       updatedById: user!!.id,
       submissionDate: now,

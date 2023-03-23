@@ -7,7 +7,7 @@ interface CommentProps {
   application: Application;
 }
 
-const CommentBar: React.FC<CommentProps> = ({ application }) => {
+const CommentBox: React.FC<CommentProps> = ({ application }) => {
   const [commentUsers, setCommentUsers] = useState<Map<String, User>>();
   const [loading, setLoading] = useState<boolean>(true);
 
@@ -16,11 +16,18 @@ const CommentBar: React.FC<CommentProps> = ({ application }) => {
       if (!loading) return;
       try {
         const map = new Map<String, User>();
-        for (const note of application.notes) {
-          const author = await fetch(`/api/user/${application.applicantId}`);
-          if (author.ok) {
-            const user = await author.json();
-            map.set(note!!.authorId, user);
+        const applicantIds = application.notes.map(note => note?.authorId);
+        const usersResponse = await fetch('/api/user/bulk', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ users: applicantIds }),
+        });
+        if (usersResponse.ok) {
+          const usersArray = await usersResponse.json();
+          for (const [id, user] of usersArray) {
+            map.set(id, user);
           }
         }
         setCommentUsers(map);
@@ -32,13 +39,6 @@ const CommentBar: React.FC<CommentProps> = ({ application }) => {
     };
     getApplication();
   }, []);
-
-  function truncate(str: string, maxLength = 19) {
-    if (str.length <= maxLength) {
-      return str;
-    }
-    return str.slice(0, maxLength - 3) + "...";
-  }
 
   return (loading ? (
     <div className="p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur"><Loader center={false}/></div>
@@ -68,4 +68,4 @@ const CommentBar: React.FC<CommentProps> = ({ application }) => {
   ));
 };
 
-export default CommentBar;
+export default CommentBox;

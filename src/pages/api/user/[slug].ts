@@ -4,7 +4,7 @@ import { dbConnect } from "src/util/mongodb";
 import { NextIronRequest, withAuth, withSession } from "../../../util/session";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
-  const { db } = await dbConnect();
+  const { db, client } = await dbConnect();
   const user = req.session.get("user");
   const { slug } = req.query;
   try {
@@ -26,6 +26,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     delete newUser.email;
     delete newUser.token;
     delete newUser.ip;
+    client.close();
 
     return res.status(200).json(newUser);
   } catch (err) {

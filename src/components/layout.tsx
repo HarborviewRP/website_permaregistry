@@ -25,9 +25,13 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       title: "Applications",
     },
     {
+      href: "/interviews",
+      title: "Interviews",
+    },
+    {
       href: "/roster",
       title: "Staff Roster",
-    },
+    }
   ];
   const guestMenu = [
     {

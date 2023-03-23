@@ -49,13 +49,18 @@ export default function MainPage({ user }: Props) {
         setHasNextPage(true);
       }
       const map = new Map<String, User>();
-      for (const app of applications) {
-        if (map.has(app.applicantId)) continue;
-
-        const users = await fetch(`/api/user/${app.applicantId}`);
-        if (users.ok) {
-          const user = await users.json();
-          map.set(app!!.applicantId, user);
+      const applicantIds = applications.map(app => app.applicantId);
+      const usersResponse = await fetch('/api/user/bulk', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ users: applicantIds }),
+      });
+      if (usersResponse.ok) {
+        const usersArray = await usersResponse.json();
+        for (const [id, user] of usersArray) {
+          map.set(id, user);
         }
       }
       setUsers(map);
