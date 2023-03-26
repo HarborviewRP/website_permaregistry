@@ -12,7 +12,7 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
-  const { user } = children?.props;
+  const { user } = (children as any).props;
   const isStaff = user?.roles.includes(DISCORD.STAFF_ROLE_ID);
   const router = useRouter();
   const [ active, setActive ] = useState(false);
