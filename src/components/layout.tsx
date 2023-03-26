@@ -89,11 +89,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </ul>
           </div>
           <div>
-            <Link href="/api/auth/logout">
+          {user ? (<><Link href="/api/auth/logout">
               <button className="bg-transparent border-2 border-red-700/40 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
                 Logout
               </button>
-            </Link>
+            </Link></>) : (<><Link href="/api/auth/login">
+              <button className="px-6 py-2 text-sm justify-start items-start text-white bg-indigo-500 backdrop-blur-3xl bg-opacity-50 font-bold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
+                Login with Discord
+              </button>
+            </Link></>)}
+            
           </div>
         </nav>
       </aside>
