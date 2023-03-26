@@ -49,11 +49,11 @@ export default function MainPage({ user }: Props) {
         setHasNextPage(true);
       }
       const map = new Map<String, User>();
-      const applicantIds = applications.map(app => app.applicantId);
-      const usersResponse = await fetch('/api/user/bulk', {
-        method: 'POST',
+      const applicantIds = applications.map((app) => app.applicantId);
+      const usersResponse = await fetch("/api/user/bulk", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ users: applicantIds }),
       });
@@ -105,7 +105,7 @@ export default function MainPage({ user }: Props) {
       <div className="mx-28 my-10">
         <h1 className="text-white text-3xl">Applications</h1>
         <button onClick={toggleSortStatus} className="text-gray-400">
-          Sort by {" "}
+          Sort by{" "}
           {sortStatus === "asc" ? (
             <span className="text-green-500">pending</span>
           ) : (
@@ -134,12 +134,16 @@ export default function MainPage({ user }: Props) {
             ))}
           </div>
           <div className="mx-32 my-4 flex justify-between">
-            <button onClick={prevPage} className="text-white">
+            <button
+              onClick={prevPage}
+              className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
+              disabled={page === 1}
+            >
               Previous
             </button>
             <button
               onClick={nextPage}
-              className="text-white"
+              className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
               disabled={!hasNextPage}
             >
               Next
@@ -149,7 +153,9 @@ export default function MainPage({ user }: Props) {
       ) : (
         <>
           <div className="flex flex-wrap mx-28">
-            <h1 className="text-gray-400 text-xl font-thin">There are no applications</h1>
+            <h1 className="text-gray-400 text-xl font-thin">
+              There are no applications
+            </h1>
           </div>
         </>
       )}

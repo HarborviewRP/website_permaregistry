@@ -25,6 +25,7 @@ export default function DiscordAuth({ user }: Props) {
 
   type FormSection = {
     title: string;
+    id: string;
     fields: FormField[];
   };
 
@@ -91,6 +92,7 @@ export default function DiscordAuth({ user }: Props) {
   const formStructure: FormStructure = {
     1: {
       title: "Section 1 - Preliminary Questions",
+      id: "section1",
       fields: [
         {
           label: "Age",
@@ -112,6 +114,7 @@ export default function DiscordAuth({ user }: Props) {
     },
     2: {
       title: "Section 2 - Scenario Questions",
+      id: "section2",
       fields: [
         {
           label: "How would you deal with someone VDMing people on the server?",
@@ -146,6 +149,7 @@ export default function DiscordAuth({ user }: Props) {
     },
     3: {
       title: "Section 3 - Roleplay Knowledge",
+      id: "section3",
       fields: [
         {
           label:
@@ -181,6 +185,7 @@ export default function DiscordAuth({ user }: Props) {
     },
     4: {
       title: "Section 4 - Acknowledgements",
+      id: "section4",
       fields: [
         {
           label:
@@ -237,13 +242,13 @@ export default function DiscordAuth({ user }: Props) {
     // Convert form data to the Application structure
     const now = Date.now();
     const application: Application = {
-      applicantId: user!!.id, // Replace this with the actual applicant ID
-      status: STATUS.PENDING, // Replace with the actual status enum value
+      applicantId: user!!.id,
+      status: STATUS.PENDING,
       statusReason: undefined,
       updatedById: user!!.id,
       submissionDate: now,
       lastUpdate: now,
-      questions: formStructureToQuestions(formData),
+      sections: formStructureToQuestions(formData),
       notes: [
         {
           noteId: "0",
@@ -266,7 +271,7 @@ export default function DiscordAuth({ user }: Props) {
       });
 
       if (response.ok) {
-        router.push(`/applications/${(await response.json()).application._id}`)
+        router.push(`/applications/${(await response.json()).application._id}`);
       } else {
         alert(
           "There was an error submitting your application. Please try again later."
@@ -284,14 +289,19 @@ export default function DiscordAuth({ user }: Props) {
   const formStructureToQuestions = (
     formData: FormFields
   ): {
-    questionId: string;
-    questionText: string;
-    responseType: string;
-    choices: [{ choiceId: string; choiceText: string }] | undefined;
-    response: { value: string; choiceId: string | undefined };
+    sectionId: string;
+    sectionText: string;
+    questions: {
+      questionId: string;
+      questionText: string;
+      responseType: string;
+      choices: [{ choiceId: string; choiceText: string }] | undefined;
+      response: { value: string; choiceId: string | undefined };
+    }[];
   }[] => {
-    const questions = [];
+    const sections = [];
     for (const section of Object.values(formStructure)) {
+      const questions = [];
       for (const field of section.fields) {
         questions.push({
           questionId: field.name,
@@ -304,8 +314,13 @@ export default function DiscordAuth({ user }: Props) {
           },
         });
       }
+      sections.push({
+        sectionId: section.id,
+        sectionText: section.title,
+        questions: questions,
+      });
     }
-    return questions;
+    return sections;
   };
 
   const nextStep = () => {
@@ -339,15 +354,17 @@ export default function DiscordAuth({ user }: Props) {
     }
 
     return (
-      <div
-        key={step}
-        className="mb-5 bg-slate-900 backdrop-blur-3xl bg-opacity-50 p-4 rounded space-y-4"
-      >
-        <h2 className="text-white text-xl font-bold mb-4">{section.title}</h2>
+      <div key={step} className="p-4 items-center w-full rounded space-y-4">
+        <h2 className="text-white text-xl font-bold  bg-slate-900 backdrop-blur-3xl bg-opacity-50 p-5 rounded">
+          {section.title}
+        </h2>
 
         <div>
           {section.fields.map((field) => (
-            <div key={field.name} className="mb-4">
+            <div
+              key={field.name}
+              className="mb-4 bg-slate-900 backdrop-blur-3xl bg-opacity-50 p-5 rounded-xl"
+            >
               <label htmlFor={field.name} className="text-white">
                 {field.label}
               </label>
@@ -358,7 +375,8 @@ export default function DiscordAuth({ user }: Props) {
                   value={(formData as any)[field.name]}
                   onChange={handleChange}
                   onBlur={handleValidation}
-                  className={`w-full p-2 mt-2 bg-slate-700 text-white bg-opacity-50 rounded ${
+                  placeholder="Your response.."
+                  className={`w-full p-2 mt-2 bg-slate-700 text-white bg-opacity-0 rounded ${
                     !(validationStatus as any)[field.name]
                       ? "border-red-500"
                       : ""
@@ -389,7 +407,8 @@ export default function DiscordAuth({ user }: Props) {
                   value={(formData as any)[field.name]}
                   onChange={handleChange}
                   onBlur={handleValidation}
-                  className={`flex flex-column w-12 p-2 mt-2 bg-slate-700 text-white bg-opacity-50 rounded ${
+                  placeholder="Your response.."
+                  className={`flex flex-column p-2 mt-2 bg-slate-700 text-white bg-opacity-0 rounded ${
                     !(validationStatus as any)[field.name]
                       ? "border-red-500"
                       : ""
@@ -408,7 +427,7 @@ export default function DiscordAuth({ user }: Props) {
     <>
       {!user && (
         <div className="w-screen h-screen flex justify-center items-center">
-          <div className="p-6 max-w-sm mx-auto bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md items-center space-x-1 backdrop-blur">
+          <div className="p-6 max-w-sm bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md items-center space-x-1 backdrop-blur">
             <div className="flex-shrink-0 flex justify-center items-center">
               <Image
                 src={`https://brandlogos.net/wp-content/uploads/2021/11/discord-logo.png`}
@@ -453,49 +472,53 @@ export default function DiscordAuth({ user }: Props) {
               <div className="w-full bg-slate-900 backdrop-blur-3xl bg-opacity-50"></div>
             </div>
           </div>
-          <div className="flex justify-center items-center p-20">
-            <div className="w-3/4 mx-auto rounded-xl space-y-6">
-              <h1 className="text-white text-2xl font-bold mb-6">
-                Staff Application
-              </h1>
-              <form onSubmit={handleSubmit}>
-                {renderStep(currentStep)}
-                <div className="flex justify-between">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    disabled={currentStep === 1}
-                    className={`py-2 px-4 rounded text-white ${
-                      currentStep === 1
-                        ? "bg-slate-700 text-gray-500"
-                        : "bg-slate-500 hover:bg-slate-400"
-                    }`}
-                  >
-                    Previous Page
-                  </button>
-                  {currentStep === 4 ? (
-                    <button
-                      type="submit"
-                      className="py-2 px-4 bg-green-500 hover:bg-green-400 text-white rounded"
-                    >
-                      Submit Application
-                    </button>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={nextStep}
-                      disabled={hasValidationErrors()}
-                      className={`py-2 px-4 bg-slate-500 ${
-                        hasValidationErrors()
-                          ? "bg-opacity-50 bg-slate-700 cursor-not-allowed text-gray-500"
-                          : "hover:bg-slate-400"
-                      } text-white rounded`}
-                    >
-                      Next Page
-                    </button>
-                  )}
-                </div>
-              </form>
+          <div className="flex flex-col items-center p-20">
+            <div className="w-2/5 items-center rounded-xl space-y-6">
+              <div className="flex flex-col items-center w-full">
+                <h1 className="text-white text-2xl font-bold mb-6">
+                  PGN: Underground - Staff Application
+                </h1>
+                <form onSubmit={handleSubmit}>
+                  <div className="flex flex-col items-center w-full">
+                    {renderStep(currentStep)}
+                    <div className="flex items-center justify-between w-full">
+                      <button
+                        type="button"
+                        onClick={prevStep}
+                        disabled={currentStep === 1}
+                        className={`py-2 px-4 rounded text-white ${
+                          currentStep === 1
+                            ? "bg-slate-700 text-gray-500"
+                            : "bg-slate-500 hover:bg-slate-400"
+                        }`}
+                      >
+                        Previous Page
+                      </button>
+                      {currentStep === 4 ? (
+                        <button
+                          type="submit"
+                          className="py-2 px-4 bg-green-500 hover:bg-green-400 text-white rounded"
+                        >
+                          Submit Application
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={nextStep}
+                          disabled={hasValidationErrors()}
+                          className={`py-2 px-4 bg-blue-500 ${
+                            hasValidationErrors()
+                              ? "bg-opacity-50 cursor-not-allowed text-gray-500"
+                              : "hover:bg-blue-400"
+                          } text-white rounded`}
+                        >
+                          Next Page
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         </>

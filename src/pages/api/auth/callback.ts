@@ -5,6 +5,7 @@ import axios from "axios";
 import { dbConnect } from "../../../util/mongodb";
 import { decrypt, encrypt } from "../../../util/crypt";
 import { DISCORD } from "src/types";
+import { getUser } from "src/util/database";
 
 const OAuthScope = ["guilds.members.read", "email", "identify", "guilds", "guilds.join"].join(" ");
 
@@ -67,8 +68,10 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       .collection("users")
       .countDocuments({ _id: user.id });
 
+    let accessLevel = 0;
+
     if (exists) {
-      db.collection("users").updateOne(
+      const user2 = await db.collection("users").updateOne(
         { _id: user.id },
         {
           $set: {
@@ -85,6 +88,8 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
           },
         }
       );
+
+      accessLevel = (await getUser(user.id))!!.access_level;
     } else {
       db.collection("users").insertOne({
         _id: user.id,
@@ -119,6 +124,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       ...user,
       roles: discordData.roles || [],
       token: encrypt(user.id),
+      access_level: accessLevel,
       banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
       avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
     });

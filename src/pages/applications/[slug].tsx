@@ -10,10 +10,18 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import CommentBox from "src/components/application/CommentBox";
 import Loader from "src/components/Loader";
-import { Application, convertStatus, DISCORD, User } from "src/types";
+import {
+  Application,
+  convertStatus,
+  DISCORD,
+  Interview,
+  STATUS,
+  User,
+} from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import { useRef } from "react";
+import Link from "next/link";
 
 interface Props {
   user?: User;
@@ -22,6 +30,7 @@ interface Props {
 export default function MainPage({ user }: Props) {
   const router = useRouter();
   const [application, setApplication] = useState<Application | null>(null);
+  const [interview, setInterview] = useState<Interview | null>(null);
   const [applicationExists, setApplicationExists] = useState<boolean>(false);
   const [applicant, setApplicant] = useState<User | null>(null);
   const [applicantExists, setApplicantExists] = useState<boolean>(false);
@@ -82,6 +91,15 @@ export default function MainPage({ user }: Props) {
           const application: Application = await res.json();
           setApplication(application);
           setApplicationExists(true);
+
+          const checkInterviewExists = await fetch(
+            `/api/interview/${application.interviewId}`
+          );
+
+          if (checkInterviewExists.ok) {
+            setInterview(await checkInterviewExists.json());
+          }
+
           const checkUserExists = await fetch(
             `/api/user/${application.applicantId}`
           );
@@ -114,7 +132,7 @@ export default function MainPage({ user }: Props) {
     event.preventDefault();
 
     const now = Date.now();
-    const applicationForm: Partial<Application> = {
+    let applicationForm: Partial<Application> = {
       lastUpdate: now,
       updatedById: (user as any)._id,
       status: formData.status,
@@ -123,6 +141,44 @@ export default function MainPage({ user }: Props) {
     };
 
     try {
+      if (formData.status === STATUS.ACCEPTED && !application?.interviewId) {
+        const interview: Interview = {
+          applicationId: (application as any).id,
+          applicantId: application!!.applicantId,
+          creationDate: Date.now(),
+          status: STATUS.PENDING,
+          updatedById: (user as any).id,
+          lastUpdate: Date.now(),
+          claimedById: undefined,
+          reason: undefined,
+          notes: [
+            {
+              noteId: "0",
+              authorId: user!!.id,
+              timestamp: now,
+              text: "Interview created...",
+            },
+          ],
+          recording_path: undefined,
+        };
+
+        const res = await fetch("/api/interview/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(interview),
+        });
+
+        if (res.ok) {
+          const response = await res.json();
+          applicationForm = {
+            ...applicationForm,
+            interviewId: response.interview._id,
+          };
+        }
+      }
+
       const response = await fetch("/api/application/update", {
         method: "POST",
         headers: {
@@ -141,12 +197,8 @@ export default function MainPage({ user }: Props) {
           "There was an error updating this application. Please try again later."
         );
       }
-    } catch (error: any) {
-      console.error("Error updating the application:", error);
-      alert(
-        "There was an error updating this application. Please try again later." +
-          error.message
-      );
+    } catch (error) {
+      console.error("An error occurred:", error);
     }
   };
 
@@ -226,7 +278,7 @@ export default function MainPage({ user }: Props) {
           {isStaff && (
             <div className="fixed right-0 m-20 max-w-4xl w-96">
               <h1 className="text-white text-xl font-semibold">Comments</h1>
-              <CommentBox application={application!!} />
+              <CommentBox obj={application!!} />
             </div>
           )}
           <div className="flex flex-row">
@@ -254,13 +306,14 @@ export default function MainPage({ user }: Props) {
               ({(applicant as any)._id})
             </p>
             <p className="text-white font-semibold italic px-2">
-              Age: {application?.questions[0]?.response?.value || 0}
+              Age:{" "}
+              {application?.sections[0]?.questions[0]?.response?.value || 0}
             </p>
             <p className="text-white font-semibold italic px-2">
               {applicant?.email}
             </p>
             <p className="text-white font-thin px-2">
-              <span className="font-semibold">Submitted:{" "}</span>
+              <span className="font-semibold">Submitted: </span>
               {moment
                 .unix(application!!.submissionDate / 1e3)
                 .format("MMMM Do YYYY, h:mm:ss A")}
@@ -280,6 +333,23 @@ export default function MainPage({ user }: Props) {
                       .format("MMMM Do YYYY, h:mm:ss A")}
                   </h1>
                 </>
+              )}
+              {interview && (
+                    <p className="text-gray-400 font-thin">
+                    Interview:{" "}
+                    <Link
+                      className={`${
+                        interview?.status === 0
+                          ? "text-gray-400"
+                          : interview?.status === 1
+                          ? "text-green-500"
+                          : "text-red-500"
+                      } font-thin`}
+                      href={`/interviews/${(interview as any)._id}`}
+                    >
+                      {convertStatus((interview as any)?.status)}
+                    </Link>
+                  </p>
               )}
             </div>
             {isStaff && (
@@ -305,111 +375,28 @@ export default function MainPage({ user }: Props) {
             </>
           )}
           <div className="flex flex-col">
-            <h1 className="text-white font-semibold text-xl pt-6">
-              General Questions
-            </h1>
-            <div className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-              <h1 className="text-white font-semibold text-sm">
-                {application?.questions[1]?.questionText}
-              </h1>
-              <p className="text-gray-400 font-thin text-sm">
-                {application?.questions[1]?.response?.value}
-              </p>
-            </div>
-            <div className="p-6 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-              <h1 className="text-white font-semibold text-sm">
-                {application?.questions[2]?.questionText}
-              </h1>
-              <p className="text-gray-400 font-thin text-sm">
-                {application?.questions[2]?.response?.value}
-              </p>
-            </div>
-            <h1 className="text-white font-semibold text-xl pt-6">
-              Scenario Questions
-            </h1>
-            <div className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-              <h1 className="text-white font-semibold text-sm">
-                {application?.questions[3]?.questionText}
-              </h1>
-              <p className="text-gray-400 font-thin text-sm">
-                {application?.questions[3]?.response?.value}
-              </p>
-            </div>
-            <div className="p-6 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-              <h1 className="text-white font-semibold text-sm">
-                {application?.questions[4]?.questionText}
-              </h1>
-              <p className="text-gray-400 font-thin text-sm">
-                {application?.questions[4]?.response?.value}
-              </p>
-            </div>
-            <div className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-              <h1 className="text-white font-semibold text-sm">
-                {application?.questions[5]?.questionText}
-              </h1>
-              <p className="text-gray-400 font-thin text-sm">
-                {application?.questions[5]?.response?.value}
-              </p>
-            </div>
-            <div className="p-6 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-              <h1 className="text-white font-semibold text-sm">
-                {application?.questions[6]?.questionText}
-              </h1>
-              <p className="text-gray-400 font-thin text-sm">
-                {application?.questions[6]?.response?.value}
-              </p>
-            </div>
-            <div className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-              <h1 className="text-white font-semibold text-sm">
-                {application?.questions[7]?.questionText}
-              </h1>
-              <p className="text-gray-400 font-thin text-sm">
-                {application?.questions[7]?.response?.value}
-              </p>
-            </div>
-          </div>
-          <h1 className="text-white font-semibold text-xl pt-6">
-            Roeplay Knowledge Questions
-          </h1>
-          <div className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-            <h1 className="text-white font-semibold text-sm">
-              {application?.questions[8]?.questionText}
-            </h1>
-            <p className="text-gray-400 font-thin text-sm">
-              {application?.questions[8]?.response?.value}
-            </p>
-          </div>
-          <div className="p-6 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-            <h1 className="text-white font-semibold text-sm">
-              {application?.questions[9]?.questionText}
-            </h1>
-            <p className="text-gray-400 font-thin text-sm">
-              {application?.questions[9]?.response?.value}
-            </p>
-          </div>
-          <div className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-            <h1 className="text-white font-semibold text-sm">
-              {application?.questions[10]?.questionText}
-            </h1>
-            <p className="text-gray-400 font-thin text-sm">
-              {application?.questions[10]?.response?.value}
-            </p>
-          </div>
-          <div className="p-6 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-            <h1 className="text-white font-semibold text-sm">
-              {application?.questions[11]?.questionText}
-            </h1>
-            <p className="text-gray-400 font-thin text-sm">
-              {application?.questions[11]?.response?.value}
-            </p>
-          </div>
-          <div className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-            <h1 className="text-white font-semibold text-sm">
-              {application?.questions[12]?.questionText}
-            </h1>
-            <p className="text-gray-400 font-thin text-sm">
-              {application?.questions[12]?.response?.value}
-            </p>
+            {application?.sections.map((section) => (
+              <div key={section.sectionId}>
+                <h1 className="text-white font-semibold text-xl pt-6">
+                  {section.sectionText}
+                </h1>
+                {section.questions
+                  .filter((question: any) => question.questionId !== "age")
+                  .map((question) => (
+                    <div
+                      key={question.questionId}
+                      className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur"
+                    >
+                      <h1 className="text-white font-semibold text-sm">
+                        {question.questionText}
+                      </h1>
+                      <p className="text-gray-400 font-thin text-sm">
+                        {question.response?.value}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+            ))}
           </div>
         </div>
       ) : (

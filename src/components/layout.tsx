@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { DISCORD, User } from "src/types";
 import type { Session } from "next-iron-session";
+import { useState } from "react";
 
 interface LayoutProps {
   user: User | null;
@@ -14,6 +15,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user } = children?.props;
   const isStaff = user?.roles.includes(DISCORD.STAFF_ROLE_ID);
   const router = useRouter();
+  const [ active, setActive ] = useState(false);
 
   const menuItems = [
     {
@@ -70,10 +72,14 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <ul>
               <>
                 {(isStaff ? menuItems : guestMenu).map(({ href, title }) => (
-                  <li className=" py-3 mb-4 text-left" key={title}>
+                  <li className="text-left flex flex-col items-center" key={title}>
                     <Link
                       href={href}
-                      className="pl-10 pr-10 rounded hover:backdrop-blur-3xl hover:bg-opacity-50 cursor-pointer text-white"
+                      className={`text-center p-3 w-full rounded-xl hover:backdrop-blur-3xl hover:bg-opacity-50 hover:text-gray-500 ${
+                        router.pathname === href
+                          ? "bg-slate-500/25 backdrop-blur-3xl"
+                          : "hover:backdrop-blur-3xl hover:bg-opacity-50 hover:text-gray-500"
+                      }  cursor-pointer text-white`}
                     >
                       {title}
                     </Link>

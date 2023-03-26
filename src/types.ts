@@ -65,22 +65,26 @@ export interface Application {
   updatedById: string;
   submissionDate: number;
   lastUpdate: number;
-  questions: {
-    questionId: string;
-    questionText: string;
-    responseType: string;
-    choices:
-      | [
-          {
-            choiceId: string;
-            choiceText: string;
-          }
-        ]
-      | undefined;
-    response: {
-      value: string;
-      choiceId: string | undefined;
-    };
+  sections: {
+    sectionId: string;
+    sectionText: string;
+    questions: {
+      questionId: string;
+      questionText: string;
+      responseType: string;
+      choices:
+        | [
+            {
+              choiceId: string;
+              choiceText: string;
+            }
+          ]
+        | undefined;
+      response: {
+        value: string;
+        choiceId: string | undefined;
+      };
+    }[];
   }[];
   notes: [
     | {
@@ -96,20 +100,19 @@ export interface Application {
 
 export interface Interview {
   applicationId: string;
+  applicantId: string;
+  claimedById: string | undefined;
   creationDate: number;
   status: STATUS;
   reason: string | undefined;
   updatedById: string;
   lastUpdate: number;
-  notes: [
-    | {
-        noteId: string;
-        authorId: string;
-        timestamp: number;
-        text: string;
-      }
-    | undefined
-  ];
+  notes: Array<{
+    noteId: string;
+    authorId: string;
+    timestamp: number;
+    text: string;
+  }>;
   recording_path: string | undefined;
 }
 
