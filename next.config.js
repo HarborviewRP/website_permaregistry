@@ -10,7 +10,4 @@ module.exports = {
       "static.tvtropes.org",
     ],
   },
-  experimental: {
-    runtime: "experimental-edge",
-  },
 };
