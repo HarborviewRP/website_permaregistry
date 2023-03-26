@@ -5,9 +5,9 @@ import '../styles/globals.css'
 
 export default function App({ Component, pageProps }: AppProps) {
   const renderWithLayout = 
-    Component.getLayout ||
+    (Component as any).getLayout ||
     function(page: any) {
-      return <Layout>{page}</Layout>
+      return <Layout user={null}>{page}</Layout>
     }
     return renderWithLayout(<Component {...pageProps} />);
   // return (
