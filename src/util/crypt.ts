@@ -1,8 +1,6 @@
 import { Cipher, createCipheriv, createDecipheriv, Encoding } from "crypto";
 
-const [key, initVector] = JSON.parse(process.env.CRYPT_KEYS!).map(
-	(key: string) => Buffer.from(key, "base64")
-);
+const [key, initVector] = [Buffer.from(process.env.CRYPT_KEY!, "base64"), Buffer.from(process.env.CRYPT_INIT!, "base64")];
 
 function crypt(
 	cipher: Cipher,
