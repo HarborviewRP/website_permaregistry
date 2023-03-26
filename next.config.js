@@ -11,6 +11,6 @@ module.exports = {
     ],
   },
   experimental: {
-    runtime: "edge",
+    runtime: "experimental-edge",
   },
 };
