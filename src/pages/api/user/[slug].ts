@@ -1,6 +1,7 @@
 import { NextApiResponse } from "next";
 import { DISCORD } from "src/types";
 import { dbConnect } from "src/util/mongodb";
+import { isStaff } from "src/util/permission";
 import { NextIronRequest, withAuth, withSession } from "../../../util/session";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
@@ -18,7 +19,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
 
     if (
       user.id === newUser?._id ||
-      user.roles.includes(DISCORD.STAFF_ROLE_ID)
+      isStaff(user)
     ) {
       return res.status(200).json(newUser);
     }

@@ -17,6 +17,7 @@ import moment from "moment";
 import Link from "next/link";
 import { Menu } from "@headlessui/react";
 import AudioPlayer from "src/components/AudioPlayer";
+import { isAdmin, isStaff as isStaffUtil } from "src/util/permission";
 
 interface Props {
   user?: User;
@@ -69,7 +70,7 @@ export default function Home({ user }: Props) {
           );
           if (checkUserExists.ok) {
             const user = await checkUserExists.json();
-            if (user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+            if (isStaffUtil(user!)) {
               setIsStaff(true);
             }
             setApplicant(user);
@@ -196,7 +197,7 @@ export default function Home({ user }: Props) {
           <>
             {((interview.claimedById === (user as any).id &&
               interview.status === 0) ||
-              user!!.access_level > 0) && (
+              isAdmin(user!!)) && (
               <>
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-row justify-between w-40 mb-6 mt-3">

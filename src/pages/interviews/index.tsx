@@ -10,6 +10,8 @@ import Loader from "src/components/Loader";
 import { Application, DISCORD, Interview, User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
+import { isStaff as isStaffUtil } from "src/util/permission";
+
 
 interface Props {
   user?: User;
@@ -27,7 +29,7 @@ export default function MainPage({ user }: Props) {
 
   useEffect(() => {
     if (!user) router.push("/");
-    if (!user?.roles.includes(DISCORD.STAFF_ROLE_ID)) router.push("/");
+    if (!isStaffUtil(user!!)) router.push("/");
   });
 
   const fetchApplications = useCallback(async () => {

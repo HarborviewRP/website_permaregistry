@@ -9,6 +9,7 @@ import moment from "moment";
 import fs from "fs";
 import path from "path";
 import { randomUUID } from "crypto";
+import { isStaff } from "src/util/permission";
 
 interface ExtendedNextApiRequest extends NextApiRequest {
   file: {
@@ -61,7 +62,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       fs.mkdirSync(uploadPath);
     }
     const user = req.session.get("user");
-    if (!user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+    if (!isStaff(user)) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 

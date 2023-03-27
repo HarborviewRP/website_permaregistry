@@ -5,6 +5,7 @@ import { Application } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { ObjectID } from "bson";
 
+// TODO: Check if user has rejected or pending application in the last 14 days
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     if (req.method === 'POST') {
     const application: Application = {

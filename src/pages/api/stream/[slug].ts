@@ -3,13 +3,14 @@ import path from "path";
 import fs from "fs";
 import { NextIronRequest, withAuth } from "src/util/session";
 import { DISCORD } from "src/types";
+import { isStaff } from "src/util/permission";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   const { slug } = req.query
   const filePath = path.join(process.cwd(), "uploads", slug as string);
   
   const user = req.session.get("user");
-  if (!user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+  if (!isStaff(user)) {
     return res.status(403).json({ message: "Unauthorized" });
   }
 

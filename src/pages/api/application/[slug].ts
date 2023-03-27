@@ -2,6 +2,7 @@ import { DISCORD } from "src/types";
 import { getApplicationById } from "./../../../util/database";
 import { NextApiResponse } from "next";
 import { NextIronRequest, withAuth, withSession } from "../../../util/session";
+import { isStaff } from "src/util/permission";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   const { slug } = req.query;
@@ -14,10 +15,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       .json({ message: `No application with ID ${slug} found...` });
   }
 
-  if (
-    application.applicantId === user.id ||
-    user.roles.includes(DISCORD.STAFF_ROLE_ID)
-  ) {
+  if (application.applicantId === user.id || isStaff(user)) {
     return res.status(200).json(application);
   }
 

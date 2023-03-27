@@ -3,6 +3,7 @@ import { updateApplication, updateInterview } from "src/util/database";
 import { dbConnect } from "src/util/mongodb";
 import { DISCORD, Interview } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
+import { isStaff } from "src/util/permission";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -10,7 +11,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     const interviewId: string = req.body.interviewId;
     const user = req.session.get("user");
 
-    if (!user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+    if (!isStaff(user)) {
       return res
         .status(403)
         .json({ message: `You are unable to modify this interview...` });

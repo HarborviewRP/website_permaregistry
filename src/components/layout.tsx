@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { DISCORD, User } from "src/types";
 import type { Session } from "next-iron-session";
 import { useState } from "react";
+import { isStaff as isStaffUtil } from "src/util/permission";
 
 interface LayoutProps {
   user: User | null;
@@ -13,7 +14,7 @@ interface LayoutProps {
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user } = (children as any).props;
-  const isStaff = user?.roles.includes(DISCORD.STAFF_ROLE_ID);
+  const isStaff = isStaffUtil(user!);
   const router = useRouter();
   const [ active, setActive ] = useState(false);
 

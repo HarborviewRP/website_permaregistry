@@ -3,6 +3,7 @@ import { NextApiResponse } from "next";
 import { createInterview } from "src/util/database";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { ObjectID } from "bson";
+import { isStaff } from "src/util/permission";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -11,7 +12,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       _id: new ObjectID().toString(),
     };
     const user = req.session.get("user");
-    if (!user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+    if (!isStaff(user)) {
       return res.status(403).json({ message: "Unauthorized" });
     }
     try {

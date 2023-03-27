@@ -7,6 +7,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ApplicationBar from "src/components/application/ApplicationBar";
 import Loader from "src/components/Loader";
 import { Application, DISCORD, User } from "src/types";
+import { isStaff } from "src/util/permission";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 
@@ -26,7 +27,7 @@ export default function MainPage({ user }: Props) {
 
   useEffect(() => {
     if (!user) router.push("/");
-    if (!user?.roles.includes(DISCORD.STAFF_ROLE_ID)) router.push("/");
+    if (!isStaff(user!!)) router.push("/");
   });
 
   const fetchApplications = useCallback(async () => {

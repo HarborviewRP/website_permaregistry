@@ -1,9 +1,8 @@
 import { NextApiResponse } from "next";
-import { dbConnect } from "src/util/mongodb";
 import { NextIronRequest, withAuth, withSession } from "../../../util/session";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
-    res.json({message: "Hello s"})
+    res.json({message: "Feature not implemented..."})
 };
 
 export default withAuth(handler);

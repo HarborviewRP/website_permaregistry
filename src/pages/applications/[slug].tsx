@@ -22,7 +22,7 @@ import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import { useRef } from "react";
 import Link from "next/link";
-
+import { isAdmin, isStaff as isStaffUtil } from "src/util/permission";
 interface Props {
   user?: User;
 }
@@ -105,7 +105,7 @@ export default function MainPage({ user }: Props) {
           );
           if (checkUserExists.ok) {
             const user = await checkUserExists.json();
-            if (user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+            if (isStaffUtil(user)) {
               setIsStaff(true);
             }
             setApplicant(user);
@@ -357,7 +357,7 @@ export default function MainPage({ user }: Props) {
                 <div className="flex flex-col">
                   {application!!.status === 0
                     ? staffElement
-                    : user!!.access_level > 0 && staffElement}
+                    : isAdmin(user!!) && staffElement}
                 </div>
               </>
             )}

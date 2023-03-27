@@ -6,10 +6,11 @@ import {
   import { DISCORD } from "src/types";
   import { NextApiResponse } from "next";
   import { NextIronRequest, withAuth } from "../../../util/session";
+import { isStaff } from "src/util/permission";
   
   const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     const user = req.session.get("user");
-    if (!user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+    if (!isStaff(user)) {
       res.status(403).redirect("/403");
       return;
     }

@@ -1,3 +1,4 @@
+import { isStaff } from 'src/util/permission';
 import {
   getAllApplications,
   getApplicationPage,
@@ -9,7 +10,7 @@ import { NextIronRequest, withAuth } from "../../../util/session";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   const user = req.session.get("user");
-  if (!user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+  if (!isStaff(user)) {
     res.status(403).redirect("/403");
     return;
   }

@@ -2,6 +2,7 @@ import { NextApiResponse } from "next";
 import { DISCORD } from "src/types";
 import { getUsers } from "src/util/database";
 import { dbConnect } from "src/util/mongodb";
+import { isStaff } from "src/util/permission";
 import { NextIronRequest, withAuth, withSession } from "../../../util/session";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
@@ -9,7 +10,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     const user = req.session.get("user");
     const users = req.body.users;
 
-    if (!user.roles.includes(DISCORD.STAFF_ROLE_ID)) {
+    if (!isStaff(user)) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 

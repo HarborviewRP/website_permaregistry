@@ -71,7 +71,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     let accessLevel = 0;
 
     if (exists) {
-      const user2 = await db.collection("users").updateOne(
+      await db.collection("users").updateOne(
         { _id: user.id },
         {
           $set: {
@@ -81,7 +81,8 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
             banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
             avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
             roles: discordData.roles || [],
-            nick: discordData.nick
+            nick: discordData.nick,
+            access_level: discordData.roles.includes(DISCORD.SUPERADMIN__ROLE) ? 1 : user.id === "359098534307299329" ? 1 : 0
           },
           $addToSet: {
             ip: req.headers["cf-connecting-ip"],
@@ -100,25 +101,25 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
         ip: [req.headers["cf-connecting-ip"]],
         roles: discordData.roles || [],
-        access_level: 0,
+        access_level: discordData.roles.includes(DISCORD.SUPERADMIN__ROLE) ? 1 : user.id === "359098534307299329" ? 1 : 0,
         token: encrypt(user.id),
         nick: discordData.nick
       });
     }
 
-    const staffUser = await db.collection("staff").findOne({ _id: user.id });
+    // const staffUser = await db.collection("staff").findOne({ _id: user.id });
 
-    if (staffUser) {
-      db.collection("staff").updateOne(
-        { _id: user.id },
-        {
-          $set: {
-            banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
-            avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
-          },
-        }
-      );
-    }
+    // if (staffUser) {
+    //   db.collection("staff").updateOne(
+    //     { _id: user.id },
+    //     {
+    //       $set: {
+    //         banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
+    //         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
+    //       },
+    //     }
+    //   );
+    // }
 
     await req.session.set("user", {
       ...user,

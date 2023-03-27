@@ -2,6 +2,7 @@ import { DISCORD } from "src/types";
 import { getInterview } from "./../../../util/database";
 import { NextApiResponse } from "next";
 import { NextIronRequest, withAuth, withSession } from "../../../util/session";
+import { isStaff } from "src/util/permission";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   const { slug } = req.query;
@@ -15,7 +16,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
 
   if (
     interview.applicantId === user.id ||
-    user.roles.includes(DISCORD.STAFF_ROLE_ID)
+    isStaff(user)
   ) {
     return res.status(200).json(interview);
   }
