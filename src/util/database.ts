@@ -35,6 +35,33 @@ export const getAllApplications = async () => {
   return res;
 };
 
+export const getUserApplicationsInRange = async (userId: string, startDate: Date, endDate: Date) => {
+  const applicationCollection = await getApplicationCollection();
+  try {
+    const res = await applicationCollection.collection.find({
+      userId: userId,
+      submissionDate: { $gte: startDate, $lte: endDate },
+    }).toArray();
+
+    return res;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const getApplicationsInRange = async (startDate: Date, endDate: Date) => {
+  const applicationCollection = await getApplicationCollection();
+  try {
+    const res = await applicationCollection.collection.find({
+      submissionDate: { $gte: startDate, $lte: endDate },
+    }).toArray();
+
+    return res;
+  } catch (err) {
+    return null;
+  }
+};
+
 export const getApplicationPage = async (page: number, pageLength: number) => {
   const applicationCollection = await getApplicationCollection();
   const skipCount = (page - 1) * pageLength;

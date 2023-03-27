@@ -70,6 +70,7 @@ export default function DiscordAuth({ user }: Props) {
     agreement2: false,
     acknowledgement: "",
   });
+  const [statusMessage, setStatusMessage] = useState<String | null>(null);
 
   const [validationStatus, setValidationStatus] = useState<
     Partial<Record<keyof FormFields, boolean>>
@@ -210,13 +211,10 @@ export default function DiscordAuth({ user }: Props) {
 
   const [currentStep, setCurrentStep] = useState(1);
 
-  const handleChange = (
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (event: any) => {
     const { name, value } = event.target;
-    setFormData((prevState) =>
-      setPropertySafe(prevState, name as keyof FormFields, value)
-    );
+    setFormData((prevState) => ({ ...prevState, [name]: value }));
+    handleValidation(event); // Call handleValidation function here
   };
 
   const handleValidation = (event: any) => {
@@ -235,7 +233,9 @@ export default function DiscordAuth({ user }: Props) {
 
     // Check for any validation errors
     if (hasValidationErrors()) {
-      alert("Please fix any validation errors before submitting the form.");
+      setStatusMessage(
+        "Please fix any validation errors before submitting the form."
+      );
       return;
     }
 
@@ -273,13 +273,11 @@ export default function DiscordAuth({ user }: Props) {
       if (response.ok) {
         router.push(`/applications/${(await response.json()).application._id}`);
       } else {
-        alert(
-          "There was an error submitting your application. Please try again later."
-        );
+        setStatusMessage((await response.json()).message);
       }
     } catch (error: any) {
       console.error("Error submitting the application:", error);
-      alert(
+      setStatusMessage(
         "There was an error submitting your application. Please try again later." +
           error.message
       );
@@ -332,8 +330,8 @@ export default function DiscordAuth({ user }: Props) {
   };
 
   const validateField = (name: any, value: any) => {
-    if (name === "age") {
-      return value !== "";
+    if (value.trim() === "") {
+      return false;
     }
     // Add more field validation cases here as needed
     return true;
@@ -478,6 +476,13 @@ export default function DiscordAuth({ user }: Props) {
                 <h1 className="text-white text-2xl font-bold mb-6">
                   PGN: Underground - Staff Application
                 </h1>
+                {statusMessage ? (
+                  <p className="text-sm text-red-500 font-thin">
+                    {statusMessage}
+                  </p>
+                ) : (
+                  <></>
+                )}
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-col items-center w-full">
                     {renderStep(currentStep)}
