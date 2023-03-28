@@ -53,7 +53,7 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
     event.preventDefault();
 
     const now = Date.now();
-    let applicationForm: Partial<Application | Interview> = {
+    let postForm: Partial<Application | Interview> = {
       lastUpdate: now,
       updatedById: author.id,
       notes:
@@ -71,13 +71,16 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
     };
 
     try {
-      const response = await fetch("/api/application/update", {
+      const response = await fetch(`/api/${obj.applicationId ? 'interview' : 'application' }/update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          application: applicationForm,
+        body: JSON.stringify(obj.applicationId ? {
+          interview: postForm,
+          interviewId: (obj as any)._id,
+        } : {
+          application: postForm,
           applicationId: (obj as any)._id,
         }),
       });
@@ -86,7 +89,7 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
         router.reload();
       } else {
         alert(
-          "There was an error updating this application. Please try again later."
+          "There was an error updating this interview. Please try again later."
         );
       }
     } catch (error) {
@@ -100,7 +103,7 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
     </div>
   ) : (
     <>
-      <div className="scrollable-container flex-col-reverse justify-end overflow-auto p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md backdrop-blur">
+      <div className="scrollable-container flex flex-col justify-end overflow-auto p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md backdrop-blur">
         {text && (
           <h1 className="text-white font-semibold">{text}</h1>
         )}

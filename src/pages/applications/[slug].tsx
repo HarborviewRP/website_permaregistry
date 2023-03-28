@@ -143,7 +143,7 @@ export default function MainPage({ user }: Props) {
     try {
       if (formData.status === STATUS.ACCEPTED && !application?.interviewId) {
         const interview: Interview = {
-          applicationId: (application as any).id,
+          applicationId: slug as string,
           applicantId: application!!.applicantId,
           creationDate: Date.now(),
           status: STATUS.PENDING,
