@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Application, Interview, User } from "src/types";
+import { Application, Interview, Note, User } from "src/types";
 import Loader from "../Loader";
 import moment from "moment";
 import { useRouter } from "next/router";
@@ -57,26 +57,26 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
       lastUpdate: now,
       updatedById: author.id,
       notes:
-        comment !== ""
-          ? [
-              ...obj!.notes,
-              {
-                noteId: obj!.notes.length + 1 + "",
-                authorId: author.id,
-                timestamp: now,
-                text: comment,
-              },
-            ]
-          : obj!.notes,
+    comment !== ""
+      ? [
+          ...(obj!.notes as Note[]),
+          {
+            noteId: obj!.notes.length + 1 + "",
+            authorId: author.id,
+            timestamp: now,
+            text: comment,
+          },
+        ]
+      : obj!.notes,
     };
 
     try {
-      const response = await fetch(`/api/${obj.applicationId ? 'interview' : 'application' }/update`, {
+      const response = await fetch(`/api/${(obj as any).applicationId ? 'interview' : 'application' }/update`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(obj.applicationId ? {
+        body: JSON.stringify((obj as any).applicationId ? {
           interview: postForm,
           interviewId: (obj as any)._id,
         } : {

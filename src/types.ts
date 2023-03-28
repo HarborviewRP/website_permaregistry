@@ -50,6 +50,13 @@ export enum APP_INTERVIEW_STATUS {
   FAILED = 2,
 }
 
+export type Note = {
+  noteId: string;
+  authorId: string;
+  timestamp: number;
+  text: string;
+};
+
 export interface Application {
   applicantId: string;
   status: STATUS;
@@ -78,15 +85,7 @@ export interface Application {
       };
     }[];
   }[];
-  notes: [
-    | {
-        noteId: string;
-        authorId: string;
-        timestamp: number;
-        text: string;
-      }
-    | undefined
-  ];
+  notes: Note[] | [];
   interviewId: string | undefined;
 }
 
@@ -99,12 +98,7 @@ export interface Interview {
   reason: string | undefined;
   updatedById: string;
   lastUpdate: number;
-  notes: Array<{
-    noteId: string;
-    authorId: string;
-    timestamp: number;
-    text: string;
-  }>;
+  notes: Note[] | [];
   recording_path: string | undefined;
 }
 
