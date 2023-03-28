@@ -30,7 +30,7 @@ const StaffBar: React.FC<StaffProps> = ({ user }) => {
       }
     };
     fetchData();
-  }, []);
+  }, [user]);
 
   function truncate(str: string, maxLength = 24) {
     if (str.length <= maxLength) {

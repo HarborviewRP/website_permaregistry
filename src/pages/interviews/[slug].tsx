@@ -91,7 +91,7 @@ export default function Home({ user }: Props) {
       }
     };
     getApplication();
-  }, []);
+  }, [applicantExists, interviewExists, loading, slug]);
 
   const claim = async (e: any) => {
     e.preventDefault();

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/link-passhref */
 import { GetServerSidePropsContext } from "next";
 import Link from "next/link";
 import Image from "next/image";

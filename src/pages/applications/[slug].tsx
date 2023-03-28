@@ -126,7 +126,7 @@ export default function MainPage({ user }: Props) {
       }
     };
     getApplication();
-  }, []);
+  }, [applicantExists, applicationExists, loading, slug]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();

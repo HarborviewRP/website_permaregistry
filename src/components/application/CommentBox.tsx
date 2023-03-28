@@ -47,7 +47,7 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
       }
     };
     func();
-  }, []);
+  }, [loading, obj.notes]);
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
