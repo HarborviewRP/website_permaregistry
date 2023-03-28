@@ -103,7 +103,7 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
     </div>
   ) : (
     <>
-      <div className="scrollable-container flex flex-col justify-end overflow-auto p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md backdrop-blur">
+      <div className="scrollable-container flex flex-col overflow-auto p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md backdrop-blur">
         {text && (
           <h1 className="text-white font-semibold">{text}</h1>
         )}

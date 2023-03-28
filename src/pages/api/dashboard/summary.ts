@@ -4,7 +4,6 @@ import {
   getApplicationsReviewedPercentage,
   getApplicationsStats,
   getTotalStaffMembers,
-  getApplicationsPerDay,
   getApplicationStatusStats,
 } from "../../../util/database";
 import { NextApiResponse } from "next";
