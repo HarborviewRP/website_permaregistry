@@ -278,7 +278,7 @@ export default function MainPage({ user }: Props) {
           {isStaff && (
             <div className="2xl:fixed lg:relative right-0 2xl:m-20 2xl:max-w-4xl lg:max-w-full 2xl:w-96 lg:w-half lg:mb-10">
               <h1 className="text-white text-xl font-semibold">Comments</h1>
-              <CommentBox obj={application!!} author={user} />
+              <CommentBox obj={application!!} author={user as User} />
             </div>
           )}
           <div className="flex flex-row">

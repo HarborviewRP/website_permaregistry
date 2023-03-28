@@ -11,7 +11,7 @@ import { withSession } from "src/util/session";
 interface CommentProps {
   obj: Application | Interview;
   author: User;
-  text: string | undefined;
+  text?: string | undefined;
 }
 
 const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) => {
