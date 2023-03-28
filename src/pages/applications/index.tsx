@@ -124,7 +124,7 @@ export default function MainPage({ user }: Props) {
         <>
           <div className="flex flex-wrap justify-center items-center">
             {applications.map((app) => (
-              <Link href={`/applications/${(app as any)._id}`}>
+              <Link href={`/applications/${(app as any)._id}`} key={(app as any)._i}>
                 <div className="px-2">
                   <ApplicationBar
                     application={app}

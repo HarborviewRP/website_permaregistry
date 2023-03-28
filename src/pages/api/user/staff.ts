@@ -5,11 +5,7 @@ import { NextIronRequest, withAuth, withSession } from "../../../util/session";
 import { DISCORD } from "src/types";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
-  const user = req.session.get("user");
-
-  if (!isStaff(user)) {
-    return res.status(403).json({ message: "Unauthorized" });
-  }
+  const session = req.session.get("user");
 
   const usersRes = await getUsersWhere({
     roles: { $in: [DISCORD.STAFF_ROLE_ID, DISCORD.SUPERADMIN_ROLE] },
@@ -17,6 +13,11 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   
   const userMap = new Map();
   for (const user of usersRes) {
+    if (!isStaff(session)) {
+      delete user.email;
+      delete user.token;
+      delete user.ip;
+    }
     userMap.set(user._id.toString(), user);
   }
   res.status(200).json([...userMap]);
