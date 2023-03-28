@@ -282,3 +282,49 @@ export const getApplicationStatusStats = async () => {
 
   return applicationStatusStats;
 };
+
+// interview utils
+export const getTotalInterviews = async () => {
+  const interviewCollection = await getInterviewCollection();
+  const totalInterviews =
+    await interviewCollection.collection.countDocuments();
+  return totalInterviews;
+};
+
+export const getInterviewsReviewedPercentage = async () => {
+  const interviewCollection = await getInterviewCollection();
+  const totalInterviews =
+    await interviewCollection.collection.countDocuments();
+  const reviewedInterviews =
+    await interviewCollection.collection.countDocuments({
+      status: { $in: [1, 2] },
+    });
+
+  const percentage = (reviewedInterviews / totalInterviews) * 100;
+  return percentage;
+};
+
+export const getInterviewStats = async () => {
+  const interviewCollection = await getInterviewCollection();
+  const totalInterviews =
+    await interviewCollection.collection.countDocuments();
+  const approvedInterviews =
+    await interviewCollection.collection.countDocuments({ status: 1 });
+
+  const deniedInterviews =
+    await interviewCollection.collection.countDocuments({ status: 2 });
+
+  const approvedPercentage = (approvedInterviews / totalInterviews) * 100;
+  const deniedPercentage = (deniedInterviews / totalInterviews) * 100;
+
+  return { approved: approvedPercentage, denied: deniedPercentage };
+};
+
+export const getInterviewStatusStats = async () => {
+  const interviewCollection = await getInterviewCollection();
+  const applicationStatusStats = await interviewCollection.collection
+    .aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }])
+    .toArray();
+
+  return applicationStatusStats;
+};

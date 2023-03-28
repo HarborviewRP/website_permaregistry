@@ -1,3 +1,4 @@
+import { getInterviewsReviewedPercentage, getInterviewStats, getTotalInterviews } from './../../../util/database';
 import { isStaff } from "src/util/permission";
 import {
   getTotalApplications,
@@ -5,6 +6,7 @@ import {
   getApplicationsStats,
   getTotalStaffMembers,
   getApplicationStatusStats,
+  getInterviewStatusStats,
 } from "../../../util/database";
 import { NextApiResponse } from "next";
 import { NextIronRequest, withAuth } from "../../../util/session";
@@ -18,11 +20,17 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
 
   try {
     const dashboardSummary = {
+      totalStaffMembers: await getTotalStaffMembers(),
+
       totalApplications: await getTotalApplications(),
       applicationsReviewedPercentage: await getApplicationsReviewedPercentage(),
       applicationsStats: await getApplicationsStats(),
-      totalStaffMembers: await getTotalStaffMembers(),
       applicationStatusStats: await getApplicationStatusStats(),
+
+      totalInterviews: await getTotalInterviews(),
+      interviewsReviewedPercentage: await getInterviewsReviewedPercentage(),
+      interviewsStats: await getInterviewStats(),
+      interviewStatusStats: await getInterviewStatusStats(),
     };    
 
     return res.status(200).json(dashboardSummary);

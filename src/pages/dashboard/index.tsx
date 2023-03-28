@@ -38,10 +38,19 @@ export default function DiscordAuth({ user }: Props) {
     denied: 0,
   });
   const [totalStaffMembers, setTotalStaffMembers] = useState<number>(0);
+
+  const [totalInterviews, setTotalInterviews] = useState<number>(0);
+  const [interviewReviewedPercentage, setInterviewReviewedPercentage] = useState<number>(0);
+  const [interviewStats, setInterviewStats] = useState({
+    approved: 0,
+    denied: 0,
+  });
+
   const [loading, setLoading] = useState<boolean>(true);
 
   const [users, setUsers] = useState<Map<String, User>>();
   const [recentForms, setRecentForms] = useState<any | undefined>();
+  const [toggleState, setToggleState] = useState(true)
 
   useEffect(() => {
     setLoading(true);
@@ -55,7 +64,14 @@ export default function DiscordAuth({ user }: Props) {
           summary.applicationsReviewedPercentage
         );
         setApplicationStats(summary.applicationsStats);
+
         setTotalStaffMembers(summary.totalStaffMembers);
+
+        setTotalInterviews(summary.totalInterviews);
+        setInterviewReviewedPercentage(
+          summary.interviewsReviewedPercentage
+        );
+        setInterviewStats(summary.interviewsStats);
 
         const recentRes = await fetch("/api/dashboard/recently-modified");
         if (recentRes.ok) {
@@ -90,6 +106,10 @@ export default function DiscordAuth({ user }: Props) {
     fetchData();
   }, []);
 
+  const handleToggle = () => {
+    setToggleState(!toggleState)
+  }
+
   return (
     <>
       <div className="mx-28 my-10">
@@ -103,32 +123,33 @@ export default function DiscordAuth({ user }: Props) {
         <>
           <div className="mx-28 my-10">
             <div className="container mx-auto my-8">
+            <h1 className="text-white text-xl mb-3"><button onClick={handleToggle}><span className={toggleState ? 'text-white' : 'text-gray-500'}>Application</span> / <span className={toggleState ?  'text-gray-500' : 'text-white'}>Interview</span> Stats </button></h1>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 <StatsCard
-                  title="Total Applications"
-                  value={totalApplications}
+                  title={`Total ${toggleState ? 'Applications' : 'Interviews'}`}
+                  value={toggleState ? totalApplications : totalInterviews}
                   icon={HiFolderOpen}
-                  iconColor="text-yellow-400"
+                  iconColor={toggleState ? "text-blue-400" : "text-yellow-400"}
                 />
                 <StatsCard
-                  title="% of Apps Reviewed"
+                  title={`% of ${toggleState ? 'Apps' : 'Interviews'} Reviewed`}
                   value={
-                    Math.round(applicationsReviewedPercentage * 10) / 10 || 0
+                    Math.round((toggleState ? applicationsReviewedPercentage : interviewReviewedPercentage) * 10) / 10 || 0
                   }
                   showPercentage={true}
                   icon={HiClipboard}
-                  iconColor="text-blue-400"
+                  iconColor={toggleState ? "text-blue-400" : "text-yellow-400"}
                 />
                 <StatsCard
-                  title="% of Apps Approved"
-                  value={Math.round(applicationStats?.approved * 10) / 10 || 0}
+                  title={`% of ${toggleState ? 'Apps' : 'Interviews'} Approved`}
+                  value={Math.round((toggleState ? applicationStats.approved : interviewStats.approved) * 10) / 10 || 0}
                   showPercentage={true}
                   icon={HiCheck}
                   iconColor="text-green-400"
                 />
                 <StatsCard
-                  title="% of Apps Denied"
-                  value={Math.round(applicationStats?.denied * 10) / 10 || 0}
+                  title={`% of ${toggleState ? 'Apps' : 'Interviews'} Rejected`}
+                  value={Math.round((toggleState ? applicationStats.denied : interviewStats.denied)* 10) / 10 || 0}
                   showPercentage={true}
                   icon={HiX}
                   iconColor="text-red-400"
