@@ -273,44 +273,6 @@ export const getTotalStaffMembers = async () => {
   return staffMembers;
 };
 
-export const getApplicationsPerDay = async (startDate: number, endDate: number) => {
-  const applicationCollectionObj = await getApplicationCollection();
-  const applicationCollection = applicationCollectionObj.collection;
-
-  const results = await applicationCollection
-    .aggregate([
-      {
-        $match: {
-          submissionDate: {
-            $gte: startDate,
-            $lte: endDate,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: {
-              format: '%Y-%m-%d',
-              date: {
-                $toDate: '$submissionDate',
-              },
-            },
-          },
-          count: { $sum: 1 },
-        },
-      },
-      { $sort: { _id: 1 } },
-    ])
-    .toArray();
-
-  const lineChartData = results.map((result) => ({
-    date: result._id,
-    count: result.count,
-  }));
-
-  return lineChartData;
-};
 
 export const getApplicationStatusStats = async () => {
   const applicationCollection = await getApplicationCollection();

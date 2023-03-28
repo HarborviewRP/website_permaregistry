@@ -10,7 +10,7 @@ interface StatsCardProps {
 }
 
 const StatsCard: React.FC<StatsCardProps> = ({
-  title: label,
+  title,
   value,
   showPercentage = false,
   icon,
@@ -25,12 +25,12 @@ const StatsCard: React.FC<StatsCardProps> = ({
       )}
       <div className="text-4xl font-semibold">
         <div className="text-xs font-medium mb-1 ont-thin text-gray-500 ">
-          {label}
+          {title}
         </div>
         <div className="flex flex-row">
-          <span className="font-thin text-gray-200">{value}</span>{" "}
+          <span className="font-thin text-gray-200 2xl:text-4xl xl:text-xl lg:text-xs">{value}</span>{" "}
           {showPercentage && (
-            <div className="text-2xl text-gray-500 ml-2">% </div>
+            <div className="text-2xl text-gray-500 ml-2 2xl:text-2xl xl:text-sm lg:text-sm">% </div>
           )}
         </div>
       </div>

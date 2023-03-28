@@ -130,7 +130,8 @@ export default function MainPage({ user }: Props) {
       ) : interviews.length > 0 ? (
         <>
           <div className="flex flex-col justify-center items-center">
-            {interviews.map((interview) => (
+            {interviews.map((interview: any) => (
+              // eslint-disable-next-line react/jsx-key, @next/next/link-passhref
               <Link href={`/interviews/${(interview as any)._id}`}>
                 <div className="px-2">
                   <InterviewBar
@@ -142,7 +143,7 @@ export default function MainPage({ user }: Props) {
               </Link>
             ))}
           </div>
-          <div className="mx-32 my-4 flex justify-between">
+          <div className="mx-48 my-4 flex justify-between">
             <button
               onClick={prevPage}
               className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}

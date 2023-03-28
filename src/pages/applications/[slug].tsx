@@ -276,9 +276,9 @@ export default function MainPage({ user }: Props) {
       ) : applicationExists && applicantExists ? (
         <div className="p-10">
           {isStaff && (
-            <div className="fixed right-0 m-20 max-w-4xl w-96">
+            <div className="2xl:fixed lg:relative right-0 2xl:m-20 2xl:max-w-4xl lg:max-w-full 2xl:w-96 lg:w-half lg:mb-10">
               <h1 className="text-white text-xl font-semibold">Comments</h1>
-              <CommentBox obj={application!!} />
+              <CommentBox obj={application!!} author={user} />
             </div>
           )}
           <div className="flex flex-row">
@@ -286,7 +286,7 @@ export default function MainPage({ user }: Props) {
               {applicant?.nick
                 ? applicant.nick
                 : `${applicant?.username}#${applicant?.discriminator}`}
-              's Staff Application
+              &apos;s Staff Application
             </h1>
             <p
               className={`${
@@ -335,21 +335,21 @@ export default function MainPage({ user }: Props) {
                 </>
               )}
               {interview && (
-                    <p className="text-gray-400 font-thin">
-                    Interview:{" "}
-                    <Link
-                      className={`${
-                        interview?.status === 0
-                          ? "text-gray-400"
-                          : interview?.status === 1
-                          ? "text-green-500"
-                          : "text-red-500"
-                      } font-thin`}
-                      href={`/interviews/${(interview as any)._id}`}
-                    >
-                      {convertStatus((interview as any)?.status)}
-                    </Link>
-                  </p>
+                <p className="text-gray-400 font-thin">
+                  Interview:{" "}
+                  <Link
+                    className={`${
+                      interview?.status === 0
+                        ? "text-gray-400"
+                        : interview?.status === 1
+                        ? "text-green-500"
+                        : "text-red-500"
+                    } font-thin`}
+                    href={`/interviews/${(interview as any)._id}`}
+                  >
+                    {convertStatus((interview as any)?.status)}
+                  </Link>
+                </p>
               )}
             </div>
             {isStaff && (
@@ -375,14 +375,14 @@ export default function MainPage({ user }: Props) {
             </>
           )}
           <div className="flex flex-col">
-            {application?.sections.map((section) => (
+            {application?.sections.map((section: any) => (
               <div key={section.sectionId}>
                 <h1 className="text-white font-semibold text-xl pt-6">
                   {section.sectionText}
                 </h1>
                 {section.questions
                   .filter((question: any) => question.questionId !== "age")
-                  .map((question) => (
+                  .map((question: any) => (
                     <div
                       key={question.questionId}
                       className="p-6 my-4 max-w-4xl bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center space-x-1 backdrop-blur"

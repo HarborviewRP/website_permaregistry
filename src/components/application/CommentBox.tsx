@@ -3,21 +3,29 @@ import Image from "next/image";
 import { Application, Interview, User } from "src/types";
 import Loader from "../Loader";
 import moment from "moment";
+import { useRouter } from "next/router";
+import { GetServerSideProps } from "next";
+import { developerRoute } from "src/util/redirects";
+import { withSession } from "src/util/session";
 
 interface CommentProps {
   obj: Application | Interview;
+  author: User;
+  text: string | undefined;
 }
 
-const CommentBox: React.FC<CommentProps> = ({ obj: application }) => {
+const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) => {
   const [commentUsers, setCommentUsers] = useState<Map<String, User>>();
   const [loading, setLoading] = useState<boolean>(true);
+  const [comment, setComment] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
-    const getApplication = async () => {
+    const func = async () => {
       if (!loading) return;
       try {
         const map = new Map<String, User>();
-        const applicantIds = application.notes.map((note) => note?.authorId);
+        const applicantIds = obj.notes.map((note) => note?.authorId);
         const usersResponse = await fetch("/api/user/bulk", {
           method: "POST",
           headers: {
@@ -38,17 +46,65 @@ const CommentBox: React.FC<CommentProps> = ({ obj: application }) => {
         setLoading(false);
       }
     };
-    getApplication();
+    func();
   }, []);
 
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    const now = Date.now();
+    let applicationForm: Partial<Application | Interview> = {
+      lastUpdate: now,
+      updatedById: author.id,
+      notes:
+        comment !== ""
+          ? [
+              ...obj!.notes,
+              {
+                noteId: obj!.notes.length + 1 + "",
+                authorId: author.id,
+                timestamp: now,
+                text: comment,
+              },
+            ]
+          : obj!.notes,
+    };
+
+    try {
+      const response = await fetch("/api/application/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          application: applicationForm,
+          applicationId: (obj as any)._id,
+        }),
+      });
+
+      if (response.ok) {
+        router.reload();
+      } else {
+        alert(
+          "There was an error updating this application. Please try again later."
+        );
+      }
+    } catch (error) {
+      console.error("An error occurred:", error);
+    }
+  };
+
   return loading ? (
-    <div className="max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center backdrop-blur">
+    <div className="max-w-4xl h-96 bg-slate-900 flex flex-row justify-center content-center backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center backdrop-blur">
       <Loader center={false} />
     </div>
   ) : (
     <>
-      <div className="scrollable-container overflow-auto p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md items-center backdrop-blur">
-        {application!!.notes.map((note) => (
+      <div className="scrollable-container flex-col-reverse justify-end overflow-auto p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md backdrop-blur">
+        {text && (
+          <h1 className="text-white font-semibold">{text}</h1>
+        )}
+        {obj!!.notes.map((note: any) => (
           <div key={note!!.noteId} className="my-2">
             <div className="flex flex-row items-center p-1">
               <div
@@ -78,6 +134,22 @@ const CommentBox: React.FC<CommentProps> = ({ obj: application }) => {
             <p className="text-sm text-gray-500 mt-1">{note!!.text}</p>
           </div>
         ))}
+        <form className="mt-auto" onSubmit={handleSubmit}>
+          <div className="mt-6 flex flex-row items-center border-solid border-x-red-100/0 border-y-red-100/0 border-t-gray-800 border-2">
+            <div className="w-full pt-3 w-3/4">
+              <textarea
+                className="resize-none bg-opacity-0 bg-white focus:outline-none active:outline-none w-full"
+                placeholder="Enter comment..."
+                onChange={(e) => (setComment(e.target.value))}
+                rows={1}
+                required
+              />
+            </div>
+            <button type="submit" className="w-1/4 mt-6 disabled:text-gray-500 disabled:cursor-not-allowed" disabled={comment.length < 1}>
+              Post
+            </button>
+          </div>
+        </form>
       </div>
     </>
   );

@@ -23,10 +23,6 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       applicationsReviewedPercentage: await getApplicationsReviewedPercentage(),
       applicationsStats: await getApplicationsStats(),
       totalStaffMembers: await getTotalStaffMembers(),
-      applicationsSubmittedPerDay: await getApplicationsPerDay(
-        new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).getTime(),
-        new Date().getTime()
-      ),
       applicationStatusStats: await getApplicationStatusStats(),
     };    
 

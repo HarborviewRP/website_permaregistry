@@ -8,17 +8,12 @@ import { Application, User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import StatsCard from "src/components/StatsCard";
-import LineChart from "src/components/LineChart";
 import {
   HiCheck,
-  HiCheckCircle,
   HiClipboard,
   HiFolderOpen,
-  HiUser,
-  HiUserCircle,
   HiUsers,
   HiX,
-  HiXCircle,
 } from "react-icons/hi";
 import RecentBar from "src/components/dashboard/RecentBar";
 import { isStaff } from "src/util/permission";
@@ -43,9 +38,6 @@ export default function DiscordAuth({ user }: Props) {
     denied: 0,
   });
   const [totalStaffMembers, setTotalStaffMembers] = useState<number>(0);
-  const [applicationsPerDay, setApplicationsPerDay] = useState<
-    Array<{ _id: string; count: number }>
-  >([]);
   const [loading, setLoading] = useState<boolean>(true);
 
   const [users, setUsers] = useState<Map<String, User>>();
@@ -64,7 +56,6 @@ export default function DiscordAuth({ user }: Props) {
         );
         setApplicationStats(summary.applicationsStats);
         setTotalStaffMembers(summary.totalStaffMembers);
-        setApplicationsPerDay(summary.applicationsPerDay);
 
         const recentRes = await fetch("/api/dashboard/recently-modified");
         if (recentRes.ok) {
@@ -112,7 +103,7 @@ export default function DiscordAuth({ user }: Props) {
         <>
           <div className="mx-28 my-10">
             <div className="container mx-auto my-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 <StatsCard
                   title="Total Applications"
                   value={totalApplications}
@@ -120,7 +111,7 @@ export default function DiscordAuth({ user }: Props) {
                   iconColor="text-yellow-400"
                 />
                 <StatsCard
-                  title="% Apps Reviewed"
+                  title="% of Apps Reviewed"
                   value={
                     Math.round(applicationsReviewedPercentage * 10) / 10 || 0
                   }
@@ -129,14 +120,14 @@ export default function DiscordAuth({ user }: Props) {
                   iconColor="text-blue-400"
                 />
                 <StatsCard
-                  title="% Approved Apps"
+                  title="% of Apps Approved"
                   value={Math.round(applicationStats?.approved * 10) / 10 || 0}
                   showPercentage={true}
                   icon={HiCheck}
                   iconColor="text-green-400"
                 />
                 <StatsCard
-                  title="% Denied Apps"
+                  title="% of Apps Denied"
                   value={Math.round(applicationStats?.denied * 10) / 10 || 0}
                   showPercentage={true}
                   icon={HiX}
@@ -150,12 +141,13 @@ export default function DiscordAuth({ user }: Props) {
                 />
               </div>
               <div className="mt-16">
-                <h1 className="text-white text-xl">Recently Modified</h1>
-                {/* <LineChart data={applicationsPerDay as any} /> */}
+                <h1 className="text-white text-xl">Recently Updated</h1>
                 {recentForms.length > 0 ? (
                   <>
                     {recentForms.map((form: any) => (
                       <Link
+                        key={form.id}
+                        passHref={true}
                         href={`/${
                           form.collection === "applications"
                             ? "applications"

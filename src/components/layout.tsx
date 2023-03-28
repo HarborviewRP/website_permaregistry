@@ -132,7 +132,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
         </nav>
       </aside>
       {/* Child Content */}
-      <main className="flex-1 mx-auto mx-64">{children}</main>
+      <main className="flex-1 mx-auto ml-60">{children}</main>
     </div>
   );
 };

@@ -288,29 +288,12 @@ export default function Home({ user }: Props) {
             </form>
           </>
         )}
-        <form onSubmit={handleSubmit}>
-          <div
-            className={`max-w-lg w-3/6 p-2 mt-2 bg-slate-900 text-white bg-opacity-50 mb-4 rounded-xl`}
-          >
-            <h1 className="text-white pl-2 font-semibold">Interview Notes</h1>
-            <textarea
-              ref={statusReasonRef}
-              id="statusSeason"
-              name="statusReason"
-              onChange={(e) => (formData["note"] = e.target.value)}
-              placeholder="Enter notes..."
-              className={`pl-2 mt-1 mb-2 bg-slate-700 text-white bg-opacity-0 rounded w-full`}
-              rows={1}
-            />
+        {isStaff && (
+            <div className="max-w-lg w-3/6">
+            <CommentBox obj={application!!} author={user} text="Interview Notes"/>
           </div>
-          <div className="pl-2">
-            <button
-              className={`max-w-lg text-red-500 bg-opacity-50 mb-4 rounded-xl`}
-            >
-              Save
-            </button>
-          </div>
-        </form>
+          )}
+        
       </div>
     </>
   );
@@ -321,18 +304,12 @@ export default function Home({ user }: Props) {
         <Loader />
       ) : interviewExists && applicantExists ? (
         <div className="p-10">
-          {isStaff && (
-            <div className="fixed right-0 m-20 max-w-4xl w-96">
-              <h1 className="text-white text-xl font-semibold">Notes</h1>
-              <CommentBox obj={interview!!} />
-            </div>
-          )}
           <div className="flex flex-row">
             <h1 className="text-white text-3xl font-semibold">
               {applicant?.nick
                 ? applicant.nick
                 : `${applicant?.username}#${applicant?.discriminator}`}
-              's Interview
+              &apos;s Interview
             </h1>
             <p
               className={`${
