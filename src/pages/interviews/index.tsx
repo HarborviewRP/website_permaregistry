@@ -12,7 +12,6 @@ import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import { isStaff as isStaffUtil } from "src/util/permission";
 
-
 interface Props {
   user?: User;
 }
@@ -52,11 +51,17 @@ export default function MainPage({ user }: Props) {
         setHasNextPage(true);
       }
       const map = new Map<String, User>();
-      const applicantIds = interviews.map(interview => interview.applicantId);
-      const usersResponse = await fetch('/api/user/bulk', {
-        method: 'POST',
+      const applicantIds = [
+        ...interviews.map((interview) => interview.applicantId),
+        ...interviews
+          .filter((interview) => interview.claimedById)
+          .map((interview) => interview.claimedById),
+      ];
+
+      const usersResponse = await fetch("/api/user/bulk", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ users: applicantIds }),
       });
@@ -108,7 +113,7 @@ export default function MainPage({ user }: Props) {
       <div className="mx-28 my-10">
         <h1 className="text-white text-3xl">Interviews</h1>
         <button onClick={toggleSortStatus} className="text-gray-400">
-          Sort by {" "}
+          Sort by{" "}
           {sortStatus === "asc" ? (
             <span className="text-green-500">pending</span>
           ) : (
@@ -131,18 +136,23 @@ export default function MainPage({ user }: Props) {
                   <InterviewBar
                     interview={interview}
                     applicant={users!!.get(interview.applicantId)!!}
+                    staffMember={users?.get(interview?.claimedById || '')}
                   />
                 </div>
               </Link>
             ))}
           </div>
           <div className="mx-32 my-4 flex justify-between">
-            <button onClick={prevPage} className={`text-white ${!hasNextPage ? 'text-gray-600' : ''}`} disabled={page === 1}>
+            <button
+              onClick={prevPage}
+              className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
+              disabled={page === 1}
+            >
               Previous
             </button>
             <button
               onClick={nextPage}
-              className={`text-white ${!hasNextPage ? 'text-gray-600' : ''}`}
+              className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
               disabled={!hasNextPage}
             >
               Next
@@ -152,7 +162,9 @@ export default function MainPage({ user }: Props) {
       ) : (
         <>
           <div className="flex flex-wrap mx-28">
-            <h1 className="text-gray-400 text-xl font-thin">There are no interviews</h1>
+            <h1 className="text-gray-400 text-xl font-thin">
+              There are no interviews
+            </h1>
           </div>
         </>
       )}

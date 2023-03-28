@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import { DISCORD, User } from "src/types";
 import type { Session } from "next-iron-session";
 import { useState } from "react";
-import { isStaff as isStaffUtil } from "src/util/permission";
+import { isAdmin, isStaff as isStaffUtil } from "src/util/permission";
 
 interface LayoutProps {
   user: User | null;
@@ -16,7 +16,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const { user } = (children as any).props;
   const isStaff = isStaffUtil(user!);
   const router = useRouter();
-  const [ active, setActive ] = useState(false);
+  const [active, setActive] = useState(false);
 
   const menuItems = [
     {
@@ -34,7 +34,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     {
       href: "/roster",
       title: "Staff Roster",
-    }
+    },
   ];
   const guestMenu = [
     {
@@ -44,7 +44,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     {
       href: "/apply",
       title: "Apply",
-    }
+    },
   ];
   return (
     <div className="min-h-screen flex">
@@ -54,15 +54,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <h1 className="text-3xl">PGN ATS</h1>
             {user ? (
               <Link href="/profile" passHref>
-                <div className="flex justify-center mt-3 ">
-                  <Image
-                    className="rounded-full mr-2"
-                    src={user.avatar}
-                    alt="User Avatar"
-                    height={24}
-                    width={24}
-                  />
-                  <p className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">{`${user.username}#${user.discriminator}`}</p>
+                <div className="flex justify-center mt-3">
+                  <div>
+                    <Image
+                      className="rounded-full mr-2"
+                      src={user.avatar}
+                      alt="User Avatar"
+                      height={24}
+                      width={24}
+                    />
+                  </div>
+
+                  <p className="text-sm break-words text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">{`${user.username}#${user.discriminator}`}</p>
                 </div>
               </Link>
             ) : (
@@ -73,7 +76,10 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             <ul>
               <>
                 {(isStaff ? menuItems : guestMenu).map(({ href, title }) => (
-                  <li className="text-left flex flex-col items-center" key={title}>
+                  <li
+                    className="text-left flex flex-col items-center"
+                    key={title}
+                  >
                     <Link
                       href={href}
                       className={`text-center p-3 w-full rounded-xl hover:backdrop-blur-3xl hover:bg-opacity-50 hover:text-gray-500 ${
@@ -90,16 +96,38 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </ul>
           </div>
           <div>
-          {user ? (<><Link href="/api/auth/logout">
-              <button className="bg-transparent border-2 border-red-700/40 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
-                Logout
-              </button>
-            </Link></>) : (<><Link href="/api/auth/login">
-              <button className="px-6 py-2 text-sm justify-start items-start text-white bg-indigo-500 backdrop-blur-3xl bg-opacity-50 font-bold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
-                Login with Discord
-              </button>
-            </Link></>)}
-            
+            {user ? (
+              <>
+                {/* {isAdmin(user) && (
+                  <>
+                    <li
+                      className="text-left flex flex-col items-center"
+                      key="Admin"
+                    >
+                      <Link
+                        href={"/admin"}
+                        className={`text-center p-3 w-full rounded-xl hover:backdrop-blur-3xl hover:bg-opacity-50 hover:text-gray-500 pb-5 cursor-pointer text-white`}
+                      >
+                        Admin Dashboard
+                      </Link>
+                    </li>
+                  </>
+                )} */}
+                <Link href="/api/auth/logout">
+                  <button className="bg-transparent border-2 border-red-700/40 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
+                    Logout
+                  </button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/api/auth/login">
+                  <button className="px-6 py-2 text-sm justify-start items-start text-white bg-indigo-500 backdrop-blur-3xl bg-opacity-50 font-bold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
+                    Login with Discord
+                  </button>
+                </Link>
+              </>
+            )}
           </div>
         </nav>
       </aside>

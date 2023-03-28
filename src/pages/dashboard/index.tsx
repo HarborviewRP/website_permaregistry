@@ -3,10 +3,26 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
-import { User } from "src/types";
+import React, { useEffect, useState } from "react";
+import { Application, User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
+import StatsCard from "src/components/StatsCard";
+import LineChart from "src/components/LineChart";
+import {
+  HiCheck,
+  HiCheckCircle,
+  HiClipboard,
+  HiFolderOpen,
+  HiUser,
+  HiUserCircle,
+  HiUsers,
+  HiX,
+  HiXCircle,
+} from "react-icons/hi";
+import RecentBar from "src/components/dashboard/RecentBar";
+import { isStaff } from "src/util/permission";
+import Loader from "src/components/Loader";
 
 interface Props {
   user?: User;
@@ -15,38 +31,159 @@ interface Props {
 export default function DiscordAuth({ user }: Props) {
   const router = useRouter();
   useEffect(() => {
-    if (!user) router.push('/')
-  })
+    if (!user) router.push("/");
+    if (!isStaff(user!!)) router.push("/");
+  });
+
+  const [totalApplications, setTotalApplications] = useState<number>(0);
+  const [applicationsReviewedPercentage, setApplicationsReviewedPercentage] =
+    useState<number>(0);
+  const [applicationStats, setApplicationStats] = useState({
+    approved: 0,
+    denied: 0,
+  });
+  const [totalStaffMembers, setTotalStaffMembers] = useState<number>(0);
+  const [applicationsPerDay, setApplicationsPerDay] = useState<
+    Array<{ _id: string; count: number }>
+  >([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  const [users, setUsers] = useState<Map<String, User>>();
+  const [recentForms, setRecentForms] = useState<any | undefined>();
+
+  useEffect(() => {
+    setLoading(true);
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/dashboard/summary");
+        const summary = await res.json();
+
+        setTotalApplications(summary.totalApplications);
+        setApplicationsReviewedPercentage(
+          summary.applicationsReviewedPercentage
+        );
+        setApplicationStats(summary.applicationsStats);
+        setTotalStaffMembers(summary.totalStaffMembers);
+        setApplicationsPerDay(summary.applicationsPerDay);
+
+        const recentRes = await fetch("/api/dashboard/recently-modified");
+        if (recentRes.ok) {
+          const recentlyMod = await recentRes.json();
+          setRecentForms(recentlyMod);
+          const applicantIds = recentlyMod.map(
+            (recentlyMod: any) => recentlyMod.applicantId
+          );
+          const usersResponse = await fetch("/api/user/bulk", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ users: applicantIds }),
+          });
+          const map = new Map<String, User>();
+          if (usersResponse.ok) {
+            const usersArray = await usersResponse.json();
+            for (const [id, user] of usersArray) {
+              map.set(id, user);
+            }
+          }
+          setUsers(map);
+          setLoading(false);
+        }
+      } catch (err: any) {
+        setLoading(false);
+        alert("There was an error..." + err.message);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <>
-     <div className="h-screen flex justify-center items-center">
-      <div className="p-6 max-w-sm mx-auto bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md flex items-center space-x-4 backdrop-blur">
-        {user && (
-          <>
-            <div className="flex-shrink-0">
-              <Image
-              className="rounded-full"
-                src={user.avatar}
-                alt="User Avatar"
-                height={56}
-                width={56}
-              />
-            </div>
-            <h1 className="px-5 py-1 text-1xl font-semibold flex justify-center items-center text-white  border-indigo-500 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
-              {user.username}#{user.discriminator}
-            </h1>
-            <Link href="/api/auth/logout" passHref>
-              <button className="px-2.5 py-2 text-sm flex justify-start text-indigo-500 font-semibold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
-                Logout
-              </button>
-            </Link>
-          </>
-        )}
+      <div className="mx-28 my-10">
+        <h1 className="text-white text-3xl">Dashboard</h1>
       </div>
-    </div>
+      {loading ? (
+        <div className="flex justify-center">
+          <Loader center={false} />
+        </div>
+      ) : (
+        <>
+          <div className="mx-28 my-10">
+            <div className="container mx-auto my-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+                <StatsCard
+                  title="Total Applications"
+                  value={totalApplications}
+                  icon={HiFolderOpen}
+                  iconColor="text-yellow-400"
+                />
+                <StatsCard
+                  title="% Apps Reviewed"
+                  value={
+                    Math.round(applicationsReviewedPercentage * 10) / 10 || 0
+                  }
+                  showPercentage={true}
+                  icon={HiClipboard}
+                  iconColor="text-blue-400"
+                />
+                <StatsCard
+                  title="% Approved Apps"
+                  value={Math.round(applicationStats?.approved * 10) / 10 || 0}
+                  showPercentage={true}
+                  icon={HiCheck}
+                  iconColor="text-green-400"
+                />
+                <StatsCard
+                  title="% Denied Apps"
+                  value={Math.round(applicationStats?.denied * 10) / 10 || 0}
+                  showPercentage={true}
+                  icon={HiX}
+                  iconColor="text-red-400"
+                />
+                <StatsCard
+                  title="Total Staff Members"
+                  value={totalStaffMembers || 0}
+                  icon={HiUsers}
+                  iconColor="text-blue-400"
+                />
+              </div>
+              <div className="mt-16">
+                <h1 className="text-white text-xl">Recently Modified</h1>
+                {/* <LineChart data={applicationsPerDay as any} /> */}
+                {recentForms.length > 0 ? (
+                  <>
+                    {recentForms.map((form: any) => (
+                      <Link
+                        href={`/${
+                          form.collection === "applications"
+                            ? "applications"
+                            : "interviews"
+                        }/${form._id}`}
+                      >
+                        <div className="px-2">
+                          <RecentBar
+                            form={form}
+                            applicant={users!!.get(form.applicantId)!!}
+                          />
+                        </div>
+                      </Link>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <h1>No Recently Modified Applications or Interviews</h1>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = withSession(developerRoute)
+export const getServerSideProps: GetServerSideProps =
+  withSession(developerRoute);

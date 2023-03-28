@@ -1,5 +1,5 @@
 import { Interview } from "./../types";
-import { ObjectId } from "mongodb";
+import { Filter, ObjectId } from "mongodb";
 import { Application, User } from "src/types";
 import {
   closeConnection,
@@ -7,6 +7,7 @@ import {
   getInterviewCollection,
   getUserCollection,
 } from "./mongodb";
+import { DISCORD } from "src/types"
 
 export const createApplication = async (application: Application) => {
   const applicationCollection = await getApplicationCollection();
@@ -35,13 +36,19 @@ export const getAllApplications = async () => {
   return res;
 };
 
-export const getUserApplicationsInRange = async (userId: string, startDate: Date, endDate: Date) => {
+export const getUserApplicationsInRange = async (
+  userId: string,
+  startDate: Date,
+  endDate: Date
+) => {
   const applicationCollection = await getApplicationCollection();
   try {
-    const res = await applicationCollection.collection.find({
-      userId: userId,
-      submissionDate: { $gte: startDate, $lte: endDate },
-    }).toArray();
+    const res = await applicationCollection.collection
+      .find({
+        userId: userId,
+        submissionDate: { $gte: startDate, $lte: endDate },
+      })
+      .toArray();
 
     return res;
   } catch (err) {
@@ -49,12 +56,17 @@ export const getUserApplicationsInRange = async (userId: string, startDate: Date
   }
 };
 
-export const getApplicationsInRange = async (startDate: Date, endDate: Date) => {
+export const getApplicationsInRange = async (
+  startDate: Date,
+  endDate: Date
+) => {
   const applicationCollection = await getApplicationCollection();
   try {
-    const res = await applicationCollection.collection.find({
-      submissionDate: { $gte: startDate, $lte: endDate },
-    }).toArray();
+    const res = await applicationCollection.collection
+      .find({
+        submissionDate: { $gte: startDate, $lte: endDate },
+      })
+      .toArray();
 
     return res;
   } catch (err) {
@@ -115,6 +127,11 @@ export const getSortedApplications = async (
 
   return applications;
 };
+
+export const getApplicationsWhere = async (filter: Filter<Document>) => {
+  const applicationCollection = await getApplicationCollection();
+  const applications = await applicationCollection.collection.find(filter)
+}
 
 export const createInterview = async (interview: Interview) => {
   const interviewCollection = await getInterviewCollection();
@@ -201,4 +218,105 @@ export const getUsers = async (ids: string[]) => {
     .find({ _id: { $in: ids } })
     .toArray();
   return users;
+};
+
+export const getUsersWhere = async (filter: Filter<Document>) => {
+  const userCollection = await getUserCollection();
+  const users = await userCollection.collection.find(filter).toArray();
+  return users;
+};
+
+export const getTotalApplications = async () => {
+  const applicationCollection = await getApplicationCollection();
+  const totalApplications =
+    await applicationCollection.collection.countDocuments();
+  return totalApplications;
+};
+
+export const getApplicationsReviewedPercentage = async () => {
+  const applicationCollection = await getApplicationCollection();
+  const totalApplications =
+    await applicationCollection.collection.countDocuments();
+  const reviewedApplications =
+    await applicationCollection.collection.countDocuments({
+      status: { $in: [1, 2] },
+    });
+
+  const percentage = (reviewedApplications / totalApplications) * 100;
+  return percentage;
+};
+
+export const getApplicationsStats = async () => {
+  const applicationCollection = await getApplicationCollection();
+  const totalApplications =
+    await applicationCollection.collection.countDocuments();
+  const approvedApplications =
+    await applicationCollection.collection.countDocuments({ status: 1 });
+
+  const deniedApplications =
+    await applicationCollection.collection.countDocuments({ status: 2 });
+
+  const approvedPercentage = (approvedApplications / totalApplications) * 100;
+  const deniedPercentage = (deniedApplications / totalApplications) * 100;
+
+  return { approved: approvedPercentage, denied: deniedPercentage };
+};
+
+export const getTotalStaffMembers = async () => {
+  const userCollection = await getUserCollection();
+  const staffMembers = await userCollection.collection.countDocuments({
+    $or: [
+      { roles: { $in: [DISCORD.STAFF_ROLE_ID, DISCORD.SUPERADMIN_ROLE] } },
+      { access_level: { $gt: 0 } },
+    ],
+  });
+  return staffMembers;
+};
+
+export const getApplicationsPerDay = async (startDate: number, endDate: number) => {
+  const applicationCollectionObj = await getApplicationCollection();
+  const applicationCollection = applicationCollectionObj.collection;
+
+  const results = await applicationCollection
+    .aggregate([
+      {
+        $match: {
+          submissionDate: {
+            $gte: startDate,
+            $lte: endDate,
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: '%Y-%m-%d',
+              date: {
+                $toDate: '$submissionDate',
+              },
+            },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ])
+    .toArray();
+
+  const lineChartData = results.map((result) => ({
+    date: result._id,
+    count: result.count,
+  }));
+
+  return lineChartData;
+};
+
+export const getApplicationStatusStats = async () => {
+  const applicationCollection = await getApplicationCollection();
+  const applicationStatusStats = await applicationCollection.collection
+    .aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }])
+    .toArray();
+
+  return applicationStatusStats;
 };

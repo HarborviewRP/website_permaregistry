@@ -50,14 +50,6 @@ export enum APP_INTERVIEW_STATUS {
   FAILED = 2,
 }
 
-export interface Appllication {
-  id: string;
-  discordId: string;
-  status: number;
-  claimedById: string | undefined;
-  notes: string | undefined;
-}
-
 export interface Application {
   applicantId: string;
   status: STATUS;
@@ -126,7 +118,7 @@ export class DISCORD {
   static readonly ID = process.env.DISCORD_ID || "605469902152663073";
   static readonly STAFF_ROLE_ID =
     process.env.STAFF_ROLE_ID || "1081002383905136662";
-  static readonly SUPERADMIN__ROLE = process.env.SUPERADMIN__ROLE || "1050767934018035772";
+  static readonly SUPERADMIN_ROLE = process.env.SUPERADMIN__ROLE || "1050767934018035772";
   static readonly VERIFY_ROLE = process.env.VERIFY_ROLE || "995813347767365732";
 }
 

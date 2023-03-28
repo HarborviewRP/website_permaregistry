@@ -22,9 +22,6 @@ export async function dbConnect() {
   if (cachedClient && cachedDb) {
     return { client: cachedClient, db: cachedDb };
   }
-
-  console.log("a");
-
   const client = await MongoClient.connect(uri as string, {
     maxPoolSize: 15,
   });
