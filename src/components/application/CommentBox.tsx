@@ -14,7 +14,11 @@ interface CommentProps {
   text?: string | undefined;
 }
 
-const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) => {
+const CommentBox: React.FC<CommentProps> = ({
+  obj,
+  author,
+  text = undefined,
+}) => {
   const [commentUsers, setCommentUsers] = useState<Map<String, User>>();
   const [loading, setLoading] = useState<boolean>(true);
   const [comment, setComment] = useState("");
@@ -57,36 +61,49 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
       lastUpdate: now,
       updatedById: author.id,
       notes:
-    comment !== ""
-      ? [
-          ...(obj!.notes as Note[]),
-          {
-            noteId: obj!.notes.length + 1 + "",
-            authorId: author.id,
-            timestamp: now,
-            text: comment,
-          },
-        ]
-      : obj!.notes,
+        comment !== ""
+          ? [
+              ...(obj!.notes as Note[]),
+              {
+                noteId: obj!.notes.length + 1 + "",
+                authorId: author.id,
+                timestamp: now,
+                text: comment,
+              },
+            ]
+          : obj!.notes,
     };
 
     try {
-      const response = await fetch(`/api/${(obj as any).applicationId ? 'interview' : 'application' }/update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify((obj as any).applicationId ? {
-          interview: postForm,
-          interviewId: (obj as any)._id,
-        } : {
-          application: postForm,
-          applicationId: (obj as any)._id,
-        }),
-      });
+      const response = await fetch(
+        `/api/${
+          (obj as any).applicationId ? "interview" : "application"
+        }/update`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(
+            (obj as any).applicationId
+              ? {
+                  interview: postForm,
+                  interviewId: (obj as any)._id,
+                }
+              : {
+                  application: postForm,
+                  applicationId: (obj as any)._id,
+                }
+          ),
+        }
+      );
 
       if (response.ok) {
-        router.reload();
+        // router.reload();
+        // setLoading(true);
+        setComment("");
+        obj.notes = postForm.notes || [];
+
       } else {
         alert(
           "There was an error updating this interview. Please try again later."
@@ -104,9 +121,7 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
   ) : (
     <>
       <div className="scrollable-container flex flex-col overflow-auto p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md backdrop-blur">
-        {text && (
-          <h1 className="text-white font-semibold">{text}</h1>
-        )}
+        {text && <h1 className="text-white font-semibold">{text}</h1>}
         {obj!!.notes.map((note: any) => (
           <div key={note!!.noteId} className="my-2">
             <div className="flex flex-row items-center p-1">
@@ -122,7 +137,9 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
                 />
               </div>
               <div className="flex flex-col">
-                <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">
+                <h1
+                  className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600"
+                >
                   {commentUsers!!.get(note!!.authorId!!)!!.username}#
                   {commentUsers!!.get(note!!.authorId!!)!!.discriminator}
                 </h1>
@@ -143,12 +160,17 @@ const CommentBox: React.FC<CommentProps> = ({ obj, author, text = undefined }) =
               <textarea
                 className="resize-none bg-opacity-0 bg-white focus:outline-none active:outline-none w-full"
                 placeholder="Enter comment..."
-                onChange={(e) => (setComment(e.target.value))}
+                onChange={(e) => setComment(e.target.value)}
+                value={comment}
                 rows={1}
                 required
               />
             </div>
-            <button type="submit" className="w-1/4 mt-6 disabled:text-gray-500 disabled:cursor-not-allowed" disabled={comment.length < 1}>
+            <button
+              type="submit"
+              className="w-1/4 mt-6 disabled:text-gray-500 disabled:cursor-not-allowed"
+              disabled={comment.length < 1}
+            >
               Post
             </button>
           </div>
