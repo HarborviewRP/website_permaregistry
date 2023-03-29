@@ -1,5 +1,5 @@
 import { NextApiResponse } from "next";
-import { getUsers, getUsersWhere } from "src/util/database";
+import { getUsers } from "src/util/database";
 import { isStaff } from "src/util/permission";
 import { NextIronRequest, withAuth, withSession } from "../../../util/session";
 
