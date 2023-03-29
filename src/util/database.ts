@@ -128,10 +128,6 @@ export const getSortedApplications = async (
   return applications;
 };
 
-export const getApplicationsWhere = async (filter: Filter<Document>) => {
-  const applicationCollection = await getApplicationCollection();
-  const applications = await applicationCollection.collection.find(filter)
-}
 
 export const createInterview = async (interview: Interview) => {
   const interviewCollection = await getInterviewCollection();
