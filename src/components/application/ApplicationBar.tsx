@@ -44,11 +44,11 @@ const ApplicationBar: React.FC<ApplicationProps> = ({
               </h1>
             </div>
           </div>
-          <div className="flex flex-row items-center">
+          <div className="flex flex-row items-center" style={{width: "35%"}}>
             <h1 className="text-gray-500 text-sm">
               {moment
                 .unix(application!!.submissionDate / 1000)
-                .format("MMMM Do YYYY, h:mm:ss A")}
+                .format("MMMM Do YYYY, h:mm A")}
             </h1>
           </div>
 

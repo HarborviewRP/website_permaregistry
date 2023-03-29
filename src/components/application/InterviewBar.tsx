@@ -19,9 +19,9 @@ const InterviewBar: React.FC<InterviewProps> = ({ interview, applicant, staffMem
 
   return (
     <>
-      <div className="p-4 my-3 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-lg items-center space-x-1 backdrop-blur">
+      <div className="p-4 my-3 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-lg items-center space-x-1 backdrop-blur" style={{width: "75vw"}}>
         <div className="flex flex-row justify-between">
-          <div className="flex flex-row items-center p-1">
+          <div className="flex flex-row items-center p-1" style={{width: "25%"}}>
             <div
               className="rounded-full mr-2 relative overflow-hidden"
               style={{ width: 36, height: 36 }}
@@ -42,11 +42,11 @@ const InterviewBar: React.FC<InterviewProps> = ({ interview, applicant, staffMem
               </h1>
             </div>
           </div>
-          <div className="flex flex-row items-center px-24">
+          <div className="flex flex-row items-center px-24" style={{width: "25%"}}>
             <h1 className="text-gray-500 text-sm">{(applicant as any)._id}</h1>
           </div>
 
-          <div className="flex flex-row">
+          <div className="flex flex-row justify-between" style={{width: "30%"}}>
             <div className="flex flex-row items-center px-8">
               <p
                 className={`${
