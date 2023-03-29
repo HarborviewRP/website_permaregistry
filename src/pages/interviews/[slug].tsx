@@ -290,7 +290,7 @@ export default function Home({ user }: Props) {
         )}
         {isStaff && (
             <div className="max-w-lg w-3/6">
-            <CommentBox obj={interview!!} author={user} text="Interview Notes"/>
+            <CommentBox obj={interview!!} author={user as User} text="Interview Notes"/>
           </div>
           )}
         
