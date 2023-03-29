@@ -7,13 +7,12 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const user = req.session.get("user");
     const users = req.body.users;
-    const filter = req.body.filter;
 
     if (!isStaff(user)) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
-    const usersRes = filter ? await getUsersWhere(filter) : await getUsers(users);
+    const usersRes = await getUsers(users);
     const userMap = new Map();
     for (const user of usersRes) {
       userMap.set(user._id.toString(), user);

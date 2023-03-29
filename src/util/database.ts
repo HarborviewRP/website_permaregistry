@@ -216,12 +216,6 @@ export const getUsers = async (ids: string[]) => {
   return users;
 };
 
-export const getUsersWhere = async (filter: Filter<Document>) => {
-  const userCollection = await getUserCollection();
-  const users = await userCollection.collection.find(filter).toArray();
-  return users;
-};
-
 export const getTotalApplications = async () => {
   const applicationCollection = await getApplicationCollection();
   const totalApplications =
