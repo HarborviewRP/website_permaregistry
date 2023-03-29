@@ -18,6 +18,7 @@ import Link from "next/link";
 import { Menu } from "@headlessui/react";
 import AudioPlayer from "src/components/AudioPlayer";
 import { isAdmin, isStaff as isStaffUtil } from "src/util/permission";
+import { randomUUID } from "crypto";
 
 interface Props {
   user?: User;
@@ -30,7 +31,6 @@ export default function Home({ user }: Props) {
     if (!user) router.push("/");
   });
 
-  const fileInputRef = useRef(null);
   const [application, setApplication] = useState<Application | null>(null);
   const [interview, setInterview] = useState<Interview | null>(null);
   const [interviewExists, setInterviewExists] = useState<boolean>(false);
@@ -38,12 +38,14 @@ export default function Home({ user }: Props) {
   const [applicantExists, setApplicantExists] = useState<boolean>(false);
   const [isStaff, setIsStaff] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
+  const [uploading, setUploading] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     note: "",
     status: 0,
   });
   const [uploadMessage, setUploadMessage] = useState("");
   const statusReasonRef = useRef<HTMLTextAreaElement>(null);
+  const [file, setFile] = useState<any>();
   const { slug } = router.query;
 
   useEffect(() => {
@@ -171,19 +173,53 @@ export default function Home({ user }: Props) {
 
   const uploadFile = async (e: any) => {
     e.preventDefault();
-    const form = new FormData();
-    form.append("file", (fileInputRef as any).current.files[0]);
-    form.append("interviewId", (interview as any)._id);
+
+    setUploading(true);
+
     try {
-      const response = await axios.post("/api/interview/upload", form);
-      setUploadMessage(response.data.message);
+      const filename = `${(interview as any)._id}_${(user as any).id}_${Date.now()}`;
+      const newfile = new File([file], filename, { type: `${file.type}` })
+      let { data } = await axios.post("/api/interview/upload", {
+        name: filename,
+        type: newfile.type,
+        interviewId: (interview as any)._id,
+      });
+      console.log(file)
+      
+      const url = data.url;
+      const res2 = await fetch(url, {
+        method: "PUT",
+        headers: {
+          "Content-type": file.type,
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: newfile
+      })
+
+      setUploading(false);
+      setFile(null);
       router.reload();
-    } catch (error) {
-      console.error("Error uploading file:", error);
+    } catch (err) {
+      console.log(err)
       setUploadMessage(
         "There was an error uploading your file. Please try again later."
       );
+      setUploading(false);
     }
+
+    // const form = new FormData();
+    // form.append("file", (fileInputRef as any).current.files[0]);
+    // form.append("interviewId", (interview as any)._id);
+    // try {
+    //   const response = await axios.post("/api/interview/upload", form);
+    //   setUploadMessage(response.data.message);
+    //   router.reload();
+    // } catch (error) {
+    //   console.error("Error uploading file:", error);
+    //   setUploadMessage(
+    //     "There was an error uploading your file. Please try again later."
+    //   );
+    // }
   };
 
   const handleButtonClick = (statusValue: number) => {
@@ -253,12 +289,18 @@ export default function Home({ user }: Props) {
                         <p className="text-red-500 text-sm">{uploadMessage}</p>
                       )}
                       <div className="border-dashed m-2 mt-5 border-2 border-slate-700">
-                        <input
-                          className="block w-full p-8 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-opacity-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-500"
-                          type="file"
-                          ref={fileInputRef}
-                          accept="audio/mp3"
-                        />
+                        {uploading ? (
+                          <Loader center={false} />
+                        ) : (
+                          <>
+                            <input
+                              className="block w-full p-8 text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:bg-opacity-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-500"
+                              type="file"
+                              onChange={(e: any) => setFile(e.target.files[0])}
+                              accept="audio/mp3"
+                            />
+                          </>
+                        )}
                       </div>
                     </div>
                     <div className="pl-2">
@@ -289,11 +331,14 @@ export default function Home({ user }: Props) {
           </>
         )}
         {isStaff && (
-            <div className="max-w-lg w-3/6">
-            <CommentBox obj={interview!!} author={user as User} text="Interview Notes"/>
+          <div className="max-w-lg w-3/6">
+            <CommentBox
+              obj={interview!!}
+              author={user as User}
+              text="Interview Notes"
+            />
           </div>
-          )}
-        
+        )}
       </div>
     </>
   );
