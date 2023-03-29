@@ -229,7 +229,7 @@ export default function Home({ user }: Props) {
                     Interview Recording
                   </h1>
                   <AudioPlayer
-                    src={`http://localhost:3000/api/stream/${interview?.recording_path}`}
+                    src={`${process.env.DOMAIN}/api/stream/${interview?.recording_path}`}
                   />
                 </div>
               </>
