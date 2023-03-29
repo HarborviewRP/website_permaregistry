@@ -46,6 +46,7 @@ export default function Home({ user }: Props) {
   const [uploadMessage, setUploadMessage] = useState("");
   const statusReasonRef = useRef<HTMLTextAreaElement>(null);
   const [file, setFile] = useState<any>();
+  const [fileUrl, setFileUrl] = useState<any>();
   const { slug } = router.query;
 
   useEffect(() => {
@@ -77,20 +78,26 @@ export default function Home({ user }: Props) {
             }
             setApplicant(user);
             setApplicantExists(true);
-            setLoading(false);
           } else {
             setApplicantExists(false);
-            setLoading(false);
           }
         } else {
           setInterviewExists(false);
-          setLoading(false);
         }
+
+        if (interview?.recording_path) {
+          const fileRes = await fetch(`/api/stream/${interview.recording_path}`);
+          if (fileRes.ok) {
+            const { url } = await fileRes.json()
+            setFileUrl(url);
+          }
+        } 
       } catch (error) {
         console.error(error);
         setInterviewExists(false);
         setLoading(false);
       }
+      setLoading(false);
     };
     getApplication();
   }, [applicantExists, interviewExists, loading, slug]);
@@ -184,10 +191,9 @@ export default function Home({ user }: Props) {
         type: newfile.type,
         interviewId: (interview as any)._id,
       });
-      console.log(file)
       
       const url = data.url;
-      const res2 = await fetch(url, {
+      await fetch(url, {
         method: "PUT",
         headers: {
           "Content-type": file.type,
@@ -265,7 +271,7 @@ export default function Home({ user }: Props) {
                     Interview Recording
                   </h1>
                   <AudioPlayer
-                    src={`/api/stream/${interview?.recording_path}`}
+                    src={fileUrl}
                   />
                 </div>
               </>

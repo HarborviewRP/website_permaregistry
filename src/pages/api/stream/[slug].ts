@@ -27,17 +27,21 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       Key: slug as string,
     };
 
-    s3.headObject(params, (err, data) => {
-      if (err) {
-        console.log(err);
-        return res.status(404).send({ message: "File not found" });
-      } else {
-        res.setHeader("Content-Type", "audio/mpeg");
-        res.setHeader("Content-Length", data.ContentLength as any);
-        const readStream = s3.getObject(params).createReadStream();
-        readStream.pipe(res);
-      }
-    });
+    const url = await s3.getSignedUrlPromise("getObject", params);
+
+    res.status(200).json({ url: url });
+
+    // s3.headObject(params, (err, data) => {
+    //   if (err) {
+    //     console.log(err);
+    //     return res.status(404).send({ message: "File not found" });
+    //   } else {
+    //     res.setHeader("Content-Type", "audio/mpeg");
+    //     res.setHeader("Content-Length", data.ContentLength as any);
+    //     const readStream = s3.getObject(params).createReadStream();
+    //     readStream.pipe(res);
+    //   }
+    // });
   } catch (err: any) {
     console.log(err);
     res.status(500).send({ message: "Error streaming file", error: err.message });
