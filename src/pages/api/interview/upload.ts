@@ -1,33 +1,23 @@
 import { getInterview, updateInterview } from "./../../../util/database";
 import { Interview } from "./../../../types";
 import type { NextApiRequest, NextApiResponse } from "next";
-import multer, { Multer, diskStorage } from "multer";
+import multer, { Multer } from "multer";
 import { NextIronRequest, withAuth } from "src/util/session";
 import { DISCORD } from "src/types";
 import { ObjectID } from "bson";
 import moment from "moment";
-import fs from "fs";
-import path from "path";
 import { randomUUID } from "crypto";
 import { isStaff } from "src/util/permission";
+import AWS from "aws-sdk";
 
 interface ExtendedNextApiRequest extends NextApiRequest {
-  file: {
-    filename: string;
-  };
+  file: File & { buffer: Buffer };
 }
 
-const storage = diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads");
-  },
-  filename: (req, file, cb) => {
-    console.log(file)
-    cb(
-      null,
-      `${randomUUID()}_${Date.now()}`
-    );
-  },
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
 });
 
 const fileFilter = (req: any, file: any, cb: any) => {
@@ -39,7 +29,6 @@ const fileFilter = (req: any, file: any, cb: any) => {
 };
 
 const upload = multer({
-  storage,
   limits: { fileSize: 500 * 1024 * 1024 },
   fileFilter,
 });
@@ -55,19 +44,32 @@ const uploadMiddleware = (
     })
   );
 
+const uploadToS3 = async (file: Express.Multer.File) => {
+  const key = `${randomUUID()}_${Date.now()}`;
+  const params = {
+    Bucket: process.env.AWS_S3_BUCKET_NAME,
+    Key: key,
+    Body: file.buffer,
+    ContentType: file.mimetype,
+    ACL: "private",
+  };
+
+  await s3.upload(params as any).promise();
+  return key;
+};
+
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
-    const uploadPath = path.join(process.cwd(), "uploads");
-    if (!fs.existsSync(uploadPath)) {
-      fs.mkdirSync(uploadPath);
-    }
     const user = req.session.get("user");
     if (!isStaff(user)) {
       return res.status(403).json({ message: "Unauthorized" });
     }
 
     try {
-      const extendedReq = await uploadMiddleware(req as unknown as ExtendedNextApiRequest, res);
+      const extendedReq = await uploadMiddleware(
+        req as unknown as ExtendedNextApiRequest,
+        res
+      );
 
       const interviewCheck = await getInterview(extendedReq.body.interviewId);
       if (!interviewCheck) {
@@ -75,18 +77,20 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       }
 
       if (interviewCheck.recording_path) {
-        return res.status(400).json({ message: "Interview has recording..."})
+        return res.status(400).json({ message: "Interview has recording..." });
       }
 
+      const s3Key = await uploadToS3(extendedReq.file as any);
+
       await updateInterview(extendedReq.body.interviewId, {
-        recording_path: extendedReq.file.filename,
+        recording_path: s3Key,
         lastUpdate: Date.now(),
         updatedById: user._id,
       });
 
       res.status(200).send({
         message: "File uploaded successfully",
-        filename: extendedReq.file.filename,
+        filename: s3Key,
       });
     } catch (error: any) {
       console.log(error);

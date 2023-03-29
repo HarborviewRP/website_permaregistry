@@ -1,31 +1,46 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import path from "path";
-import fs from "fs";
 import { NextIronRequest, withAuth } from "src/util/session";
 import { DISCORD } from "src/types";
 import { isStaff } from "src/util/permission";
+import AWS from "aws-sdk";
+
+AWS.config.update({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+  region: process.env.AWS_REGION,
+});
+
+const s3 = new AWS.S3();
+const BUCKET_NAME = process.env.AWS_S3_BUCKET_NAME;
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
-  const { slug } = req.query
-  const filePath = path.join(process.cwd(), "uploads", slug as string);
-  
+  const { slug } = req.query;
+
   const user = req.session.get("user");
   if (!isStaff(user)) {
     return res.status(403).json({ message: "Unauthorized" });
   }
 
   try {
-    if (fs.existsSync(filePath)) {
-      const stat = fs.statSync(filePath);
-      res.setHeader("Content-Type", "audio/mpeg");
-      res.setHeader("Content-Length", stat.size);
-      const readStream = fs.createReadStream(filePath);
-      readStream.pipe(res);
-    } else {
-      res.status(404).send({ message: "File not found" });
-    }
+    const params: AWS.S3.GetObjectRequest = {
+      Bucket: BUCKET_NAME!!,
+      Key: slug as string,
+    };
+
+    s3.headObject(params, (err, data) => {
+      if (err) {
+        console.log(err);
+        return res.status(404).send({ message: "File not found" });
+      } else {
+        res.setHeader("Content-Type", "audio/mpeg");
+        res.setHeader("Content-Length", data.ContentLength as any);
+        const readStream = s3.getObject(params).createReadStream();
+        readStream.pipe(res);
+      }
+    });
   } catch (err: any) {
     console.log(err);
+    res.status(500).send({ message: "Error streaming file", error: err.message });
   }
 };
 
