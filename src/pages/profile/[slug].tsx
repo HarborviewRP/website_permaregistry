@@ -59,7 +59,7 @@ export default function MainPage({ user }: Props) {
                   <p className="text-center text-xl font-semibold text-white">
                     {`${otherUser.username}#${otherUser.discriminator}`}
                     <span className="font-light text-sm pl-2 italic">
-                      ({otherUser._id})
+                      ({(otherUser as any)._id})
                     </span>
                   </p>
                 </div>
