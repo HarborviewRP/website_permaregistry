@@ -205,7 +205,7 @@ export default function DiscordAuth({ user }: Props) {
                   iconColor="text-blue-400"
                 />
               </div>
-              <div className="mt-16 flex flex-row ">
+              <div className="mt-8 flex flex-row">
                 <div style={{ width: "70%" }} className="mx-2">
                   {toggleState ? (
                     <LineChart
