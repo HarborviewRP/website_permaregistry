@@ -98,6 +98,7 @@ export default function Home({ user }: Props) {
         console.error(error);
         setInterviewExists(false);
         setLoading(false);
+        router.push('/');
       }
       setLoading(false);
     };

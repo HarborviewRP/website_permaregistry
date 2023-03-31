@@ -70,49 +70,54 @@ export default function DiscordAuth({ user }: Props) {
     const fetchData = async () => {
       try {
         const res = await fetch("/api/dashboard/summary");
-        const summary = await res.json();
+        if (res.ok) {
+          const summary = await res.json();
 
-        setTotalApplications(summary.totalApplications);
-        setApplicationsReviewedPercentage(
-          summary.applicationsReviewedPercentage
-        );
-        setApplicationStats(summary.applicationsStats);
-        setApplicationsPerDay(summary.applicationsSubmittedPerDay);
-        setApplicationStatusStats(summary.applicationStatusStats);
-        setTotalStaffMembers(summary.totalStaffMembers);
-        setTotalInterviews(summary.totalInterviews);
-        setInterviewReviewedPercentage(summary.interviewsReviewedPercentage);
-        setInterviewStats(summary.interviewsStats);
-        setInterviewsPerDay(summary.interviewsPerDay);
-        setInterviewStatusStats(summary.interviewStatusStats);
-
-        const recentRes = await fetch("/api/dashboard/recently-modified");
-        if (recentRes.ok) {
-          const recentlyMod = await recentRes.json();
-          setRecentForms(recentlyMod);
-          const applicantIds = recentlyMod.map(
-            (recentlyMod: any) => recentlyMod.applicantId
+          setTotalApplications(summary.totalApplications);
+          setApplicationsReviewedPercentage(
+            summary.applicationsReviewedPercentage
           );
-          const usersResponse = await fetch("/api/user/bulk", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ users: applicantIds }),
-          });
-          const map = new Map<String, User>();
-          if (usersResponse.ok) {
-            const usersArray = await usersResponse.json();
-            for (const [id, user] of usersArray) {
-              map.set(id, user);
+          setApplicationStats(summary.applicationsStats);
+          setApplicationsPerDay(summary.applicationsSubmittedPerDay);
+          setApplicationStatusStats(summary.applicationStatusStats);
+          setTotalStaffMembers(summary.totalStaffMembers);
+          setTotalInterviews(summary.totalInterviews);
+          setInterviewReviewedPercentage(summary.interviewsReviewedPercentage);
+          setInterviewStats(summary.interviewsStats);
+          setInterviewsPerDay(summary.interviewsPerDay);
+          setInterviewStatusStats(summary.interviewStatusStats);
+
+          const recentRes = await fetch("/api/dashboard/recently-modified");
+          if (recentRes.ok) {
+            const recentlyMod = await recentRes.json();
+            setRecentForms(recentlyMod);
+            const applicantIds = recentlyMod.map(
+              (recentlyMod: any) => recentlyMod.applicantId
+            );
+            const usersResponse = await fetch("/api/user/bulk", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ users: applicantIds }),
+            });
+            const map = new Map<String, User>();
+            if (usersResponse.ok) {
+              const usersArray = await usersResponse.json();
+              for (const [id, user] of usersArray) {
+                map.set(id, user);
+              }
             }
+            setUsers(map);
+            setLoading(false);
+          } else {
+            setLoading(false);
+            setUsers(undefined);
           }
-          setUsers(map);
-          setLoading(false);
         }
       } catch (err: any) {
         setLoading(false);
-        alert("There was an error..." + err.message);
+        router.push('/');
       }
     };
 
@@ -132,7 +137,7 @@ export default function DiscordAuth({ user }: Props) {
         <div className="flex justify-center">
           <Loader center={false} />
         </div>
-      ) : (
+      ) : users ? (
         <>
           <div className="mx-28 my-10">
             <div className="container mx-auto my-8">
@@ -220,15 +225,27 @@ export default function DiscordAuth({ user }: Props) {
                   )}
                 </div>
                 <div style={{ width: "30%" }} className="mx-2">
-                {toggleState ? (
+                  {toggleState ? (
                     <DonutChart
-                      data={[(totalApplications - (applicationStatusStats[0].count + applicationStatusStats[1].count)), applicationStatusStats[0].count, applicationStatusStats[1].count]}
+                      data={[
+                        totalApplications -
+                          (applicationStatusStats[0].count +
+                            applicationStatusStats[1].count),
+                        applicationStatusStats[0].count,
+                        applicationStatusStats[1].count,
+                      ]}
                       label={"# Of Applications"}
                     />
                   ) : (
                     <DonutChart
-                    data={[(totalInterviews - (interviewStatusStats[0].count + interviewStatusStats[1].count)), interviewStatusStats[0].count, interviewStatusStats[1].count]}
-                    label={"# Of Interviews"}
+                      data={[
+                        totalInterviews -
+                          (interviewStatusStats[0].count +
+                            interviewStatusStats[1].count),
+                        interviewStatusStats[0].count,
+                        interviewStatusStats[1].count,
+                      ]}
+                      label={"# Of Interviews"}
                     />
                   )}
                 </div>
@@ -265,6 +282,8 @@ export default function DiscordAuth({ user }: Props) {
             </div>
           </div>
         </>
+      ) : (
+        <h1>There was an error loading this page...</h1>
       )}
     </>
   );

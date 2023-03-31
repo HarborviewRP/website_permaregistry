@@ -22,6 +22,7 @@ export default function MainPage({ user }: Props) {
   const [users, setUsers] = useState<Map<string, User>>(
     new Map<string, User>()
   );
+  const [text, setText] = useState<string | undefined>();
 
   useEffect(() => {
     if (!user) router.push("/");
@@ -29,30 +30,50 @@ export default function MainPage({ user }: Props) {
   });
 
   const fetchUsers = useCallback(async () => {
-    // setLoading(true);
-    // const res = await fetch(`/api/user/staff`);
-    // if (res.ok) {
-    //   const usersData: [string, User][] = await res.json();
-    //   const usersMap = new Map<string, User>(usersData);
-    //   setUsers(usersMap);
-    //   setLoading(false);
-    // } else {
-    //   setLoading(false);
-    // }
+    setLoading(true);
+    const res = await fetch(`/api/user/staff`);
+    if (res.ok) {
+      const usersData: [string, User][] = await res.json();
+      const usersMap = new Map<string, User>(usersData);
+      setUsers(usersMap);
+      setLoading(false);
+    } else {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
+  const logUserOut = (id: string) => {
+    const func = async (id: string) => {
+      try {
+        const res = await fetch(`/api/logout/${id}`);
+        if (res.ok) {
+          setText(((await res.json()) as any).message);
+          await new Promise(res => setTimeout(res, 5000))
+          setText('');
+        } else {
+          setText(res.statusText)
+        }
+      } catch (err: any) {
+        setText(err.message);
+        router.push('/')
+      }
+    }
+    func(id);
+  }
+
   return (
     <>
       <div className="mx-28 my-10">
         <h1 className="text-white text-3xl">Staff Members (Admin Dashboard)</h1>
+        {text ? <p className="text-green-500">{text}</p> : <></>}
       </div>
-      <div className="mx-28 my-10">
+      {/* <div className="mx-28 my-10">
         <h1 className="text-white text-2xl font-thin">Coming soon...!</h1>
-      </div>
+      </div> */}
       {loading ? (
         <>
           <div className="flex flex-wrap justify-center items-center">
@@ -61,31 +82,34 @@ export default function MainPage({ user }: Props) {
         </>
       ) : users.size > 0 ? (
         <>
-          {/* <div className="flex flex-col flex-wrap justify-center items-center">
+          <div className="flex flex-col flex-wrap justify-center items-center">
             {Array.from(users).map(([userId, userData]) => (
-              <Link
-                key={userId}
-                href={`/profile/${userId}`}
-                passHref={true}
-                style={{ width: "85%" }}
-              >
-                <div className="flex flex-row">
-                  <div
-                    className="flex-grow-0 flex-shrink-0 flex-basis-auto"
-                    style={{ width: "85%" }}
+              <div style={{ width: "80%" }}>
+                <div className="flex flex-row items-center">
+                  <Link
+                    key={userId}
+                    href={`/profile/${userId}`}
+                    passHref={true}
+                    style={{ width: "95%" }}
                   >
-                    <StaffBar user={userData} />
-                  </div>
+                    <div
+                      className="flex-grow-0 flex-shrink-0 flex-basis-auto"
+                      style={{ width: "95%" }}
+                    >
+                      <StaffBar user={userData} />
+                    </div>
+                  </Link>
+
                   <div
-                    className="flex-grow-0 flex-shrink-0 flex-basis-auto ml-2"
+                    className="flex-grow-0 items-center justify-center flex-shrink-0 flex-basis-auto"
                     style={{ width: "5%" }}
                   >
-                    <h1>Logout</h1>
+                    <button className="text-red-600" onClick={() => logUserOut(userId)}>Logout</button>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
-          </div> */}
+          </div>
         </>
       ) : (
         <>

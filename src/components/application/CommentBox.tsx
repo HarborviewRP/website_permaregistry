@@ -105,9 +105,7 @@ const CommentBox: React.FC<CommentProps> = ({
         setComment("");
         obj.notes = postForm.notes || [];
       } else {
-        alert(
-          "There was an error updating this interview. Please try again later."
-        );
+        router.push('/');
       }
     } catch (error) {
       console.error("An error occurred:", error);

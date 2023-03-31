@@ -6,5 +6,5 @@ export const isStaff = (user: User) => {
 }
 
 export const isAdmin = (user: User) => {
-    return user.access_level > 0;
+    return user?.access_level > 0;
 }

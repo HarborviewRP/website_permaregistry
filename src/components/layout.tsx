@@ -126,7 +126,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
           <div>
             {user ? (
               <>
-                {/* {isAdmin(user) && (
+                {isAdmin(user) && (
                   <>
                     <li
                       className="text-left flex flex-col items-center"
@@ -140,7 +140,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                       </Link>
                     </li>
                   </>
-                )} */}
+                )}
                 <Link href="/api/auth/logout">
                   <button id="btn" className="bg-transparent border-2 border-red-700/40 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
                     Logout

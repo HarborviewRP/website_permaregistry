@@ -22,13 +22,13 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   try {
     const { slug } = req.query;
 
-    const userCol = await (await getUserCollection()).collection;
+    const userCol = (await getUserCollection()).collection;
     const user = await userCol.findOne({ _id: slug as string });
     if (!user) {
         return res.status(404).json({ message: "User not found" });
     }
 
-    await userCol.updateOne({ id: slug as string}, { lougout: true })
+    await userCol.updateOne({ id: slug as string}, {$set: { logout: true }})
     return res.status(200).json({ message: "User logged out successfully. "});
   } catch (err: any) {
     console.log(err);

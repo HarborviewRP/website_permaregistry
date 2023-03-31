@@ -198,6 +198,7 @@ export default function MainPage({ user }: Props) {
         );
       }
     } catch (error) {
+      router.push('/');
       console.error("An error occurred:", error);
     }
   };

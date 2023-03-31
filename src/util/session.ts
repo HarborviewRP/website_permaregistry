@@ -54,15 +54,15 @@ export function withAuth(handler: NextIronHandler | NextRoute) {
         return;
       }
 
-    //   if (exists.logout) {
-    //     (await db.collection("users")).updateOne(
-    //       { token: encrypt(user.id) },
-    //       { $set: { logout: false } }
-    //     );
-    //     req.session.destroy();
-    //     res.redirect(`/`);
-    //     return;
-    //   }
+      if (exists.logout) {
+        (await db.collection("users")).updateOne(
+          { token: encrypt(user.id) },
+          { $set: { logout: false } }
+        );
+        req.session.destroy();
+        res.redirect(`/api/logout`);
+        return;
+      }
 
       handler(req, res);
     },
