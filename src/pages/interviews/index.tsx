@@ -48,7 +48,7 @@ export default function MainPage({ user }: Props) {
       const interviews: Interview[] = json.interviews;
       setTotal(json.total);
       setInterviews(interviews);
-      if (page > total / 12) {
+      if (page > total / 6) {
         setHasNextPage(false);
       } else {
         setHasNextPage(true);
