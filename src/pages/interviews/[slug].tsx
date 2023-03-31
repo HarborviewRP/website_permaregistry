@@ -86,12 +86,14 @@ export default function Home({ user }: Props) {
         }
 
         if (interview?.recording_path) {
-          const fileRes = await fetch(`/api/stream/${interview.recording_path}`);
+          const fileRes = await fetch(
+            `/api/stream/${interview.recording_path}`
+          );
           if (fileRes.ok) {
-            const { url } = await fileRes.json()
+            const { url } = await fileRes.json();
             setFileUrl(url);
           }
-        } 
+        }
       } catch (error) {
         console.error(error);
         setInterviewExists(false);
@@ -184,14 +186,16 @@ export default function Home({ user }: Props) {
     setUploading(true);
 
     try {
-      const filename = `${(interview as any)._id}_${(user as any).id}_${Date.now()}`;
-      const newfile = new File([file], filename, { type: `${file.type}` })
+      const filename = `${(interview as any)._id}_${
+        (user as any).id
+      }_${Date.now()}`;
+      const newfile = new File([file], filename, { type: `${file.type}` });
       let { data } = await axios.post("/api/interview/upload", {
         name: filename,
         type: newfile.type,
         interviewId: (interview as any)._id,
       });
-      
+
       const url = data.url;
       await fetch(url, {
         method: "PUT",
@@ -199,14 +203,14 @@ export default function Home({ user }: Props) {
           "Content-type": file.type,
           "Access-Control-Allow-Origin": "*",
         },
-        body: newfile
-      })
+        body: newfile,
+      });
 
       setUploading(false);
       setFile(null);
       router.reload();
     } catch (err) {
-      console.log(err)
+      console.log(err);
       setUploadMessage(
         "There was an error uploading your file. Please try again later."
       );
@@ -232,6 +236,24 @@ export default function Home({ user }: Props) {
     formData["status"] = statusValue;
   };
 
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/interview/${(application as any)._id!!}`, {
+        method: "DELETE",
+        body: JSON.stringify({ interviewId: (interview as any)._id!! }),
+      });
+      if (res.ok) {
+        setLoading(true);
+        alert("Interview deleted successfully!");
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      setLoading(false);
+      alert("There was an error deleteing this interview...");
+    }
+  };
+
   const staffElement = (
     <>
       <div className="flex flex-col relative">
@@ -243,20 +265,34 @@ export default function Home({ user }: Props) {
               <>
                 <form onSubmit={handleSubmit}>
                   <div className="flex flex-row justify-between w-40 mb-6 mt-3">
-                    <button
-                      type="submit"
-                      onClick={() => handleButtonClick(1)}
-                      className="bg-gradient-to-b from-green-500 to-green-700 text-white font-thin text-sm p-1 px-3 rounded"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      type="submit"
-                      onClick={() => handleButtonClick(2)}
-                      className="bg-gradient-to-b from-red-500 to-red-700 text-white font-thin text-sm p-1 px-5 rounded"
-                    >
-                      Reject
-                    </button>
+                    <div className="m-2">
+                      <button
+                        type="submit"
+                        onClick={() => handleButtonClick(1)}
+                        className="bg-gradient-to-b from-green-500 to-green-700 text-white font-thin text-sm p-1 px-3 rounded"
+                      >
+                        Approve
+                      </button>
+                    </div>
+                    <div className="m-2">
+                      <button
+                        type="submit"
+                        onClick={() => handleButtonClick(2)}
+                        className="bg-gradient-to-b from-red-500 to-red-700 text-white font-thin text-sm p-1 px-5 rounded"
+                      >
+                        Reject
+                      </button>
+                    </div>
+                    {isAdmin(user!!) && (
+                      <div className="m-2">
+                        <button
+                          onClick={() => handleDelete()}
+                          className="bg-gradient-to-b from-red-700 to-red-900 text-white font-thin text-sm p-1 px-5 rounded"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </form>
               </>
@@ -270,9 +306,7 @@ export default function Home({ user }: Props) {
                   <h1 className="text-white pl-2 font-semibold mb-3">
                     Interview Recording
                   </h1>
-                  <AudioPlayer
-                    src={fileUrl}
-                  />
+                  <AudioPlayer src={fileUrl} />
                 </div>
               </>
             ) : (
@@ -375,13 +409,13 @@ export default function Home({ user }: Props) {
             </p>
           </div>
           <div className="flex flex-row py-2">
-          <Link href={`/profile/${((applicant as any)._id)}`} passHref={true}>
-            <div className="flex flex-row">
-            <h1 className="text-white font-semibold">{`${applicant?.username}#${applicant?.discriminator}`}</h1>
-            <p className="text-white font-thin italic px-2">
-              ({(applicant as any)._id})
-            </p>
-            </div>
+            <Link href={`/profile/${(applicant as any)._id}`} passHref={true}>
+              <div className="flex flex-row">
+                <h1 className="text-white font-semibold">{`${applicant?.username}#${applicant?.discriminator}`}</h1>
+                <p className="text-white font-thin italic px-2">
+                  ({(applicant as any)._id})
+                </p>
+              </div>
             </Link>
             <p className="text-white font-semibold italic px-2">
               Age:{" "}

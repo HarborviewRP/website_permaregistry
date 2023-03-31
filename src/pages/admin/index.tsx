@@ -3,9 +3,12 @@ import Head from "next/head";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useEffect, useState } from "react";
-import { User } from "src/types";
-import { isAdmin } from "src/util/permission";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import ApplicationBar from "src/components/application/ApplicationBar";
+import Loader from "src/components/Loader";
+import StaffBar from "src/components/roster/StaffBar";
+import { Application, DISCORD, User } from "src/types";
+import { isAdmin, isStaff } from "src/util/permission";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 
@@ -13,44 +16,89 @@ interface Props {
   user?: User;
 }
 
-export default function DiscordAuth({ user }: Props) {
+export default function MainPage({ user }: Props) {
   const router = useRouter();
-  useEffect(() => {
-    if (!user) router.push('/')
-    if (!isAdmin(user!!)) router.push('/404');
-  })
+  const [loading, setLoading] = useState<boolean>(false);
+  const [users, setUsers] = useState<Map<string, User>>(
+    new Map<string, User>()
+  );
 
-  const [users, setUsers] = useState<Map<String, User>>();
+  useEffect(() => {
+    if (!user) router.push("/");
+    if (!isAdmin(user!!)) router.push("/");
+  });
+
+  const fetchUsers = useCallback(async () => {
+    // setLoading(true);
+    // const res = await fetch(`/api/user/staff`);
+    // if (res.ok) {
+    //   const usersData: [string, User][] = await res.json();
+    //   const usersMap = new Map<string, User>(usersData);
+    //   setUsers(usersMap);
+    //   setLoading(false);
+    // } else {
+    //   setLoading(false);
+    // }
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   return (
     <>
-     <div className="h-screen flex justify-center items-center">
-      <div className="p-6 max-w-sm mx-auto bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md flex items-center space-x-4 backdrop-blur">
-        {user && (
-          <>
-            <div className="flex-shrink-0">
-              <Image
-              className="rounded-full"
-                src={user.avatar}
-                alt="User Avatar"
-                height={56}
-                width={56}
-              />
-            </div>
-            <h1 className="px-5 py-1 text-1xl font-semibold flex justify-center items-center text-white  border-indigo-500 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
-              {user.username}#{user.discriminator}
-            </h1>
-            <Link href="/api/auth/logout" passHref>
-              <button className="px-2.5 py-2 text-sm flex justify-start text-indigo-500 font-semibold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
-                Logout
-              </button>
-            </Link>
-          </>
-        )}
+      <div className="mx-28 my-10">
+        <h1 className="text-white text-3xl">Staff Members (Admin Dashboard)</h1>
       </div>
-    </div>
+      <div className="mx-28 my-10">
+        <h1 className="text-white text-2xl font-thin">Coming soon...!</h1>
+      </div>
+      {loading ? (
+        <>
+          <div className="flex flex-wrap justify-center items-center">
+            <Loader center={false} />
+          </div>
+        </>
+      ) : users.size > 0 ? (
+        <>
+          {/* <div className="flex flex-col flex-wrap justify-center items-center">
+            {Array.from(users).map(([userId, userData]) => (
+              <Link
+                key={userId}
+                href={`/profile/${userId}`}
+                passHref={true}
+                style={{ width: "85%" }}
+              >
+                <div className="flex flex-row">
+                  <div
+                    className="flex-grow-0 flex-shrink-0 flex-basis-auto"
+                    style={{ width: "85%" }}
+                  >
+                    <StaffBar user={userData} />
+                  </div>
+                  <div
+                    className="flex-grow-0 flex-shrink-0 flex-basis-auto ml-2"
+                    style={{ width: "5%" }}
+                  >
+                    <h1>Logout</h1>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div> */}
+        </>
+      ) : (
+        <>
+          <div className="flex flex-wrap mx-28">
+            <h1 className="text-gray-400 text-xl font-thin">
+              There are no staff...
+            </h1>
+          </div>
+        </>
+      )}
     </>
   );
 }
 
-export const getServerSideProps: GetServerSideProps = withSession(developerRoute)
+export const getServerSideProps: GetServerSideProps =
+  withSession(developerRoute);

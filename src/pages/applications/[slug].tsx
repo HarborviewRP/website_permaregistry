@@ -206,6 +206,24 @@ export default function MainPage({ user }: Props) {
     formData["status"] = statusValue;
   };
 
+  const handleDelete = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/application/${(application as any)._id!!}`, {
+        method: "DELETE",
+        body: JSON.stringify({ applicationId: (application as any)._id!! }),
+      });
+      if (res.ok) {
+        setLoading(true);
+        alert("Application deleted successfully!")
+        router.push("/dashboard");
+      }
+    } catch (error) {
+      setLoading(false);
+      alert("There was an error deleteing this application...");
+    }
+  };
+
   const staffElement = (
     <>
       <form onSubmit={handleSubmit}>
@@ -250,20 +268,35 @@ export default function MainPage({ user }: Props) {
           </div>
         </div>
         <div className="flex flex-row justify-between w-40">
-          <button
-            type="submit"
-            onClick={() => handleButtonClick(1)}
-            className="bg-gradient-to-b from-green-500 to-green-700 text-white font-thin text-sm p-1 px-3 rounded"
-          >
-            Approve
-          </button>
-          <button
-            type="submit"
-            onClick={() => handleButtonClick(2)}
-            className="bg-gradient-to-b from-red-500 to-red-700 text-white font-thin text-sm p-1 px-5 rounded"
-          >
-            Reject
-          </button>
+          <div className="m-2">
+            <button
+              type="submit"
+              onClick={() => handleButtonClick(1)}
+              className="bg-gradient-to-b from-green-500 to-green-700 text-white font-thin text-sm p-1 px-3 rounded"
+            >
+              Approve
+            </button>
+          </div>
+          <div className="m-2">
+            <button
+              type="submit"
+              onClick={() => handleButtonClick(2)}
+              className="bg-gradient-to-b from-red-500 to-red-700 text-white font-thin text-sm p-1 px-5 rounded"
+            >
+              Reject
+            </button>
+          </div>
+
+          {isAdmin(user!!) && (
+            <div className="m-2">
+              <button
+                onClick={() => handleDelete()}
+                className="bg-gradient-to-b from-red-700 to-red-900 text-white font-thin text-sm p-1 px-5 rounded"
+              >
+                Delete
+              </button>
+            </div>
+          )}
         </div>
       </form>
     </>
@@ -301,13 +334,13 @@ export default function MainPage({ user }: Props) {
             </p>
           </div>
           <div className="flex flex-row py-2">
-            <Link href={`/profile/${((applicant as any)._id)}`} passHref={true}>
-            <div className="flex flex-row">
-            <h1 className="text-white font-semibold">{`${applicant?.username}#${applicant?.discriminator}`}</h1>
-            <p className="text-white font-thin italic px-2">
-              ({(applicant as any)._id})
-            </p>
-            </div>
+            <Link href={`/profile/${(applicant as any)._id}`} passHref={true}>
+              <div className="flex flex-row">
+                <h1 className="text-white font-semibold">{`${applicant?.username}#${applicant?.discriminator}`}</h1>
+                <p className="text-white font-thin italic px-2">
+                  ({(applicant as any)._id})
+                </p>
+              </div>
             </Link>
             <p className="text-white font-semibold italic px-2">
               Age:{" "}
@@ -330,7 +363,7 @@ export default function MainPage({ user }: Props) {
                   <h1 className="text-gray-400 font-thin pb-2">
                     Last modfied by:{" "}
                     <Link href={`/profile/${application?.updatedById}`}>
-                       {application?.updatedById}
+                      {application?.updatedById}
                     </Link>
                   </h1>
                   <h1 className="text-gray-400 font-thin ">

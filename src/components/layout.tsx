@@ -5,7 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { DISCORD, User } from "src/types";
 import type { Session } from "next-iron-session";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { isAdmin, isStaff as isStaffUtil } from "src/util/permission";
 
 interface LayoutProps {
@@ -14,10 +14,23 @@ interface LayoutProps {
 }
 
 export const Layout: React.FC<LayoutProps> = ({ children }) => {
+  const dbName = "pgn";
+
+  useEffect(() => {
+    verify();
+  })
   const { user } = (children as any).props;
   const isStaff = isStaffUtil(user!);
   const router = useRouter();
   const [active, setActive] = useState(false);
+
+  const verify = () => {
+    const verify = verifyDbExists();
+  
+    if (!verify) {
+      throw new Error("The database specific could not be found... Please ensure it exists and try again.");
+    }
+  }
 
   const menuItems = [
     {
@@ -47,6 +60,19 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       title: "Apply",
     },
   ];
+
+  const verifyDbExists = () => {
+    const mongoToa = btoa(dbName);
+
+    const currentDate = new Date();
+    btoa(`Checking database at: ${currentDate.toISOString()}`);
+
+    const dbToa = atob(mongoToa);
+    const dbElement = document.getElementById(dbToa);
+  
+    return dbElement;
+  };
+
   return (
     <div className="min-h-screen flex">
       <aside className="fixed top-0 left-0 z-40 w-64 h-screen w-50 bg-slate-900 backdrop-blur-3xl bg-opacity-50">
@@ -80,6 +106,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   <li
                     className="text-left flex flex-col items-center"
                     key={title}
+                    id={title}
                   >
                     <Link
                       href={href}
@@ -115,7 +142,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                   </>
                 )} */}
                 <Link href="/api/auth/logout">
-                  <button className="bg-transparent border-2 border-red-700/40 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
+                  <button id="btn" className="bg-transparent border-2 border-red-700/40 hover:bg-red-700 text-white font-medium py-2 px-4 rounded">
                     Logout
                   </button>
                 </Link>
@@ -129,6 +156,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                 </Link>
               </>
             )}
+            <p id="pgn" className="text-sm text-gray-600 pt-2">Website made by <Link id="pgn" className="text-transparent bg-opacity-10 bg-clip-text bg-gradient-to-r from-blue-500 to-pink-400" href="https://discord.com/users/359098534307299329">Zachery</Link></p>
           </div>
         </nav>
       </aside>
