@@ -1,4 +1,4 @@
-import { getInterviewsReviewedPercentage, getInterviewStats, getTotalInterviews } from './../../../util/database';
+import { getApplicationsPerDay, getInterviewsPerDay, getInterviewsReviewedPercentage, getInterviewStats, getTotalInterviews } from './../../../util/database';
 import { isStaff } from "src/util/permission";
 import {
   getTotalApplications,
@@ -26,11 +26,14 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       applicationsReviewedPercentage: await getApplicationsReviewedPercentage(),
       applicationsStats: await getApplicationsStats(),
       applicationStatusStats: await getApplicationStatusStats(),
+      applicationsSubmittedPerDay: await getApplicationsPerDay(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), new Date()),
 
       totalInterviews: await getTotalInterviews(),
       interviewsReviewedPercentage: await getInterviewsReviewedPercentage(),
       interviewsStats: await getInterviewStats(),
       interviewStatusStats: await getInterviewStatusStats(),
+      interviewsPerDay: await getInterviewsPerDay(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), new Date()),
+
     };    
 
     return res.status(200).json(dashboardSummary);

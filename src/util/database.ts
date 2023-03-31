@@ -318,3 +318,90 @@ export const getInterviewStatusStats = async () => {
 
   return applicationStatusStats;
 };
+
+
+export const getInterviewsPerDay = async (startDate: Date, endDate: Date) => {
+  const interviewCollectionObj = await getInterviewCollection();
+  const interviewCollection = interviewCollectionObj.collection;
+
+  const results = await interviewCollection
+    .aggregate([
+      {
+        '$match': {
+          'creationDate': {
+            '$gte': startDate.getTime(), 
+            '$lte': endDate.getTime(),
+          }
+        }
+      }, {
+        '$group': {
+          '_id': {
+            '$dateToString': {
+              'format': '%Y-%m-%d', 
+              'date': {
+                '$toDate': '$creationDate'
+              }
+            }
+          }, 
+          'count': {
+            '$sum': 1
+          }
+        }
+      }, {
+        '$sort': {
+          '_id': 1
+        }
+      }
+    ])
+    .toArray();
+
+  const lineChartData = results.map((result) => ({
+    date: result._id,
+    count: result.count,
+  }));
+
+  return lineChartData;
+};
+
+export const getApplicationsPerDay = async (startDate: Date, endDate: Date) => {
+  const applicationCollectionObj = await getApplicationCollection();
+  const applicationCollection = applicationCollectionObj.collection;
+
+  const results = await applicationCollection
+    .aggregate([
+      {
+        '$match': {
+          'submissionDate': {
+            '$gte': startDate.getTime(), 
+            '$lte': endDate.getTime(),
+          }
+        }
+      }, {
+        '$group': {
+          '_id': {
+            '$dateToString': {
+              'format': '%Y-%m-%d', 
+              'date': {
+                '$toDate': '$submissionDate'
+              }
+            }
+          }, 
+          'count': {
+            '$sum': 1
+          }
+        }
+      }, {
+        '$sort': {
+          '_id': 1
+        }
+      }
+    ])
+    .toArray();
+
+  const lineChartData = results.map((result) => ({
+    date: result._id,
+    count: result.count,
+  }));
+
+  return lineChartData;
+};

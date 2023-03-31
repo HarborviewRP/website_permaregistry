@@ -18,12 +18,16 @@ import {
 import RecentBar from "src/components/dashboard/RecentBar";
 import { isStaff } from "src/util/permission";
 import Loader from "src/components/Loader";
+import LineChart from "src/components/dashboard/LineChart";
+import { Chart } from "chart.js";
+import DonutChart from "src/components/dashboard/DonutChart";
 
 interface Props {
   user?: User;
 }
 
 export default function DiscordAuth({ user }: Props) {
+  Chart.register(LineChart as any);
   const router = useRouter();
   useEffect(() => {
     if (!user) router.push("/");
@@ -40,7 +44,8 @@ export default function DiscordAuth({ user }: Props) {
   const [totalStaffMembers, setTotalStaffMembers] = useState<number>(0);
 
   const [totalInterviews, setTotalInterviews] = useState<number>(0);
-  const [interviewReviewedPercentage, setInterviewReviewedPercentage] = useState<number>(0);
+  const [interviewReviewedPercentage, setInterviewReviewedPercentage] =
+    useState<number>(0);
   const [interviewStats, setInterviewStats] = useState({
     approved: 0,
     denied: 0,
@@ -50,7 +55,15 @@ export default function DiscordAuth({ user }: Props) {
 
   const [users, setUsers] = useState<Map<String, User>>();
   const [recentForms, setRecentForms] = useState<any | undefined>();
-  const [toggleState, setToggleState] = useState(true)
+  const [toggleState, setToggleState] = useState(true);
+  const [applicationsPerDay, setApplicationsPerDay] = useState<
+    Array<{ _id: string; count: number }>
+  >([]);
+  const [interviewsPerDay, setInterviewsPerDay] = useState<
+    Array<{ _id: string; count: number }>
+  >([]);
+  const [applicationStatusStats, setApplicationStatusStats] = useState<any>();
+  const [interviewStatusStats, setInterviewStatusStats] = useState<any>();
 
   useEffect(() => {
     setLoading(true);
@@ -64,14 +77,14 @@ export default function DiscordAuth({ user }: Props) {
           summary.applicationsReviewedPercentage
         );
         setApplicationStats(summary.applicationsStats);
-
+        setApplicationsPerDay(summary.applicationsSubmittedPerDay);
+        setApplicationStatusStats(summary.applicationStatusStats);
         setTotalStaffMembers(summary.totalStaffMembers);
-
         setTotalInterviews(summary.totalInterviews);
-        setInterviewReviewedPercentage(
-          summary.interviewsReviewedPercentage
-        );
+        setInterviewReviewedPercentage(summary.interviewsReviewedPercentage);
         setInterviewStats(summary.interviewsStats);
+        setInterviewsPerDay(summary.interviewsPerDay);
+        setInterviewStatusStats(summary.interviewStatusStats);
 
         const recentRes = await fetch("/api/dashboard/recently-modified");
         if (recentRes.ok) {
@@ -107,8 +120,8 @@ export default function DiscordAuth({ user }: Props) {
   }, []);
 
   const handleToggle = () => {
-    setToggleState(!toggleState)
-  }
+    setToggleState(!toggleState);
+  };
 
   return (
     <>
@@ -123,33 +136,64 @@ export default function DiscordAuth({ user }: Props) {
         <>
           <div className="mx-28 my-10">
             <div className="container mx-auto my-8">
-            <h1 className="text-white text-xl mb-3"><button onClick={handleToggle}><span className={toggleState ? 'text-white' : 'text-gray-500'}>Application</span> / <span className={toggleState ?  'text-gray-500' : 'text-white'}>Interview</span> Stats </button></h1>
+              <h1 className="text-white text-xl mb-3">
+                <button onClick={handleToggle}>
+                  <span
+                    className={toggleState ? "text-white" : "text-gray-500"}
+                  >
+                    Application
+                  </span>{" "}
+                  /{" "}
+                  <span
+                    className={toggleState ? "text-gray-500" : "text-white"}
+                  >
+                    Interview
+                  </span>{" "}
+                  Stats{" "}
+                </button>
+              </h1>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 <StatsCard
-                  title={`Total ${toggleState ? 'Applications' : 'Interviews'}`}
+                  title={`Total ${toggleState ? "Applications" : "Interviews"}`}
                   value={toggleState ? totalApplications : totalInterviews}
                   icon={HiFolderOpen}
                   iconColor={toggleState ? "text-blue-400" : "text-yellow-400"}
                 />
                 <StatsCard
-                  title={`% of ${toggleState ? 'Apps' : 'Interviews'} Reviewed`}
+                  title={`% of ${toggleState ? "Apps" : "Interviews"} Reviewed`}
                   value={
-                    Math.round((toggleState ? applicationsReviewedPercentage : interviewReviewedPercentage) * 10) / 10 || 0
+                    Math.round(
+                      (toggleState
+                        ? applicationsReviewedPercentage
+                        : interviewReviewedPercentage) * 10
+                    ) / 10 || 0
                   }
                   showPercentage={true}
                   icon={HiClipboard}
                   iconColor={toggleState ? "text-blue-400" : "text-yellow-400"}
                 />
                 <StatsCard
-                  title={`% of ${toggleState ? 'Apps' : 'Interviews'} Approved`}
-                  value={Math.round((toggleState ? applicationStats.approved : interviewStats.approved) * 10) / 10 || 0}
+                  title={`% of ${toggleState ? "Apps" : "Interviews"} Approved`}
+                  value={
+                    Math.round(
+                      (toggleState
+                        ? applicationStats.approved
+                        : interviewStats.approved) * 10
+                    ) / 10 || 0
+                  }
                   showPercentage={true}
                   icon={HiCheck}
                   iconColor="text-green-400"
                 />
                 <StatsCard
-                  title={`% of ${toggleState ? 'Apps' : 'Interviews'} Rejected`}
-                  value={Math.round((toggleState ? applicationStats.denied : interviewStats.denied)* 10) / 10 || 0}
+                  title={`% of ${toggleState ? "Apps" : "Interviews"} Rejected`}
+                  value={
+                    Math.round(
+                      (toggleState
+                        ? applicationStats.denied
+                        : interviewStats.denied) * 10
+                    ) / 10 || 0
+                  }
                   showPercentage={true}
                   icon={HiX}
                   iconColor="text-red-400"
@@ -160,6 +204,34 @@ export default function DiscordAuth({ user }: Props) {
                   icon={HiUsers}
                   iconColor="text-blue-400"
                 />
+              </div>
+              <div className="mt-16 flex flex-row ">
+                <div style={{ width: "70%" }} className="mx-2">
+                  {toggleState ? (
+                    <LineChart
+                      data={applicationsPerDay}
+                      label={"Applications Submitted / Day"}
+                    />
+                  ) : (
+                    <LineChart
+                      data={interviewsPerDay}
+                      label={"Interviews Opened / Day"}
+                    />
+                  )}
+                </div>
+                <div style={{ width: "30%" }} className="mx-2">
+                {toggleState ? (
+                    <DonutChart
+                      data={[(totalApplications - (applicationStatusStats[0].count + applicationStatusStats[1].count)), applicationStatusStats[0].count, applicationStatusStats[1].count]}
+                      label={"# Of Applications"}
+                    />
+                  ) : (
+                    <DonutChart
+                    data={[(totalInterviews - (interviewStatusStats[0].count + interviewStatusStats[1].count)), interviewStatusStats[0].count, interviewStatusStats[1].count]}
+                    label={"# Of Interviews"}
+                    />
+                  )}
+                </div>
               </div>
               <div className="mt-16">
                 <h1 className="text-white text-xl">Recently Updated</h1>
