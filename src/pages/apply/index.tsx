@@ -301,6 +301,7 @@ export default function DiscordAuth({ user }: Props) {
     for (const section of Object.values(formStructure)) {
       const questions = [];
       for (const field of section.fields) {
+        if (field.name === "agreement1" || field.name === "agreement2") continue; 
         questions.push({
           questionId: field.name,
           questionText: field.label,

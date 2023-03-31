@@ -7,6 +7,7 @@ module.exports = {
       "robohash.org",
       "seeklogo.com",
       "cdn.discordapp.com",
+      "media.discordapp.net",
       "static.tvtropes.org",
     ],
   },

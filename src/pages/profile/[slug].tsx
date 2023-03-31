@@ -36,7 +36,7 @@ export default function MainPage({ user }: Props) {
   });
 
   const bannerStyle = {
-    backgroundImage: `url(${user?.banner}?size=4096)`,
+    backgroundImage: `url(${otherUser?.banner}?size=4096)`,
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
     backgroundBlendMode: "multiply",
@@ -65,11 +65,13 @@ export default function MainPage({ user }: Props) {
                 </div>
                 {isStaff(otherUser) ? (
                   <div className="px-16">
-                    {isAdmin(otherUser) ? <><p className="text-center text-xl font-bold text-red-800">
+                    {otherUser.access_level === 1 ? <p className="text-center text-xl font-bold text-red-800">
                     Website Admin
-                  </p></> : <p className="text-center text-xl font-bold text-yellow-500">
+                  </p> : (otherUser.access_level > 1 ? <p className="text-center text-xl font-bold text-red-500">
+                    System
+                  </p> : <p className="text-center text-xl font-bold text-yellow-500">
                     Recruitment Team
-                  </p>}
+                  </p>)}
                   
                 </div>
                 ) : <p className="px-16 text-center text-xl font-bold text-gray-500">
