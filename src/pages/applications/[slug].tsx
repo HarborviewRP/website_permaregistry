@@ -301,10 +301,14 @@ export default function MainPage({ user }: Props) {
             </p>
           </div>
           <div className="flex flex-row py-2">
+            <Link href={`/profile/${((applicant as any)._id)}`} passHref={true}>
+            <div className="flex flex-row">
             <h1 className="text-white font-semibold">{`${applicant?.username}#${applicant?.discriminator}`}</h1>
             <p className="text-white font-thin italic px-2">
               ({(applicant as any)._id})
             </p>
+            </div>
+            </Link>
             <p className="text-white font-semibold italic px-2">
               Age:{" "}
               {application?.sections[0]?.questions[0]?.response?.value || 0}
@@ -324,7 +328,10 @@ export default function MainPage({ user }: Props) {
               {isStaff && (
                 <>
                   <h1 className="text-gray-400 font-thin pb-2">
-                    Last modfied by: {application?.updatedById}
+                    Last modfied by:{" "}
+                    <Link href={`/profile/${application?.updatedById}`}>
+                       {application?.updatedById}
+                    </Link>
                   </h1>
                   <h1 className="text-gray-400 font-thin ">
                     Last updated:{" "}

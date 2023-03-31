@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { GetServerSideProps } from "next";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
+import Link from "next/link";
 
 interface CommentProps {
   obj: Application | Interview;
@@ -103,7 +104,6 @@ const CommentBox: React.FC<CommentProps> = ({
         // setLoading(true);
         setComment("");
         obj.notes = postForm.notes || [];
-
       } else {
         alert(
           "There was an error updating this interview. Please try again later."
@@ -124,32 +124,35 @@ const CommentBox: React.FC<CommentProps> = ({
         {text && <h1 className="text-white font-semibold">{text}</h1>}
         {obj!!.notes.map((note: any) => (
           <div key={note!!.noteId} className="my-2">
-            <div className="flex flex-row items-center p-1">
-              <div
-                className="rounded-full mr-2 relative overflow-hidden"
-                style={{ width: 24, height: 24 }}
-              >
-                <Image
-                  src={commentUsers!!.get(note!!.authorId!!)!!.avatar}
-                  alt="User Avatar"
-                  height={24}
-                  width={24}
-                />
-              </div>
-              <div className="flex flex-col">
-                <h1
-                  className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600"
+            <Link
+              href={`/profile/${(commentUsers!!.get(note!!.authorId!!)!! as any)._id}`}
+              passHref={true}
+            >
+              <div className="flex flex-row items-center p-1">
+                <div
+                  className="rounded-full mr-2 relative overflow-hidden"
+                  style={{ width: 24, height: 24 }}
                 >
-                  {commentUsers!!.get(note!!.authorId!!)!!.username}#
-                  {commentUsers!!.get(note!!.authorId!!)!!.discriminator}
-                </h1>
-                <p className="text-gray-500 text-xs">
-                  {moment
-                    .unix(note!!.timestamp / 1e3)
-                    .format("MMM Do, YYYY - h:mm A")}
-                </p>
+                  <Image
+                    src={commentUsers!!.get(note!!.authorId!!)!!.avatar}
+                    alt="User Avatar"
+                    height={24}
+                    width={24}
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">
+                    {commentUsers!!.get(note!!.authorId!!)!!.username}#
+                    {commentUsers!!.get(note!!.authorId!!)!!.discriminator}
+                  </h1>
+                  <p className="text-gray-500 text-xs">
+                    {moment
+                      .unix(note!!.timestamp / 1e3)
+                      .format("MMM Do, YYYY - h:mm A")}
+                  </p>
+                </div>
               </div>
-            </div>
+            </Link>
 
             <p className="text-sm text-gray-500 mt-1">{note!!.text}</p>
           </div>
