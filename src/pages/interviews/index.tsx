@@ -21,10 +21,11 @@ export default function MainPage({ user }: Props) {
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<Map<String, User>>();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(router.query.page ? router.query.page as unknown as number : 1);
   const [pageLength, setPageLength] = useState(6);
   const [sortStatus, setSortStatus] = useState<string | null>("asc");
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     if (!user) router.push("/");
@@ -43,9 +44,11 @@ export default function MainPage({ user }: Props) {
       `/api/interview/get-interviews?${queryParams.toString()}`
     );
     if (res.ok) {
-      const interviews: Interview[] = await res.json();
+      const json = (await res.json());
+      const interviews: Interview[] = json.interviews;
+      setTotal(json.total);
       setInterviews(interviews);
-      if (interviews.length < pageLength) {
+      if (page > total / 12) {
         setHasNextPage(false);
       } else {
         setHasNextPage(true);
@@ -151,6 +154,7 @@ export default function MainPage({ user }: Props) {
             >
               Previous
             </button>
+            <p className="text-white">Page {page} of {Math.round(total / 12)}</p>
             <button
               onClick={nextPage}
               className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}

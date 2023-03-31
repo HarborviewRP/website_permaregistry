@@ -2,6 +2,7 @@ import {
     getallInterviews,
     getInterviewPage,
     getSortedInterviews,
+    getTotalInterviews,
   } from "./../../../util/database";
   import { DISCORD } from "src/types";
   import { NextApiResponse } from "next";
@@ -25,11 +26,11 @@ import { isStaff } from "src/util/permission";
       const sortStatus = req.query.sortStatus as 'asc' | 'desc' | undefined;
   
       if (page !== undefined && pageLength !== undefined) {
-        if (sortStatus) {
-          return res.status(200).json(await getSortedInterviews(page, pageLength, sortStatus));
-        } else {
-          return res.status(200).json(await getInterviewPage(page, pageLength));
-        }
+      if (sortStatus) {
+        return res.status(200).json({ interviews: await getSortedInterviews(page, pageLength, sortStatus), total: await getTotalInterviews()});
+      } else {
+        return res.status(200).json({ interviews: await getInterviewPage(page, pageLength), total: await getTotalInterviews()});
+      }
       }
   
       return res.status(200).json(await getallInterviews());

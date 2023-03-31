@@ -3,6 +3,7 @@ import {
   getAllApplications,
   getApplicationPage,
   getSortedApplications,
+  getTotalApplications,
 } from "./../../../util/database";
 import { DISCORD } from "src/types";
 import { NextApiResponse } from "next";
@@ -26,9 +27,9 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
 
     if (page !== undefined && pageLength !== undefined) {
       if (sortStatus) {
-        return res.status(200).json(await getSortedApplications(page, pageLength, sortStatus));
+        return res.status(200).json({ applications: await getSortedApplications(page, pageLength, sortStatus), total: await getTotalApplications()});
       } else {
-        return res.status(200).json(await getApplicationPage(page, pageLength));
+        return res.status(200).json({ applications: await getApplicationPage(page, pageLength), total: await getTotalApplications()});
       }
     }
 

@@ -20,10 +20,11 @@ export default function MainPage({ user }: Props) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<Map<String, User>>();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useState(router.query.page ? router.query.page as unknown as number : 1);
   const [pageLength, setPageLength] = useState(12);
   const [sortStatus, setSortStatus] = useState<string | null>("asc");
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
     if (!user) router.push("/");
@@ -42,9 +43,12 @@ export default function MainPage({ user }: Props) {
       `/api/application/get-applications?${queryParams.toString()}`
     );
     if (res.ok) {
-      const applications: Application[] = await res.json();
+      const json = (await res.json());
+      const applications: Application[] = json.applications;
+      setTotal(json.total);
+
       setApplications(applications);
-      if (applications.length < pageLength) {
+      if (page > total / 12) {
         setHasNextPage(false);
       } else {
         setHasNextPage(true);
@@ -142,6 +146,7 @@ export default function MainPage({ user }: Props) {
             >
               Previous
             </button>
+            <p className="text-white">Page {page} of {Math.round(total / 12)}</p>
             <button
               onClick={nextPage}
               className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}

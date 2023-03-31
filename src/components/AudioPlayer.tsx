@@ -4,9 +4,24 @@ interface CustomAudioPlayerProps {
   src: string;
 }
 
+const formatTime = (time: number) => {
+  const hours = Math.floor(time / 3600);
+  const minutes = Math.floor((time % 3600) / 60);
+  const seconds = Math.floor(time % 60);
+
+  return (
+    (hours > 0 ? hours + ":" : "") +
+    minutes.toString().padStart(2, "0") +
+    ":" +
+    seconds.toString().padStart(2, "0")
+  );
+};
+
 const AudioPlayer: React.FC<CustomAudioPlayerProps> = ({ src }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const togglePlayPause = () => {
@@ -20,6 +35,8 @@ const AudioPlayer: React.FC<CustomAudioPlayerProps> = ({ src }) => {
       const currentProgress =
         ((audio?.currentTime || 0) / (audio?.duration || 1)) * 100;
       setProgress(currentProgress);
+      setCurrentTime(audio?.currentTime || 0);
+      setDuration(audio?.duration || 0);
     };
 
     if (audio) {
@@ -92,6 +109,9 @@ const AudioPlayer: React.FC<CustomAudioPlayerProps> = ({ src }) => {
             onChange={handleProgressChange}
             className="w-full bg-gray-300 h-1.5 cursor-pointer"
           />
+          <p>
+            {formatTime(currentTime)} / {formatTime(duration)}
+          </p>
         </div>
       </div>
     </div>
