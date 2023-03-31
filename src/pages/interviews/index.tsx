@@ -48,7 +48,7 @@ export default function MainPage({ user }: Props) {
       const interviews: Interview[] = json.interviews;
       setTotal(json.total);
       setInterviews(interviews);
-      if (page > total / 6) {
+      if (page >= total / 6) {
         setHasNextPage(false);
       } else {
         setHasNextPage(true);
@@ -154,7 +154,7 @@ export default function MainPage({ user }: Props) {
             >
               Previous
             </button>
-            <p className="text-white">Page {page} of {Math.round(total / 12)}</p>
+            <p className="text-white">Page {page} of {Math.round(total / 6)}</p>
             <button
               onClick={nextPage}
               className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
