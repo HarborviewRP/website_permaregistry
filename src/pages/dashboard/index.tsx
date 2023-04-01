@@ -1,17 +1,15 @@
 import { GetServerSideProps } from "next";
-import Head from "next/head";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import { Application, User } from "src/types";
+import {  User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import StatsCard from "src/components/StatsCard";
 import {
+  HiArchive,
   HiCheck,
-  HiClipboard,
-  HiFolderOpen,
+  HiClipboardCheck,
   HiUsers,
   HiX,
 } from "react-icons/hi";
@@ -161,7 +159,7 @@ export default function DiscordAuth({ user }: Props) {
                 <StatsCard
                   title={`Total ${toggleState ? "Applications" : "Interviews"}`}
                   value={toggleState ? totalApplications : totalInterviews}
-                  icon={HiFolderOpen}
+                  icon={HiArchive}
                   iconColor={toggleState ? "text-blue-400" : "text-yellow-400"}
                 />
                 <StatsCard
@@ -174,7 +172,7 @@ export default function DiscordAuth({ user }: Props) {
                     ) / 10 || 0
                   }
                   showPercentage={true}
-                  icon={HiClipboard}
+                  icon={HiClipboardCheck}
                   iconColor={toggleState ? "text-blue-400" : "text-yellow-400"}
                 />
                 <StatsCard
