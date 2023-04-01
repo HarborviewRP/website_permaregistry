@@ -1,13 +1,4 @@
-import { getInterviewsReviewedPercentage, getInterviewStats, getTotalInterviews } from './../../../util/database';
-import { isAdmin, isStaff } from "src/util/permission";
-import {
-  getTotalApplications,
-  getApplicationsReviewedPercentage,
-  getApplicationsStats,
-  getTotalStaffMembers,
-  getApplicationStatusStats,
-  getInterviewStatusStats,
-} from "../../../util/database";
+import { isAdmin } from "src/util/permission";
 import { NextApiResponse } from "next";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { getUserCollection } from 'src/util/mongodb';
@@ -28,7 +19,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         return res.status(404).json({ message: "User not found" });
     }
 
-    await userCol.updateOne({ id: slug as string}, {$set: { logout: true }})
+    const update = await userCol.updateOne({ id: slug as string}, {$set: { logout: true }});
     return res.status(200).json({ message: "User logged out successfully. "});
   } catch (err: any) {
     console.log(err);

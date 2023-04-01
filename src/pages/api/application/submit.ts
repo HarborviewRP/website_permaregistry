@@ -5,10 +5,17 @@ import { dbConnect } from "src/util/mongodb";
 import { Application } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { ObjectID } from "bson";
+import { isStaff } from "src/util/permission";
 
 // TODO: Check if user has rejected or pending application in the last 14 days
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
+    const user = req.session.get("user");
+
+    if (!user.member) {
+      return res.status(403).json({ message: 'You must be a member of the Discord before applying...' })
+    }
+
     const applicantId = req.body.applicantId;
     const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000); // 14 days ago
 
@@ -21,7 +28,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       submissionDate: { $gte: twoWeeksAgo.getTime() },
     });
 
-    if (rejectedOrPending) {
+    if (rejectedOrPending && !isStaff(user)) {
       const timeUntilNextApplication =
         twoWeeksAgo.getTime() + 14 * 24 * 60 * 60 * 1000 - Date.now(); // in milliseconds
       const daysUntilNextApplication = Math.ceil(

@@ -51,12 +51,20 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       }
     );
 
-    const { data: discordData } = await axios.get(`https://discordapp.com/api/v9/users/@me/guilds/${DISCORD.ID}/member`,
-    {
-      headers: {
-        Authorization: `Bearer ${data.access_token}`,
-      }
-    });
+    let discordData;
+
+    try {
+      const { data: resData } = await axios.get(`https://discordapp.com/api/v9/users/@me/guilds/${DISCORD.ID}/member`,
+      {
+        headers: {
+          Authorization: `Bearer ${data.access_token}`,
+        }
+      });
+      discordData = resData;
+    } catch (err: any) {
+      
+    }
+
 
     if (user.email === null) {
       return res
@@ -83,8 +91,8 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
             banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
             avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
             roles: discordData.roles || [],
-            nick: discordData.nick,
-            access_level: discordData.roles.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : user.id === "359098534307299329" ? 1 : 0
+            nick: discordData.nick || null,
+            access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : user.id === "359098534307299329" ? 1 : 0
           },
           $addToSet: {
             ip: req.headers["cf-connecting-ip"],
@@ -105,9 +113,9 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
         ip: [req.headers["cf-connecting-ip"]],
         roles: discordData.roles || [],
-        access_level: discordData.roles.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : user.id === "359098534307299329" ? 1 : 0,
+        access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : user.id === "359098534307299329" ? 1 : 0,
         token: encrypt(user.id),
-        nick: discordData.nick
+        nick: discordData.nick || null
       });
     }
 
@@ -130,6 +138,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       roles: discordData.roles || [],
       token: encrypt(user.id),
       access_level: accessLevel,
+      member: !!discordData,
       banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
       avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
     });
