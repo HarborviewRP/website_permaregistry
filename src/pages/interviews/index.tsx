@@ -21,7 +21,9 @@ export default function MainPage({ user }: Props) {
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<Map<String, User>>();
-  const [page, setPage] = useState(router.query.page ? router.query.page as unknown as number : 1);
+  const [page, setPage] = useState(
+    router.query.page ? (router.query.page as unknown as number) : 1
+  );
   const [pageLength, setPageLength] = useState(6);
   const [sortStatus, setSortStatus] = useState<string | null>("asc");
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
@@ -44,10 +46,12 @@ export default function MainPage({ user }: Props) {
       `/api/interview/get-interviews?${queryParams.toString()}`
     );
     if (res.ok) {
-      const json = (await res.json());
+      const json = await res.json();
       const interviews: Interview[] = json.interviews;
-      setTotal(json.total);
+      const total = json.total;
+
       setInterviews(interviews);
+      setTotal(total);
       if (page >= total / 6) {
         setHasNextPage(false);
       } else {
@@ -140,7 +144,7 @@ export default function MainPage({ user }: Props) {
                   <InterviewBar
                     interview={interview}
                     applicant={users!!.get(interview.applicantId)!!}
-                    staffMember={users?.get(interview?.claimedById || '')}
+                    staffMember={users?.get(interview?.claimedById || "")}
                   />
                 </div>
               </Link>
@@ -154,7 +158,9 @@ export default function MainPage({ user }: Props) {
             >
               Previous
             </button>
-            <p className="text-white">Page {page} of {Math.round(total / 6)}</p>
+            <p className="text-white">
+              Page {page} of {Math.round(total / 6)}
+            </p>
             <button
               onClick={nextPage}
               className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}

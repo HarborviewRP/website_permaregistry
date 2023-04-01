@@ -44,10 +44,12 @@ export default function MainPage({ user }: Props) {
     );
     if (res.ok) {
       const json = (await res.json());
+      const total = json.total;
       const applications: Application[] = json.applications;
-      setTotal(json.total);
 
       setApplications(applications);
+      setTotal(total);
+
       if (page > total / 12) {
         setHasNextPage(false);
       } else {
