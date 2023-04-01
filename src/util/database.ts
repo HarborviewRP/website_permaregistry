@@ -313,7 +313,7 @@ export const getInterviewStats = async () => {
 export const getInterviewStatusStats = async () => {
   const interviewCollection = await getInterviewCollection();
   const applicationStatusStats = await interviewCollection.collection
-    .aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }])
+    .aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }, { $sort: { _id: 1 }}])
     .toArray();
 
   return applicationStatusStats;
