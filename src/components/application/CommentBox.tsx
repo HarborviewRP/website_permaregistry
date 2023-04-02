@@ -120,7 +120,7 @@ const CommentBox: React.FC<CommentProps> = ({
     <>
       <div className="scrollable-container flex flex-col overflow-auto p-6 max-w-4xl h-96 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-md backdrop-blur">
         {text && <h1 className="text-white font-semibold">{text}</h1>}
-        {obj!!.notes.map((note: any) => (
+        {obj!!.notes.filter((note) => note.authorId).map((note: any) => (
           <div key={note!!.noteId} className="my-2">
             <Link
               href={`/profile/${(commentUsers!!.get(note!!.authorId!!)!! as any)._id}`}
