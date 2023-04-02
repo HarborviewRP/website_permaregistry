@@ -4,6 +4,7 @@ import { dbConnect } from "src/util/mongodb";
 import { DISCORD, Interview } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { isStaff } from "src/util/permission";
+import { sendDm } from "src/util/discord";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -30,6 +31,34 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     try {
       const result = await updateInterview(interviewId, interview);
       if (result.acknowledged) {
+        if (req.body.statusUpdate) {
+          await sendDm(interview.applicantId, {
+            content: "Your PGN: Underground staff interview has been updated",
+            embeds: [
+              {
+                type: "rich",
+                title: `Interview Update`,
+                description: `Your PGN: Underground staff interview has been updated!`,
+                color: interview.status === 2 ? 0xeb0909 : 0x0bef16 ,
+                fields: [
+                  {
+                    name: `Status`,
+                    value: interview.status === 1 ? "Approved" : "Rejected",
+                    inline: true,
+                  },
+                  {
+                    name: `Reason`,
+                    value: interview.reason,
+                  },
+                ],
+                footer: {
+                  text: `This is an automated message regarding your PGN: Underground staff interview. Do not reply to this message as it is not monitored`,
+                },
+                url: `${process.env.DOMAIN}/interviews/${interviewId}`,
+              },
+            ],
+          });
+        }
         res.status(200).json({ message: "Interview updated successfully" });
       } else {
         res.status(500).json({ message: "Failed to update the interview" });

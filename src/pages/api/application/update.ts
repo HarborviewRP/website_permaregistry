@@ -4,6 +4,7 @@ import { dbConnect } from "src/util/mongodb";
 import { Application, DISCORD } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { isStaff } from "src/util/permission";
+import { sendDm } from "src/util/discord";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -18,17 +19,41 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     }
 
     if (!application || !applicationId) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Please provide a valid application form and application ID.",
-        });
+      return res.status(400).json({
+        message: "Please provide a valid application form and application ID.",
+      });
     }
-
     try {
       const result = await updateApplication(applicationId, application);
       if (result.acknowledged) {
+        if (req.body.statusUpdate) {
+          await sendDm(application.applicantId, {
+            content: "Your PGN: Underground staff application has been updated",
+            embeds: [
+              {
+                type: "rich",
+                title: `Application Update`,
+                description: `Your PGN: Underground staff application has been updated!`,
+                color: application.status === 2 ? 0xeb0909 : 0x0bef16 ,
+                fields: [
+                  {
+                    name: `Status`,
+                    value: application.status === 1 ? "Approved" : "Rejected",
+                    inline: true,
+                  },
+                  {
+                    name: `Reason`,
+                    value: application.statusReason,
+                  },
+                ],
+                footer: {
+                  text: `This is an automated message regarding your PGN: Underground staff application. Do not reply to this message as it is not monitored`,
+                },
+                url: `${process.env.DOMAIN}/applications/${applicationId}`,
+              },
+            ],
+          });
+        }
         res.status(200).json({ message: "Application updated successfully" });
       } else {
         res.status(500).json({ message: "Failed to update the application" });

@@ -145,6 +145,7 @@ export default function Home({ user }: Props) {
       lastUpdate: now,
       updatedById: (user as any).id,
       status: formData.status,
+      reason: formData.note === "" ? application?.statusReason : formData.note,
       notes:
         formData.note !== ""
           ? [
@@ -168,6 +169,7 @@ export default function Home({ user }: Props) {
         body: JSON.stringify({
           interview: interviewForm,
           interviewId: (interview as any)._id,
+          statusUpdate: interviewForm.status !== interview?.status
         }),
       });
 
