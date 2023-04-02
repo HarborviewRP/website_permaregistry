@@ -226,18 +226,18 @@ export default function DiscordAuth({ user }: Props) {
                   {toggleState ? (
                     <DonutChart
                       data={[
-                        applicationStatusStats[0].count,
-                        applicationStatusStats[1].count,
-                        applicationStatusStats[2].count,
+                        applicationStatusStats["0"],
+                        applicationStatusStats["1"],
+                        applicationStatusStats["2"],
                       ]}
                       label={"# Of Applications"}
                     />
                   ) : (
                     <DonutChart
                       data={[
-                        interviewStatusStats[0].count,
-                        interviewStatusStats[1].count,
-                        interviewStatusStats[2].count,
+                        interviewStatusStats["0"],
+                        interviewStatusStats["1"],
+                        interviewStatusStats["2"],
                       ]}
                       label={"# Of Interviews"}
                     />

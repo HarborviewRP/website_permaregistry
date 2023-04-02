@@ -271,10 +271,44 @@ export const getTotalStaffMembers = async () => {
 export const getApplicationStatusStats = async () => {
   const applicationCollection = await getApplicationCollection();
   const applicationStatusStats = await applicationCollection.collection
-    .aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }, { $sort: { _id: 1 } },])
-    .toArray();
+  .aggregate([
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $group: {
+        _id: null,
+        results: { $push: { k: { $toString: "$_id" }, v: "$count" } }
+      }
+    },
+    {
+      $project: {
+        _id: 0,
+        results: { $arrayToObject: "$results" }
+      }
+    },
+    {
+      $project: {
+        results: {
+          $mergeObjects: [
+            { "0": 0, "1": 0, "2": 0 },
+            "$results"
+          ]
+        }
+      }
+    },
+    {
+      $replaceRoot: {
+        newRoot: "$results"
+      }
+    }
+  ])
+  .toArray();
 
-  return applicationStatusStats;
+return applicationStatusStats.length > 0 ? applicationStatusStats[0] : { "0": 0, "1": 0, "2": 0 };
 };
 
 // interview utils
@@ -314,15 +348,46 @@ export const getInterviewStats = async () => {
 
 export const getInterviewStatusStats = async () => {
   const interviewCollection = await getInterviewCollection();
-  const applicationStatusStats = await interviewCollection.collection
+  const interviewStatusStats = await interviewCollection.collection
     .aggregate([
-      { $group: { _id: "$status", count: { $sum: 1 } } },
-      { $sort: { _id: 1 } },
+      {
+        $group: {
+          _id: "$status",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          results: { $push: { k: { $toString: "$_id" }, v: "$count" } }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          results: { $arrayToObject: "$results" }
+        }
+      },
+      {
+        $project: {
+          results: {
+            $mergeObjects: [
+              { "0": 0, "1": 0, "2": 0 },
+              "$results"
+            ]
+          }
+        }
+      },
+      {
+        $replaceRoot: {
+          newRoot: "$results"
+        }
+      }
     ])
     .toArray();
-
-  return applicationStatusStats;
-};
+  
+  return interviewStatusStats.length > 0 ? interviewStatusStats[0] : { "0": 0, "1": 0, "2": 0 };
+  };
 
 export const getInterviewsPerDay = async (startDate: Date, endDate: Date) => {
   const interviewCollectionObj = await getInterviewCollection();
