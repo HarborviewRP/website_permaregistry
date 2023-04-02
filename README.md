@@ -1,35 +1,43 @@
-# Discord Oauth2 Example
-The methods was taken from [Dank Memer Rewrite Website](https://github.com/DankMemer/dankmemer.lol) but this code is simplified only for the oauth2 codes. The design is completlely different , just the methods.
+# Discord Authenticated Applicant Tracking System
+This system was built for the ProGamerNetwork community but is free for use by other communities.
 
-# [Live Preview](https://discord-oauth-react.netlify.app//)
+## [Live Preview](https://recruit.pgn.plus/)
 
 ## .env 
 ```env
-COOKIE_SECRET= COOKIE_SECRET
-CLIENT_ID= DISCORD CLIENT ID
-CLIENT_SECRET= DISCORD CLIENT SECRET
-CRYPT_KEYS= Array of crypt keys [2]
-DOMAIN=http://localhost:3000 // Or the website domain
-MONGODB_URI= MONGODB URI
-MONGODB_DB= MONGODB COLLECTION NAME < ANY NAME >
-REDIS_PORT=6379
-REDIS_HOST=localhost
+COOKIE_SECRET=cookie_sceret_gt_32_characters
+CLIENT_ID=discord_oauth_client_id
+CLIENT_SECRET=discord_oauth_client_secret
+BOT_TOKEN=discord_bot_token
+CRYPT_KEY=long_key
+CRYPT_INIT=short_key
+DOMAIN=http://localhost:3000
+MONGODB_URI=mongouri
+MONGODB_DB=mongodbname
+SEND_STATUS_DM=false
+DISCORD_ID=discord_community_guild_id
+STAFF_ROLE_ID=<moderator role>
+SUPERADMIN_ROLE=<admin role>
+VERIFY_ROLE=<role for verifying membership>
+AWS_ACCESS_KEY_ID=aws_access_key_id
+AWS_SECRET_ACCESS_KEY=aws_secret_access_key
+AWS_REGION=aws-region
+AWS_S3_BUCKET_NAME=aws-bucket-name
 ```
 
-* Generating `CRYPT_KEYS` = 
+## Generating `CRYPT_KEYS` = 
 ```js
 node -p "[ 32, 16 ].map(n => crypto.randomBytes(n).toString('base64'))"
 ```
 
-* Cookie Secret ( At leat **32** characters long. ) <br />
+## Cookie Secret ( At leat **32** characters long. ) <br />
 #### [1password.com](https://1password.com/password-generator/)
 
-# Written By  
-[UnusualAbsurd](https://github.com/UnusualAbsurd)
+## AWS Guide
+[Connecting AWS S3 Buckets to NextJS](https://selectfrom.dev/connecting-aws-s3-buckets-to-next-js-25e903621c70)
 
-# Method Authors
--   **Ronin** - _Initial work_ - [TheCyberRonin](https://github.com/TheCyberRonin)
--   **Mel** - _Initial design_ - [Melmsie](https://github.com/melmsie)
--   **Aetheryx** - _Basically the whole thing_ - [Aetheryx](https://github.com/aetheryx)
--   **InBlue** - _Taken over work for redesign_ - [InBlue](https://github.com/inblue)
--   **Badosz** - _Rewrite and feedback page_ - [badosz0](https://github.com/badosz0)
+## Written By  
+[ZachyFoxx](https://github.com/zachyfoxx)
+
+## OAuth Code Credit
+[UnusualAbsurd](https://github.com/UnusualAbsurd)
