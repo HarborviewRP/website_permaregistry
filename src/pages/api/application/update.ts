@@ -28,7 +28,6 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       if (result.acknowledged) {
         if (req.body.statusUpdate) {
           await sendDm(application.applicantId, {
-            content: "Your PGN: Underground staff application has been updated",
             embeds: [
               {
                 type: "rich",
@@ -50,6 +49,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
                   text: `This is an automated message regarding your PGN: Underground staff application. Do not reply to this message as it is not monitored`,
                 },
                 url: `${process.env.DOMAIN}/applications/${applicationId}`,
+                timestamp: new Date(),
               },
             ],
           });

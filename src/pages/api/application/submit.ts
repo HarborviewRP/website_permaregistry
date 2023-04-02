@@ -7,7 +7,6 @@ import { NextIronRequest, withAuth } from "../../../util/session";
 import { ObjectID } from "bson";
 import { isStaff } from "src/util/permission";
 
-// TODO: Check if user has rejected or pending application in the last 14 days
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const user = req.session.get("user");
