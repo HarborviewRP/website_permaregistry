@@ -2,7 +2,7 @@ import { GetServerSideProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
-import {  User } from "src/types";
+import { User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import StatsCard from "src/components/StatsCard";
@@ -115,7 +115,7 @@ export default function DiscordAuth({ user }: Props) {
         }
       } catch (err: any) {
         setLoading(false);
-        router.push('/');
+        router.push("/");
       }
     };
 
@@ -226,22 +226,18 @@ export default function DiscordAuth({ user }: Props) {
                   {toggleState ? (
                     <DonutChart
                       data={[
-                        totalApplications -
-                          (applicationStatusStats[0].count +
-                            applicationStatusStats[1].count),
                         applicationStatusStats[0].count,
                         applicationStatusStats[1].count,
+                        applicationStatusStats[2].count,
                       ]}
                       label={"# Of Applications"}
                     />
                   ) : (
                     <DonutChart
                       data={[
-                        totalInterviews -
-                          (interviewStatusStats[0].count +
-                            interviewStatusStats[1].count),
                         interviewStatusStats[0].count,
                         interviewStatusStats[1].count,
+                        interviewStatusStats[2].count,
                       ]}
                       label={"# Of Interviews"}
                     />

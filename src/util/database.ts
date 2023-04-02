@@ -271,7 +271,7 @@ export const getTotalStaffMembers = async () => {
 export const getApplicationStatusStats = async () => {
   const applicationCollection = await getApplicationCollection();
   const applicationStatusStats = await applicationCollection.collection
-    .aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }])
+    .aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }, { $sort: { _id: 1 } },])
     .toArray();
 
   return applicationStatusStats;
