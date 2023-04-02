@@ -28,7 +28,7 @@ export default function MainPage({ user }: Props) {
 
   useEffect(() => {
     if (!user) router.push("/");
-    if (!isStaff(user!!)) router.push("/");
+    // if (!isStaff(user!!)) router.push("/");
   });
 
   const fetchApplications = useCallback(async () => {

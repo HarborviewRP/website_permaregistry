@@ -7,7 +7,7 @@ import {
   getInterviewCollection,
   getUserCollection,
 } from "./mongodb";
-import { DISCORD } from "src/types"
+import { DISCORD } from "src/types";
 
 export const createApplication = async (application: Application) => {
   const applicationCollection = await getApplicationCollection();
@@ -74,12 +74,16 @@ export const getApplicationsInRange = async (
   }
 };
 
-export const getApplicationPage = async (page: number, pageLength: number) => {
+export const getApplicationPage = async (
+  page: number,
+  pageLength: number,
+  userId?: string
+) => {
   const applicationCollection = await getApplicationCollection();
   const skipCount = (page - 1) * pageLength;
 
   const applications = await applicationCollection.collection
-    .find()
+    .find(userId ? { applicantId: userId } : {})
     .skip(skipCount)
     .limit(pageLength)
     .toArray();
@@ -112,14 +116,15 @@ export const deleteApplication = async (id: string) => {
 export const getSortedApplications = async (
   page: number,
   pageLength: number,
-  sortStatus: "asc" | "desc"
+  sortStatus: "asc" | "desc",
+  userId?: string
 ) => {
   const applicationCollection = await getApplicationCollection();
   const skipCount = (page - 1) * pageLength;
   const sortDirection = sortStatus === "asc" ? 1 : -1;
 
   const applications = await applicationCollection.collection
-    .find()
+    .find(userId ? { applicantId: userId } : {})
     .sort({ status: sortDirection })
     .skip(skipCount)
     .limit(pageLength)
@@ -127,7 +132,6 @@ export const getSortedApplications = async (
 
   return applications;
 };
-
 
 export const createInterview = async (interview: Interview) => {
   const interviewCollection = await getInterviewCollection();
@@ -148,13 +152,13 @@ export const getallInterviews = async () => {
   return res;
 };
 
-export const getInterviewPage = async (page: number, pageLength: number) => {
+export const getInterviewPage = async (page: number, pageLength: number, userId?: string) => {
   const interviewCollection = await getInterviewCollection();
   const skipCount = (page - 1) * pageLength;
 
   const applications = await interviewCollection.collection
-    .find()
-    .skip(skipCount)
+  .find(userId ? { applicantId: userId } : {})
+  .skip(skipCount)
     .limit(pageLength)
     .toArray();
 
@@ -186,14 +190,15 @@ export const deleteInterview = async (id: string) => {
 export const getSortedInterviews = async (
   page: number,
   pageLength: number,
-  sortStatus: "asc" | "desc"
+  sortStatus: "asc" | "desc",
+  userId?: string
 ) => {
   const interviewCollection = await getInterviewCollection();
   const skipCount = (page - 1) * pageLength;
   const sortDirection = sortStatus === "asc" ? 1 : -1;
 
   const interviews = await interviewCollection.collection
-    .find()
+    .find(userId ? { applicantId: userId } : {})
     .sort({ status: sortDirection })
     .skip(skipCount)
     .limit(pageLength)
@@ -216,10 +221,10 @@ export const getUsers = async (ids: string[]) => {
   return users;
 };
 
-export const getTotalApplications = async () => {
+export const getTotalApplications = async (userId?: string) => {
   const applicationCollection = await getApplicationCollection();
   const totalApplications =
-    await applicationCollection.collection.countDocuments();
+    await applicationCollection.collection.countDocuments(userId ? { applicantId: userId } : {});
   return totalApplications;
 };
 
@@ -263,7 +268,6 @@ export const getTotalStaffMembers = async () => {
   return staffMembers;
 };
 
-
 export const getApplicationStatusStats = async () => {
   const applicationCollection = await getApplicationCollection();
   const applicationStatusStats = await applicationCollection.collection
@@ -274,17 +278,15 @@ export const getApplicationStatusStats = async () => {
 };
 
 // interview utils
-export const getTotalInterviews = async () => {
+export const getTotalInterviews = async (userId?: string) => {
   const interviewCollection = await getInterviewCollection();
-  const totalInterviews =
-    await interviewCollection.collection.countDocuments();
+  const totalInterviews = await interviewCollection.collection.countDocuments(userId ? { applicantId: userId } : {});
   return totalInterviews;
 };
 
 export const getInterviewsReviewedPercentage = async () => {
   const interviewCollection = await getInterviewCollection();
-  const totalInterviews =
-    await interviewCollection.collection.countDocuments();
+  const totalInterviews = await interviewCollection.collection.countDocuments();
   const reviewedInterviews =
     await interviewCollection.collection.countDocuments({
       status: { $in: [1, 2] },
@@ -296,13 +298,13 @@ export const getInterviewsReviewedPercentage = async () => {
 
 export const getInterviewStats = async () => {
   const interviewCollection = await getInterviewCollection();
-  const totalInterviews =
-    await interviewCollection.collection.countDocuments();
+  const totalInterviews = await interviewCollection.collection.countDocuments();
   const approvedInterviews =
     await interviewCollection.collection.countDocuments({ status: 1 });
 
-  const deniedInterviews =
-    await interviewCollection.collection.countDocuments({ status: 2 });
+  const deniedInterviews = await interviewCollection.collection.countDocuments({
+    status: 2,
+  });
 
   const approvedPercentage = (approvedInterviews / totalInterviews) * 100;
   const deniedPercentage = (deniedInterviews / totalInterviews) * 100;
@@ -313,12 +315,14 @@ export const getInterviewStats = async () => {
 export const getInterviewStatusStats = async () => {
   const interviewCollection = await getInterviewCollection();
   const applicationStatusStats = await interviewCollection.collection
-    .aggregate([{ $group: { _id: "$status", count: { $sum: 1 } } }, { $sort: { _id: 1 }}])
+    .aggregate([
+      { $group: { _id: "$status", count: { $sum: 1 } } },
+      { $sort: { _id: 1 } },
+    ])
     .toArray();
 
   return applicationStatusStats;
 };
-
 
 export const getInterviewsPerDay = async (startDate: Date, endDate: Date) => {
   const interviewCollectionObj = await getInterviewCollection();
@@ -327,31 +331,33 @@ export const getInterviewsPerDay = async (startDate: Date, endDate: Date) => {
   const results = await interviewCollection
     .aggregate([
       {
-        '$match': {
-          'creationDate': {
-            '$gte': startDate.getTime(), 
-            '$lte': endDate.getTime(),
-          }
-        }
-      }, {
-        '$group': {
-          '_id': {
-            '$dateToString': {
-              'format': '%Y-%m-%d', 
-              'date': {
-                '$toDate': '$creationDate'
-              }
-            }
-          }, 
-          'count': {
-            '$sum': 1
-          }
-        }
-      }, {
-        '$sort': {
-          '_id': 1
-        }
-      }
+        $match: {
+          creationDate: {
+            $gte: startDate.getTime(),
+            $lte: endDate.getTime(),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: {
+                $toDate: "$creationDate",
+              },
+            },
+          },
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $sort: {
+          _id: 1,
+        },
+      },
     ])
     .toArray();
 
@@ -370,31 +376,33 @@ export const getApplicationsPerDay = async (startDate: Date, endDate: Date) => {
   const results = await applicationCollection
     .aggregate([
       {
-        '$match': {
-          'submissionDate': {
-            '$gte': startDate.getTime(), 
-            '$lte': endDate.getTime(),
-          }
-        }
-      }, {
-        '$group': {
-          '_id': {
-            '$dateToString': {
-              'format': '%Y-%m-%d', 
-              'date': {
-                '$toDate': '$submissionDate'
-              }
-            }
-          }, 
-          'count': {
-            '$sum': 1
-          }
-        }
-      }, {
-        '$sort': {
-          '_id': 1
-        }
-      }
+        $match: {
+          submissionDate: {
+            $gte: startDate.getTime(),
+            $lte: endDate.getTime(),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: {
+                $toDate: "$submissionDate",
+              },
+            },
+          },
+          count: {
+            $sum: 1,
+          },
+        },
+      },
+      {
+        $sort: {
+          _id: 1,
+        },
+      },
     ])
     .toArray();
 

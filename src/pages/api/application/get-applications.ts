@@ -11,10 +11,6 @@ import { NextIronRequest, withAuth } from "../../../util/session";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   const user = req.session.get("user");
-  if (!isStaff(user)) {
-    res.status(403).redirect("/403");
-    return;
-  }
 
   try {
     const page = req.query.page
@@ -27,9 +23,9 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
 
     if (page !== undefined && pageLength !== undefined) {
       if (sortStatus) {
-        return res.status(200).json({ applications: await getSortedApplications(page, pageLength, sortStatus), total: await getTotalApplications()});
+        return res.status(200).json({ applications: await getSortedApplications(page, pageLength, sortStatus, !isStaff(user) ? user.id : undefined), total: await getTotalApplications(!isStaff(user) ? user.id : undefined)});
       } else {
-        return res.status(200).json({ applications: await getApplicationPage(page, pageLength), total: await getTotalApplications()});
+        return res.status(200).json({ applications: await getApplicationPage(page, pageLength, !isStaff(user) ? user.id : undefined), total: await getTotalApplications(!isStaff(user) ? user.id : undefined)});
       }
     }
 

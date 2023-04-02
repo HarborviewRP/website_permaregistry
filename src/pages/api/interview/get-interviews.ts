@@ -27,9 +27,9 @@ import { isStaff } from "src/util/permission";
   
       if (page !== undefined && pageLength !== undefined) {
       if (sortStatus) {
-        return res.status(200).json({ interviews: await getSortedInterviews(page, pageLength, sortStatus), total: await getTotalInterviews()});
+        return res.status(200).json({ interviews: await getSortedInterviews(page, pageLength, sortStatus, !isStaff(user) ? user.id : undefined), total: await getTotalInterviews(!isStaff(user) ? user.id : undefined)});
       } else {
-        return res.status(200).json({ interviews: await getInterviewPage(page, pageLength), total: await getTotalInterviews()});
+        return res.status(200).json({ interviews: await getInterviewPage(page, pageLength, !isStaff(user) ? user.id : undefined), total: await getTotalInterviews(!isStaff(user) ? user.id : undefined)});
       }
       }
   
