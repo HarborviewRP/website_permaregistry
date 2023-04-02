@@ -48,7 +48,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
                   },
                   {
                     name: `Reason`,
-                    value: interview.reason,
+                    value: interview.reason || "no reason given",
                   },
                 ],
                 footer: {

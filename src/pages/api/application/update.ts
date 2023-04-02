@@ -43,7 +43,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
                   },
                   {
                     name: `Reason`,
-                    value: application.statusReason,
+                    value: application.statusReason || "no reason given",
                   },
                 ],
                 footer: {

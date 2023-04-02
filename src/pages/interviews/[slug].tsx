@@ -142,6 +142,7 @@ export default function Home({ user }: Props) {
 
     const now = Date.now();
     let interviewForm: Partial<Interview> = {
+      applicantId: interview?.applicantId,
       lastUpdate: now,
       updatedById: (user as any).id,
       status: formData.status,
