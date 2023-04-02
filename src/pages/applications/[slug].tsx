@@ -1,5 +1,5 @@
 import { Menu } from "@headlessui/react";
-import { HiBan, HiOutlineClipboardList, HiX } from "react-icons/hi";
+import { HiBan, HiCheck, HiOutlineClipboardList, HiX } from "react-icons/hi";
 import { HiOutlineBookOpen } from "react-icons/hi";
 import { HiOutlineClock } from "react-icons/hi";
 import { HiOutlineExclamationCircle } from "react-icons/hi";
@@ -77,6 +77,14 @@ export default function MainPage({ user }: Props) {
     },
   ];
 
+  const acceptanceReasons = [
+    {
+      name: "Acceptance",
+      reason: "Hello :wave:, I am so happy to inform you that your application has been accepted! :partying_face: Before we move to the next steps, you must complete an interview, a recruiter will reach out in regards to an interview as soon as possile, so keep your DMs open! Again, congratulations on your acceptance, we're thrilled at the possibility of having you on our team!",
+      icon: HiCheck
+    }
+  ]
+
   useEffect(() => {
     if (!user) router.push("/");
   });
@@ -133,11 +141,12 @@ export default function MainPage({ user }: Props) {
 
     const now = Date.now();
     let applicationForm: Partial<Application> = {
+      applicantId: application?.applicantId,
       lastUpdate: now,
       updatedById: (user as any)._id,
       status: formData.status,
       statusReason:
-        formData.statusReason === "" ? undefined : formData.statusReason,
+        formData.statusReason === "" ? application?.statusReason : formData.statusReason,
     };
 
     try {
@@ -187,6 +196,7 @@ export default function MainPage({ user }: Props) {
         body: JSON.stringify({
           application: applicationForm,
           applicationId: (application as any)._id,
+          statusUpdate: applicationForm.status !== application?.status
         }),
       });
 
@@ -242,7 +252,7 @@ export default function MainPage({ user }: Props) {
             <div>
               <Menu>
                 <Menu.Button className="py-1 bg-slate-700 bg-opacity-50 text-white font-thin text-sm p-1 px-4 py-3 rounded">
-                  Rejection Options
+                  Rejection Messages
                 </Menu.Button>
                 <Menu.Items className="text-white z-50 flex flex-col py-6 px-3 my-4 absolute bg-slate-700 backdrop-blur-sm bg-opacity-25 text-white rounded-xl space-y-2 font-thin transition-all duration-300  transform -translate-x-4">
                   {rejectionOptions.map((option) => (

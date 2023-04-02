@@ -1,3 +1,4 @@
+import moment from "moment";
 import { NextApiResponse } from "next";
 import { DISCORD } from "src/types";
 import {
@@ -35,11 +36,9 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       return res.json({ status: 404, message: "User not found" });
     }
 
-    const startOfWeek = new Date();
-    startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+    const startOfWeek = moment().startOf("week").toDate().getTime();
 
-    const endOfWeek = new Date();
-    endOfWeek.setDate(endOfWeek.getDate() + (6 - endOfWeek.getDay()));
+    const endOfWeek = moment().endOf("week").toDate().getTime();
 
     const interviewCount = await getTotalInterviews();
     const applicationCount = await getTotalApplications();
@@ -50,8 +49,8 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       updatedById: newUser._id,
       status: { $in: [1, 2] },
       lastUpdate: {
-        $gte: startOfWeek.getTime(),
-        $lte: endOfWeek.getTime(),
+        $gte: startOfWeek,
+        $lte: endOfWeek,
       },
     });
 
@@ -62,8 +61,8 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       recording_path: { $ne: undefined },
       status: { $in: [1, 2] },
       lastUpdate: {
-        $gte: startOfWeek.getTime(),
-        $lte: endOfWeek.getTime(),
+        $gte: startOfWeek,
+        $lte: endOfWeek,
       },
     });
 
