@@ -21,6 +21,7 @@ export const TOKEN = process.env.BOT_TOKEN || "";
     });
  */
 export const sendDm = async (userId: string, content: any) => {
+  if (!process.env.SEND_STATUS_DM) return false;
   try {
     const res = await fetch(DISCORD_API + ENDPOINT.CREATE_DM, {
       method: "POST",
