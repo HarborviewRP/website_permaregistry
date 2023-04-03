@@ -21,7 +21,7 @@ const ApplicationBar: React.FC<ApplicationProps> = ({
 
   return (
     <>
-      <div className="p-4 my-3 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-lg items-center space-x-1 backdrop-blur">
+      <div className="p-4 my-3 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-lg items-center space-x-1 backdrop-blur" style={{width: "38vw", maxWidth: "38vw"}}>
         <div className="flex flex-row justify-between">
           <div className="flex flex-row items-center p-1 w-64">
             <div
