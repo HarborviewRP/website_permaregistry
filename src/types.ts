@@ -92,7 +92,7 @@ export interface Application {
 export interface Interview {
   applicationId: string;
   applicantId: string;
-  claimedById: string | undefined;
+  claimedById: string | undefined | null;
   creationDate: number;
   status: STATUS;
   reason: string | undefined;

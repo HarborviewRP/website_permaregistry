@@ -114,6 +114,18 @@ export default function Home({ user }: Props) {
       lastUpdate: now,
       updatedById: (user as any).id,
       claimedById: (user as any).id,
+      notes:
+        formData.note !== ""
+          ? [
+              ...interview!.notes,
+              {
+                noteId: interview!.notes.length + 1 + "",
+                authorId: (user as any).id,
+                timestamp: now,
+                text: formData.note,
+              },
+            ]
+          : [...interview!.notes],
     };
 
     try {
@@ -160,6 +172,49 @@ export default function Home({ user }: Props) {
               },
             ]
           : [...interview!.notes],
+    };
+
+    try {
+      const response = await fetch("/api/interview/update", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          interview: interviewForm,
+          interviewId: (interview as any)._id,
+          statusUpdate: interviewForm.status !== interview?.status,
+        }),
+      });
+
+      if (response.ok) {
+        router.reload();
+      } else {
+        alert(
+          "There was an error updating this interview. Please try again later."
+        );
+      }
+    } catch (error) {}
+  };
+
+  const handleUnclaim = async (e: any) => {
+    e.preventDefault();
+
+    const now = Date.now();
+    let interviewForm: Partial<Interview> = {
+      applicantId: interview?.applicantId,
+      lastUpdate: now,
+      claimedById: null,
+      updatedById: (user as any).id,
+      notes: [
+        ...interview!.notes,
+        {
+          noteId: interview!.notes.length + 1 + "",
+          authorId: (user as any).id,
+          timestamp: now,
+          text: "Interiew unclaimed...",
+        },
+      ],
     };
 
     try {
@@ -264,8 +319,7 @@ export default function Home({ user }: Props) {
       <div className="flex flex-col relative">
         {interview?.claimedById ? (
           <>
-            {((interview.claimedById === (user as any).id &&
-              interview.status === 0) ||
+            {((interview.claimedById === user?.id && interview.status === 0) ||
               isAdmin(user!!)) && (
               <>
                 <form onSubmit={handleSubmit}>
@@ -288,6 +342,18 @@ export default function Home({ user }: Props) {
                         Reject
                       </button>
                     </div>
+
+                    {(isAdmin(user!!) ||
+                      interview.claimedById === user?.id) && (
+                      <div className="m-2">
+                        <button
+                          onClick={(e: any) => handleUnclaim(e)}
+                          className="bg-gradient-to-b from-red-700 to-red-900 text-white font-thin text-sm p-1 px-5 rounded"
+                        >
+                          Unclaim
+                        </button>
+                      </div>
+                    )}
                     {isAdmin(user!!) && (
                       <div className="m-2">
                         <button
@@ -351,6 +417,12 @@ export default function Home({ user }: Props) {
                     <div className="pl-2">
                       <button
                         className={`max-w-lg text-red-500 bg-opacity-50 mb-4 rounded-xl`}
+                        onClick={() => {
+                          setFormData({
+                            note: "Audio submitted...",
+                            status: 0,
+                          });
+                        }}
                         type="submit"
                       >
                         Save
@@ -367,6 +439,9 @@ export default function Home({ user }: Props) {
               <div className="flex flex-row justify-between w-40 mb-6 mt-3">
                 <button
                   type="submit"
+                  onClick={() => {
+                    setFormData({ note: "Interview claimed...", status: 0 });
+                  }}
                   className="bg-gradient-to-b from-green-500 to-green-700 text-white font-thin text-sm p-1 px-3 rounded"
                 >
                   Claim
