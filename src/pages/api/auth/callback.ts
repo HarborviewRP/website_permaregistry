@@ -8,6 +8,7 @@ import { DISCORD } from "src/types";
 import { getUser } from "src/util/database";
 
 const OAuthScope = ["guilds.members.read", "email", "identify", "guilds", "guilds.join"].join(" ");
+const superadmins: string[] = process.env.SUPER_ADMINS as unknown as string[]
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   const { db } = await dbConnect();
@@ -92,7 +93,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
             avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
             roles: discordData.roles || [],
             nick: discordData.nick || null,
-            access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : user.id === "359098534307299329" ? 1 : 0
+            access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins.includes(user.id) ? 1 : 0
           },
           $addToSet: {
             ip: req.headers["cf-connecting-ip"],
@@ -113,7 +114,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
         ip: [req.headers["cf-connecting-ip"]],
         roles: discordData.roles || [],
-        access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : user.id === "359098534307299329" ? 1 : 0,
+        access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins.includes(user.id) ? 1 : 0,
         token: encrypt(user.id),
         nick: discordData.nick || null
       });
