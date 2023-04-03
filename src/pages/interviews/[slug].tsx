@@ -147,7 +147,7 @@ export default function Home({ user }: Props) {
       lastUpdate: now,
       updatedById: (user as any).id,
       status: formData.status,
-      reason: formData.note === "" ? application?.statusReason : formData.note,
+      reason: formData.note === "" ? "no reason given" : formData.note,
       notes:
         formData.note !== ""
           ? [
