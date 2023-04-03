@@ -54,6 +54,10 @@ export default function Home({ user }: Props) {
       if (interviewExists && applicantExists) return;
       if (!loading) return;
       try {
+        if (isStaffUtil(user!)) {
+          setIsStaff(true);
+        }
+
         const res = await fetch(`/api/interview/${slug}`);
         if (res.ok) {
           const interview: Interview = await res.json();
@@ -73,9 +77,6 @@ export default function Home({ user }: Props) {
           );
           if (checkUserExists.ok) {
             const user = await checkUserExists.json();
-            if (isStaffUtil(user!)) {
-              setIsStaff(true);
-            }
             setApplicant(user);
             setApplicantExists(true);
           } else {
@@ -98,7 +99,7 @@ export default function Home({ user }: Props) {
         console.error(error);
         setInterviewExists(false);
         setLoading(false);
-        router.push('/');
+        router.push("/");
       }
       setLoading(false);
     };
@@ -170,7 +171,7 @@ export default function Home({ user }: Props) {
         body: JSON.stringify({
           interview: interviewForm,
           interviewId: (interview as any)._id,
-          statusUpdate: interviewForm.status !== interview?.status
+          statusUpdate: interviewForm.status !== interview?.status,
         }),
       });
 

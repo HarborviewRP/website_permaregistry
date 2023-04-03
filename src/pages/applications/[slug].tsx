@@ -80,10 +80,11 @@ export default function MainPage({ user }: Props) {
   const acceptanceReasons = [
     {
       name: "Acceptance",
-      reason: "Hello :wave:, I am so happy to inform you that your application has been accepted! :partying_face: Before we move to the next steps, you must complete an interview, a recruiter will reach out in regards to an interview as soon as possile, so keep your DMs open! Again, congratulations on your acceptance, we're thrilled at the possibility of having you on our team!",
-      icon: HiCheck
-    }
-  ]
+      reason:
+        "Hello :wave:, I am so happy to inform you that your application has been accepted! :partying_face: Before we move to the next steps, you must complete an interview, a recruiter will reach out in regards to an interview as soon as possile, so keep your DMs open! Again, congratulations on your acceptance, we're thrilled at the possibility of having you on our team!",
+      icon: HiCheck,
+    },
+  ];
 
   useEffect(() => {
     if (!user) router.push("/");
@@ -94,6 +95,10 @@ export default function MainPage({ user }: Props) {
       if (applicationExists && applicantExists) return;
       if (!loading) return;
       try {
+        if (isStaffUtil(user!!)) {
+          setIsStaff(true);
+        }
+
         const res = await fetch(`/api/application/${slug}`);
         if (res.ok) {
           const application: Application = await res.json();
@@ -113,9 +118,6 @@ export default function MainPage({ user }: Props) {
           );
           if (checkUserExists.ok) {
             const user = await checkUserExists.json();
-            if (isStaffUtil(user)) {
-              setIsStaff(true);
-            }
             setApplicant(user);
             setApplicantExists(true);
             setLoading(false);
@@ -146,7 +148,9 @@ export default function MainPage({ user }: Props) {
       updatedById: (user as any)._id,
       status: formData.status,
       statusReason:
-        formData.statusReason === "" ? application?.statusReason : formData.statusReason,
+        formData.statusReason === ""
+          ? application?.statusReason
+          : formData.statusReason,
     };
 
     try {
@@ -196,7 +200,7 @@ export default function MainPage({ user }: Props) {
         body: JSON.stringify({
           application: applicationForm,
           applicationId: (application as any)._id,
-          statusUpdate: applicationForm.status !== application?.status
+          statusUpdate: applicationForm.status !== application?.status,
         }),
       });
 
@@ -208,7 +212,7 @@ export default function MainPage({ user }: Props) {
         );
       }
     } catch (error) {
-      router.push('/');
+      router.push("/");
       console.error("An error occurred:", error);
     }
   };
@@ -220,13 +224,16 @@ export default function MainPage({ user }: Props) {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/application/${(application as any)._id!!}`, {
-        method: "DELETE",
-        body: JSON.stringify({ applicationId: (application as any)._id!! }),
-      });
+      const res = await fetch(
+        `/api/application/${(application as any)._id!!}`,
+        {
+          method: "DELETE",
+          body: JSON.stringify({ applicationId: (application as any)._id!! }),
+        }
+      );
       if (res.ok) {
         setLoading(true);
-        alert("Application deleted successfully!")
+        alert("Application deleted successfully!");
         router.push("/dashboard");
       }
     } catch (error) {
