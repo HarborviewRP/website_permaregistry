@@ -234,7 +234,7 @@ export default function DiscordAuth({ user }: Props) {
     // Check for any validation errors
     if (hasValidationErrors()) {
       setStatusMessage(
-        "Please fix any validation errors before submitting the form."
+        "Please fill out each form correctly then try again..."
       );
       return;
     }
@@ -331,6 +331,15 @@ export default function DiscordAuth({ user }: Props) {
   };
 
   const validateField = (name: any, value: any) => {
+    if (name === 'age') {
+      if (isNaN(value)) return false;
+      if (value < 0) return false;
+      if (value > 99) return false;
+    }
+
+    if (name === 'acknowledgement') {
+      if (value.toLowerCase() !== 'acknowledged') return false;
+    }
     if (value.trim() === "") {
       return false;
     }
