@@ -145,7 +145,7 @@ export default function MainPage({ user }: Props) {
     let applicationForm: Partial<Application> = {
       applicantId: application?.applicantId,
       lastUpdate: now,
-      updatedById: (user as any)._id,
+      updatedById: user?.id,
       status: formData.status,
       statusReason:
         formData.statusReason === ""
