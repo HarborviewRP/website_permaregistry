@@ -26,7 +26,7 @@ export default function MainPage({ user }: Props) {
 
   return !user ? (
     <>
-      <div className="w-screen h-screen flex justify-center items-center">
+      <div className="h-screen flex justify-center items-center">
         <div className="p-6 max-w-sm mx-auto bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md items-center space-x-1 backdrop-blur">
           <div className="flex-shrink-0 flex justify-center items-center">
             <Image
