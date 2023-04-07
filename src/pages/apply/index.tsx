@@ -71,6 +71,7 @@ export default function DiscordAuth({ user }: Props) {
     acknowledgement: "",
   });
   const [statusMessage, setStatusMessage] = useState<String | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const [validationStatus, setValidationStatus] = useState<
     Partial<Record<keyof FormFields, boolean>>
@@ -230,6 +231,7 @@ export default function DiscordAuth({ user }: Props) {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setIsSubmitting(true)
 
     // Check for any validation errors
     if (hasValidationErrors()) {
@@ -282,6 +284,7 @@ export default function DiscordAuth({ user }: Props) {
           error.message
       );
     }
+    setIsSubmitting(false);
   };
 
   const formStructureToQuestions = (
@@ -335,6 +338,7 @@ export default function DiscordAuth({ user }: Props) {
       if (isNaN(value)) return false;
       if (value < 0) return false;
       if (value > 99) return false;
+      if (value % 1 != 0) return false;
     }
 
     if (name === 'acknowledgement') {
@@ -513,6 +517,7 @@ export default function DiscordAuth({ user }: Props) {
                         <button
                           type="submit"
                           className="py-2 px-4 bg-green-500 hover:bg-green-400 text-white rounded"
+                          disabled={isSubmitting}
                         >
                           Submit Application
                         </button>
