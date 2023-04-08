@@ -134,7 +134,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
                       <Link
                         href={href}
-                        className={`p-3 w-full rounded-xl hover:backdrop-blur-3xl hover:bg-opacity-50 hover:text-gray-500 cursor-pointer text-white`}
+                        className={`p-3 w-full hover:text-gray-500 cursor-pointer text-white`}
                       >
                         {title}
                       </Link>
