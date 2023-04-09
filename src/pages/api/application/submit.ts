@@ -1,8 +1,8 @@
 import { getApplicationCollection } from "./../../../util/mongodb";
 import { NextApiResponse } from "next";
-import { createApplication } from "src/util/database";
+import { createApplication, createChangeLog } from "src/util/database";
 import { dbConnect } from "src/util/mongodb";
-import { Application } from "src/types";
+import { Action, Application, ChangeLog, FormType } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { ObjectID } from "bson";
 import { isStaff } from "src/util/permission";
@@ -38,14 +38,25 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       });
       return;
     }
+    const appId = new ObjectID();
 
     const application: Application = {
       ...req.body,
-      _id: new ObjectID(),
+      _id: appId,
     };
     try {
       const result = await createApplication(application);
       if (result.acknowledged) {
+
+        const changeLog: ChangeLog = {
+          userId: user.id,
+          form: FormType.APPLICATION,
+          formId: (application as any)._id,
+          action: Action.CREATED,
+          changes: [],
+        }
+        await createChangeLog(changeLog)
+
         res.status(200).json({
           message: "Application submitted successfully",
           application: application,

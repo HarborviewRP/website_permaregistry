@@ -1,6 +1,6 @@
-import { DISCORD, Interview } from "./../../../types";
+import { Action, ChangeLog, DISCORD, FormType, Interview } from "./../../../types";
 import { NextApiResponse } from "next";
-import { createInterview } from "src/util/database";
+import { createChangeLog, createInterview } from "src/util/database";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { ObjectID } from "bson";
 import { isStaff } from "src/util/permission";
@@ -9,7 +9,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const interview: Interview = {
       ...req.body,
-      _id: new ObjectID().toString(),
+      _id: new ObjectID(),
     };
     const user = req.session.get("user");
     if (!isStaff(user)) {
@@ -18,6 +18,14 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     try {
       const result = await createInterview(interview);
       if (result.acknowledged) {
+        const changeLog: ChangeLog = {
+          userId: user.id,
+          form: FormType.INTERVIEW,
+          formId: (interview as any)._id,
+          action: Action.CREATED,
+          changes: [],
+        }
+        await createChangeLog(changeLog)
         res
           .status(200)
           .json({

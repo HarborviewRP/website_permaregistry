@@ -58,6 +58,7 @@ export type Note = {
 };
 
 export interface Application {
+  _id: any | undefined;
   applicantId: string;
   status: STATUS;
   statusReason: string | undefined;
@@ -90,6 +91,7 @@ export interface Application {
 }
 
 export interface Interview {
+  _id: any | undefined;
   applicationId: string;
   applicantId: string;
   claimedById: string | undefined | null;
@@ -100,6 +102,32 @@ export interface Interview {
   lastUpdate: number;
   notes: Note[] | [];
   recording_path: string | undefined;
+}
+
+export interface ChangeLog {
+  userId: string;
+  form: FormType;
+  formId: string;
+  action: Action;
+  changes: FormActionChange[] | undefined;
+}
+
+export enum Action {
+  CREATED,
+  DELETED,
+  MODIFIED,
+}
+
+export interface FormActionChange {
+  field: string;
+  index?: number;
+  previous: string;
+  change: string;
+}
+
+export enum FormType {
+  INTERVIEW,
+  APPLICATION,
 }
 
 export enum STATUS {

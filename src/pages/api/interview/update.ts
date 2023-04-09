@@ -1,7 +1,7 @@
 import { NextApiResponse } from "next";
-import { updateApplication, updateInterview } from "src/util/database";
+import { compareForms, createChangeLog, getInterview, updateApplication, updateInterview } from "src/util/database";
 import { dbConnect } from "src/util/mongodb";
-import { DISCORD, Interview } from "src/types";
+import { Action, ChangeLog, DISCORD, FormType, Interview } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { isStaff } from "src/util/permission";
 import { sendDm } from "src/util/discord";
@@ -29,8 +29,19 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
 
 
     try {
+      const oldInterview = await getInterview(interviewId);
       const result = await updateInterview(interviewId, interview);
       if (result.acknowledged) {
+
+        const changeLog: ChangeLog = {
+          userId: user.id,
+          form: FormType.INTERVIEW,
+          formId: interviewId,
+          action: Action.MODIFIED,
+          changes: compareForms(oldInterview!!, interview),
+        }
+        await createChangeLog(changeLog)
+
         if (req.body.statusUpdate) {
           await sendDm(interview.applicantId, {
             embeds: [

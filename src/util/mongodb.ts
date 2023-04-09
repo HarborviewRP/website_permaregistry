@@ -65,3 +65,11 @@ export const getUserCollection = async () => {
     client: client.client,
   };
 };
+
+export const getChangeLogCollection = async () => {
+  const client = await dbConnect();
+  return {
+    collection: client.db.collection("changelog"),
+    client: client.client,
+  }
+}

@@ -1,5 +1,5 @@
-import { DISCORD } from "src/types";
-import { deleteApplication, getApplicationById } from "./../../../util/database";
+import { Action, ChangeLog, DISCORD, FormType } from "src/types";
+import { createChangeLog, deleteApplication, getApplicationById } from "./../../../util/database";
 import { NextApiResponse } from "next";
 import { NextIronRequest, withAuth, withSession } from "../../../util/session";
 import { isAdmin, isStaff } from "src/util/permission";
@@ -45,6 +45,16 @@ const del = async (req: any, res: any) => {
 
   if (isAdmin(user)) {
     await deleteApplication(applicationId);
+
+    const changeLog: ChangeLog = {
+      userId: user.id,
+      form: FormType.APPLICATION,
+      formId: applicationId,
+      action: Action.DELETED,
+      changes: []
+    }
+    await createChangeLog(changeLog);
+    
     return res.status(200).json({ message: "Application deleted sucessfully" });
   }
 

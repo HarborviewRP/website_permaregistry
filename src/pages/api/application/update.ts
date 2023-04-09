@@ -1,7 +1,7 @@
 import { NextApiResponse } from "next";
-import { createApplication, updateApplication } from "src/util/database";
+import { compareForms, createApplication, createChangeLog, getApplicationById, updateApplication } from "src/util/database";
 import { dbConnect } from "src/util/mongodb";
-import { Application, DISCORD } from "src/types";
+import { Action, Application, ChangeLog, DISCORD, FormType } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { isStaff } from "src/util/permission";
 import { sendDm } from "src/util/discord";
@@ -24,8 +24,19 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       });
     }
     try {
+      const oldApplication = await getApplicationById(applicationId);
       const result = await updateApplication(applicationId, application);
       if (result.acknowledged) {
+
+        const changeLog: ChangeLog = {
+          userId: user.id,
+          form: FormType.APPLICATION,
+          formId: applicationId,
+          action: Action.MODIFIED,
+          changes: compareForms(oldApplication!!, application),
+        }
+        await createChangeLog(changeLog)
+
         if (req.body.statusUpdate) {
           await sendDm(application.applicantId, {
             embeds: [
@@ -59,6 +70,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         res.status(500).json({ message: "Failed to update the application" });
       }
     } catch (error: any) {
+      console.log(error)
       res.status(500).json({
         message: "Error updating the application",
         error: error.message,

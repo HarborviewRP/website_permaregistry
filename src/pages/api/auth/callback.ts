@@ -93,7 +93,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
             avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
             roles: discordData.roles || [],
             nick: discordData.nick || null,
-            access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins.includes(user.id) ? 1 : 0
+            access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins?.includes(user.id) ? 1 : 0
           },
           $addToSet: {
             ip: req.headers["cf-connecting-ip"],
@@ -114,7 +114,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
         avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
         ip: [req.headers["cf-connecting-ip"]],
         roles: discordData.roles || [],
-        access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins.includes(user.id) ? 1 : 0,
+        access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins?.includes(user.id) ? 1 : 0,
         token: encrypt(user.id),
         nick: discordData.nick || null
       });
@@ -144,7 +144,8 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
     });
   } catch (e) {
-    res.redirect("/discord?r=true");
+    console.log(e)
+    res.redirect("/discord?r=false");
     return;
   }
 

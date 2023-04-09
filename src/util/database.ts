@@ -1,9 +1,10 @@
-import { Interview } from "./../types";
+import { Action, ChangeLog, FormActionChange, FormType, Interview } from "./../types";
 import { Filter, ObjectId } from "mongodb";
 import { Application, User } from "src/types";
 import {
   closeConnection,
   getApplicationCollection,
+  getChangeLogCollection,
   getInterviewCollection,
   getUserCollection,
 } from "./mongodb";
@@ -141,7 +142,7 @@ export const createInterview = async (interview: Interview) => {
 
 export const getInterview = async (id: string) => {
   const interviewCollection = await getInterviewCollection();
-  const res = await interviewCollection.collection.findOne({ _id: id });
+  const res = await interviewCollection.collection.findOne({ _id: new ObjectId(id) });
   return res;
 };
 
@@ -171,7 +172,7 @@ export const updateInterview = async (
 ) => {
   const interviewCollection = await getInterviewCollection();
   const res = await interviewCollection.collection.updateOne(
-    { _id: id },
+    { _id: new ObjectId(id) },
     { $set: updatedInterview }
   );
 
@@ -181,7 +182,7 @@ export const updateInterview = async (
 export const deleteInterview = async (id: string) => {
   const interviewCollection = await getInterviewCollection();
   const res = await interviewCollection.collection.deleteOne({
-    _id: id,
+    _id: new ObjectId(id),
   });
 
   return res;
@@ -478,3 +479,154 @@ export const getApplicationsPerDay = async (startDate: Date, endDate: Date) => {
 
   return lineChartData;
 };
+
+export const createChangeLog = async (changeLog: ChangeLog) => {
+  const changeLogCollection = await getChangeLogCollection();
+  const res = await changeLogCollection.collection.insertOne({...changeLog, timestamp: Date.now()});
+
+  return res;
+};
+
+export const getChangeLogById = async (id: string) => {
+  const changeLogCollection = await getChangeLogCollection();
+  try {
+    const res = await changeLogCollection.collection.findOne({
+      _id: new ObjectId(id),
+    });
+
+    return res;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const getAllChangeLogs = async () => {
+  const changeLogCollection = await getChangeLogCollection();
+  const res = await changeLogCollection.collection.find().toArray();
+
+  return res;
+};
+
+export const getChangeLogsByUserId = async (userId: string) => {
+  const changeLogCollection = await getChangeLogCollection();
+  try {
+    const res = await changeLogCollection.collection
+      .find({ userId: userId })
+      .toArray();
+
+    return res;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const getChangeLogsByFormType = async (formType: FormType) => {
+  const changeLogCollection = await getChangeLogCollection();
+  try {
+    const res = await changeLogCollection.collection
+      .find({ form: formType })
+      .toArray();
+
+    return res;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const getChangeLogsByAction = async (action: Action) => {
+  const changeLogCollection = await getChangeLogCollection();
+  try {
+    const res = await changeLogCollection.collection
+      .find({ action: action })
+      .toArray();
+
+    return res;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const getChangeLogsByFormId = async (formId: string) => {
+  const changeLogCollection = await getChangeLogCollection();
+  try {
+    const res = await changeLogCollection.collection
+      .find({ formId: formId })
+      .toArray();
+
+    return res;
+  } catch (err) {
+    return null;
+  }
+};
+
+export const updateChangeLog = async (
+  id: string,
+  updatedChangeLog: Partial<ChangeLog>
+) => {
+  const changeLogCollection = await getChangeLogCollection();
+  const res = await changeLogCollection.collection.updateOne(
+    { _id: new ObjectId(id) },
+    { $set: updatedChangeLog }
+  );
+
+  return res;
+};
+
+export const deleteChangeLog = async (id: string) => {
+  const changeLogCollection = await getChangeLogCollection();
+  const res = await changeLogCollection.collection.deleteOne({
+    _id: new ObjectId(id),
+  });
+
+  return res;
+};
+
+export function compareForms<T extends Record<string, any>>(
+  oldForm: T,
+  newForm: T
+): FormActionChange[] {
+  const changes: FormActionChange[] = [];
+
+  for (const key in oldForm) {
+    if (Object.prototype.hasOwnProperty.call(newForm, key)) {
+      const oldValue = oldForm[key];
+      const newValue = newForm[key];
+
+      if (Array.isArray(oldValue) && Array.isArray(newValue)) {
+        // Loop through the old array and compare elements with the new array
+        oldValue.forEach((item: any, index: any) => {
+          if (JSON.stringify(item) !== JSON.stringify(newValue[index])) {
+            changes.push({
+              field: key,
+              index: index,
+              previous: JSON.stringify(item),
+              change: JSON.stringify(newValue[index]),
+            });
+          }
+        });
+
+        // Check for new elements added to the array
+        if (newValue.length > oldValue.length) {
+          for (let i = oldValue.length; i < newValue.length; i++) {
+            changes.push({
+              field: key,
+              index: i,
+              previous: 'undefined',
+              change: JSON.stringify(newValue[i]),
+            });
+          }
+        }
+      } else if (!Array.isArray(oldValue) && !Array.isArray(newValue)) {
+        if (JSON.stringify(oldValue) !== JSON.stringify(newValue)) {
+          changes.push({
+            field: key,
+            previous: JSON.stringify(oldValue),
+            change: JSON.stringify(newValue),
+          });
+        }
+      }
+    }
+  }
+
+  return changes;
+}
