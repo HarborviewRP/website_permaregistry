@@ -126,7 +126,7 @@ export const getSortedApplications = async (
 
   const applications = await applicationCollection.collection
     .find(userId ? { applicantId: userId } : {})
-    .sort({ status: sortDirection })
+    .sort({ status: sortDirection, _id: 1 })
     .skip(skipCount)
     .limit(pageLength)
     .toArray();
@@ -142,7 +142,13 @@ export const createInterview = async (interview: Interview) => {
 
 export const getInterview = async (id: string) => {
   const interviewCollection = await getInterviewCollection();
-  const res = await interviewCollection.collection.findOne({ _id: new ObjectId(id) });
+  let res;
+  try {
+    const res2 = await interviewCollection.collection.findOne({ _id: new ObjectId(id) });
+    res = res2;
+  } catch (err) {
+    return null;
+  }
   return res;
 };
 
@@ -200,7 +206,7 @@ export const getSortedInterviews = async (
 
   const interviews = await interviewCollection.collection
     .find(userId ? { applicantId: userId } : {})
-    .sort({ status: sortDirection })
+    .sort({ status: sortDirection, _id: 1 })
     .skip(skipCount)
     .limit(pageLength)
     .toArray();

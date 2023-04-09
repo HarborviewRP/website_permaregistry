@@ -22,7 +22,7 @@ import { isStaff } from "src/util/permission";
         : undefined;
       const pageLength = req.query.pageLength
         ? parseInt(req.query.pageLength as string, 10)
-        : 16;
+        : 6;
       const sortStatus = req.query.sortStatus as 'asc' | 'desc' | undefined;
   
       if (page !== undefined && pageLength !== undefined) {

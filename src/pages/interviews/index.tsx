@@ -18,13 +18,14 @@ interface Props {
 
 export default function MainPage({ user }: Props) {
   const router = useRouter();
+  const PAGE_LENGTH = 6;
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<Map<String, User>>();
   const [page, setPage] = useState(
     router.query.page ? (router.query.page as unknown as number) : 1
   );
-  const [pageLength, setPageLength] = useState(6);
+  const [pageLength, setPageLength] = useState(PAGE_LENGTH);
   const [sortStatus, setSortStatus] = useState<string | null>("asc");
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
   const [total, setTotal] = useState(0);
@@ -52,7 +53,7 @@ export default function MainPage({ user }: Props) {
 
       setInterviews(interviews);
       setTotal(total);
-      if (page >= total / 6) {
+      if (page >= total / PAGE_LENGTH) {
         setHasNextPage(false);
       } else {
         setHasNextPage(true);
@@ -159,7 +160,7 @@ export default function MainPage({ user }: Props) {
               Previous
             </button>
             <p className="text-white">
-              Page {page} of {Math.round(total / 6)}
+              Page {page} of {Math.round(total / PAGE_LENGTH)}
             </p>
             <button
               onClick={nextPage}

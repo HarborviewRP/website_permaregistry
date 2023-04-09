@@ -299,7 +299,7 @@ export default function Home({ user }: Props) {
   const handleDelete = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/interview/${(application as any)._id!!}`, {
+      const res = await fetch(`/api/interview/${(interview as any)._id!!}`, {
         method: "DELETE",
         body: JSON.stringify({ interviewId: (interview as any)._id!! }),
       });
