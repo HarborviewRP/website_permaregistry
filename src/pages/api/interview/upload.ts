@@ -4,7 +4,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import multer from "multer";
 import { NextIronRequest, withAuth } from "src/util/session";
 import { DISCORD } from "src/types";
-import { ObjectID } from "bson";
 import moment from "moment";
 import { randomUUID } from "crypto";
 import { isStaff } from "src/util/permission";

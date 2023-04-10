@@ -1,7 +1,7 @@
 import { NextApiResponse } from "next";
 import { compareForms, createChangeLog, getInterview, updateApplication, updateInterview } from "src/util/database";
 import { dbConnect } from "src/util/mongodb";
-import { Action, ChangeLog, DISCORD, FormType, Interview } from "src/types";
+import { Action, ChangeLog, DISCORD, FormType, Interview, InterviewWithId } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
 import { isStaff } from "src/util/permission";
 import { sendDm } from "src/util/discord";
@@ -38,7 +38,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
           form: FormType.INTERVIEW,
           formId: interviewId,
           action: Action.MODIFIED,
-          changes: compareForms(oldInterview!!, interview),
+          changes: compareForms(oldInterview!!, interview as InterviewWithId),
         }
         await createChangeLog(changeLog)
 

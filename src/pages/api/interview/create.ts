@@ -2,14 +2,14 @@ import { Action, ChangeLog, DISCORD, FormType, Interview } from "./../../../type
 import { NextApiResponse } from "next";
 import { createChangeLog, createInterview } from "src/util/database";
 import { NextIronRequest, withAuth } from "../../../util/session";
-import { ObjectID } from "bson";
 import { isStaff } from "src/util/permission";
+import { ObjectId } from "mongodb";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
     const interview: Interview = {
       ...req.body,
-      _id: new ObjectID(),
+      _id: new ObjectId(),
     };
     const user = req.session.get("user");
     if (!isStaff(user)) {

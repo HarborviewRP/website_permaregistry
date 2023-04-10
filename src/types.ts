@@ -1,3 +1,5 @@
+import { ObjectId, WithId } from "mongodb";
+
 export interface User {
   accent_color: string;
   avatar: string;
@@ -57,8 +59,9 @@ export type Note = {
   text: string;
 };
 
+export type ApplicationWithId = WithId<Application>;
+
 export interface Application {
-  _id: any | undefined;
   applicantId: string;
   status: STATUS;
   statusReason: string | undefined;
@@ -90,8 +93,10 @@ export interface Application {
   interviewId: string | undefined;
 }
 
+export type InterviewWithId = WithId<Interview>;
+
 export interface Interview {
-  _id: any | undefined;
+  _id?: ObjectId;
   applicationId: string;
   applicantId: string;
   claimedById: string | undefined | null;
