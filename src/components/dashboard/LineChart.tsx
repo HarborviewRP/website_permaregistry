@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto';
+import { ScriptableContext } from 'chart.js/auto';
 
 interface LineChartProps {
   label: string;
@@ -12,46 +13,28 @@ const LineChart: React.FC<LineChartProps> = ({ data, label }) => {
     labels: data.map((item: any) => item.date),
     datasets: [
       {
+        lineTension: 0.2,
         label: label,
         data: data.map((item: any) => item.count),
-        borderColor: '#8884d8',
+        borderColor: 'rgba(136,132,216,0.2',
         borderWidth: 2,
-        backgroundColor: 'rgba(136, 132, 216, 0.1)',
-        pointBackgroundColor: '#8884d8',
+        //backgroundColor: 'rgba(136, 132, 216, 0.1)',
+        backgroundColor: (context: ScriptableContext<"line">) => {
+          const ctx = context.chart.ctx;
+          const gradient = ctx.createLinearGradient(0, 0, 0, 275);
+          gradient.addColorStop(0, "rgba(136,132,216,0.5)");
+          gradient.addColorStop(1, "rgba(136,132,216,0)");
+          return gradient;
+        },
+        pointBorderColor: "rgba(136,132,216,0.0)",
+        pointBackgroundColor: 'rgba(136,132,216,0.1)',
+        fill: true
       },
     ],
   };
 
   const chartOptions = {
     maintainAspectRatio: false,
-    scales: {
-      xAxes: [
-        {
-          type: 'time',
-          time: {
-            unit: 'day',
-            displayFormats: {
-              day: 'MMM DD',
-            },
-          },
-          scaleLabel: {
-            display: true,
-            labelString: 'Date',
-          },
-        },
-      ],
-      yAxes: [
-        {
-          ticks: {
-            beginAtZero: true,
-          },
-          scaleLabel: {
-            display: true,
-            labelString: 'Count',
-          },
-        },
-      ],
-    },
   };
 
   return (

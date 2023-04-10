@@ -433,10 +433,35 @@ export const getInterviewsPerDay = async (startDate: Date, endDate: Date) => {
     ])
     .toArray();
 
-  const lineChartData = results.map((result) => ({
-    date: result._id,
-    count: result.count,
-  }));
+  // Helper function to add days to a date
+  const addDays = (date: any, days: any) => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  };
+
+  // Helper function to generate a date array between two dates
+  const generateDateArray = (start: any, end: any) => {
+    const dateArray = [];
+    let currentDate = start;
+
+    while (currentDate <= end) {
+      dateArray.push(currentDate.toISOString().slice(0, 10));
+      currentDate = addDays(currentDate, 1);
+    }
+
+    return dateArray;
+  };
+
+  const dateArray = generateDateArray(startDate, endDate);
+
+  const lineChartData = dateArray.map((date) => {
+    const interviewCount = results.find((result) => result._id === date)?.count || 0;
+    return {
+      date,
+      count: interviewCount,
+    };
+  });
 
   return lineChartData;
 };
@@ -478,10 +503,35 @@ export const getApplicationsPerDay = async (startDate: Date, endDate: Date) => {
     ])
     .toArray();
 
-  const lineChartData = results.map((result) => ({
-    date: result._id,
-    count: result.count,
-  }));
+  // Helper function to add days to a date
+  const addDays = (date: any, days: any) => {
+    const result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  };
+
+  // Helper function to generate a date array between two dates
+  const generateDateArray = (start: any, end: any) => {
+    const dateArray = [];
+    let currentDate = start;
+
+    while (currentDate <= end) {
+      dateArray.push(currentDate.toISOString().slice(0, 10));
+      currentDate = addDays(currentDate, 1);
+    }
+
+    return dateArray;
+  };
+
+  const dateArray = generateDateArray(startDate, endDate);
+
+  const lineChartData = dateArray.map((date) => {
+    const applicationCount = results.find((result) => result._id === date)?.count || 0;
+    return {
+      date,
+      count: applicationCount,
+    };
+  });
 
   return lineChartData;
 };
