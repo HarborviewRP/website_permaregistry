@@ -4,8 +4,8 @@ import { createApplication, createChangeLog } from "src/util/database";
 import { dbConnect } from "src/util/mongodb";
 import { Action, Application, ChangeLog, FormType } from "src/types";
 import { NextIronRequest, withAuth } from "../../../util/session";
-import { ObjectID } from "bson";
 import { isStaff } from "src/util/permission";
+import { ObjectId } from "mongodb";
 
 const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   if (req.method === "POST") {
@@ -38,7 +38,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       });
       return;
     }
-    const appId = new ObjectID();
+    const appId = new ObjectId();
 
     const application: Application = {
       ...req.body,
