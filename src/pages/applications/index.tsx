@@ -6,6 +6,7 @@ import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ApplicationBar from "src/components/application/ApplicationBar";
 import Loader from "src/components/Loader";
+import PageSelector from "src/components/PageSector";
 import { Application, DISCORD, User } from "src/types";
 import { isStaff } from "src/util/permission";
 import { developerRoute } from "src/util/redirects";
@@ -30,6 +31,15 @@ export default function MainPage({ user }: Props) {
     if (!user) router.push("/");
     // if (!isStaff(user!!)) router.push("/");
   });
+
+  const onPageClick = (pageNumber: number) => {
+    setPage(pageNumber);
+  
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set("page", pageNumber.toString());
+    const newUrl = window.location.pathname + "?" + queryParams.toString();
+    window.history.pushState({ path: newUrl }, "", newUrl);
+  };
 
   const fetchApplications = useCallback(async () => {
     setLoading(true);
@@ -141,21 +151,12 @@ export default function MainPage({ user }: Props) {
             ))}
           </div>
           <div className="mx-32 my-4 flex justify-between">
-            <button
-              onClick={prevPage}
-              className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
-              disabled={page === 1}
-            >
-              Previous
-            </button>
-            <p className="text-white">Page {page} of {Math.round(total / 12)}</p>
-            <button
-              onClick={nextPage}
-              className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
-              disabled={!hasNextPage}
-            >
-              Next
-            </button>
+            <PageSelector
+              currentPage={page}
+              totalPages={Math.ceil(total / 12)}
+              adjacentPages={2}
+              onPageClick={onPageClick}
+            />
           </div>
         </>
       ) : (

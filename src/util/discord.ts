@@ -27,13 +27,12 @@ export const sendDm = async (userId: string, content: any) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bot ${TOKEN}`,
+        Authorization: `Bot ${TOKEN}`,
       },
       body: JSON.stringify({
         recipient_id: userId,
       }),
     });
-
 
     if (!res.ok) return false;
 
@@ -57,3 +56,22 @@ export const sendDm = async (userId: string, content: any) => {
     return false;
   }
 };
+
+export function lightenColor(hexColor: string, amount: number) {
+  var red = parseInt(hexColor.substring(1, 3), 16);
+  var green = parseInt(hexColor.substring(3, 5), 16);
+  var blue = parseInt(hexColor.substring(5, 7), 16);
+
+  red = Math.round(Math.min(255, red + (255 - red) * amount));
+  green = Math.round(Math.min(255, green + (255 - green) * amount));
+  blue = Math.round(Math.min(255, blue + (255 - blue) * amount));
+
+  var newHexColor = "#" + componentToHex(red) + componentToHex(green) + componentToHex(blue);
+
+  return newHexColor;
+}
+
+function componentToHex(c: number) {
+  var hex = c.toString(16);
+  return hex.length == 1 ? "0" + hex : hex;
+}

@@ -8,6 +8,7 @@ import { GetServerSideProps } from "next";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import Link from "next/link";
+import UserGradient from "../user/UserGradient";
 
 interface CommentProps {
   obj: Application | Interview;
@@ -123,7 +124,7 @@ const CommentBox: React.FC<CommentProps> = ({
         {obj!!.notes.filter((note) => note.authorId).map((note: any) => (
           <div key={note!!.noteId} className="my-2">
             <Link
-              href={`/profile/${(commentUsers!!.get(note!!.authorId!!)!! as any)._id}`}
+              href={`/profile/${(commentUsers?.get(note!!.authorId!!)!! as any)._id}`}
               passHref={true}
             >
               <div className="flex flex-row items-center p-1">
@@ -139,9 +140,8 @@ const CommentBox: React.FC<CommentProps> = ({
                   />
                 </div>
                 <div className="flex flex-col">
-                  <h1 className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">
-                    {commentUsers!!.get(note!!.authorId!!)!!.username}#
-                    {commentUsers!!.get(note!!.authorId!!)!!.discriminator}
+                  <h1>
+                    <UserGradient user={commentUsers!!.get(note!!.authorId!!)!!} />
                   </h1>
                   <p className="text-gray-500 text-xs">
                     {moment

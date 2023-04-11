@@ -2,16 +2,20 @@ import React from "react";
 import Image from "next/image";
 import { Application, convertStatus, Interview, User } from "src/types";
 import moment from "moment";
+import UserGradient from "../user/UserGradient";
 
 interface ApplicationProps {
-  form: {_id: string, status: number, lastUpdate: number, collection: string, applicantId: string};
+  form: {
+    _id: string;
+    status: number;
+    lastUpdate: number;
+    collection: string;
+    applicantId: string;
+  };
   applicant: User;
 }
 
-const RecentBar: React.FC<ApplicationProps> = ({
-  form,
-  applicant,
-}) => {
+const RecentBar: React.FC<ApplicationProps> = ({ form, applicant }) => {
   function truncate(str: string, maxLength = 19) {
     if (str.length <= maxLength) {
       return str;
@@ -39,14 +43,18 @@ const RecentBar: React.FC<ApplicationProps> = ({
               <h1 className="text-white font-thin text-lg">
                 {truncate(applicant.nick ? applicant.nick : applicant.username)}
               </h1>
-              <h1 className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">
-                {applicant.username}#{applicant.discriminator}
+              <h1 className="text-sm">
+                <UserGradient user={applicant} />
               </h1>
             </div>
           </div>
           <div className="flex flex-row items-center">
             <h1 className="text-gray-500 text-sm">
-              {(form.collection === "applications" ? <span className="text-blue-400">{form.collection}</span> : <span className="text-yellow-400">{form.collection}</span>)}
+              {form.collection === "applications" ? (
+                <span className="text-blue-400">{form.collection}</span>
+              ) : (
+                <span className="text-yellow-400">{form.collection}</span>
+              )}
             </h1>
           </div>
 

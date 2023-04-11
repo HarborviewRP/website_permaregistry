@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Interview, convertStatus, User } from "src/types";
 import moment from "moment";
+import UserGradient from "../user/UserGradient";
 
 interface InterviewProps {
   interview: Interview;
@@ -37,8 +38,8 @@ const InterviewBar: React.FC<InterviewProps> = ({ interview, applicant, staffMem
               <h1 className="text-white font-thin text-lg">
                 {truncate(applicant.nick ? applicant.nick : applicant.username)}
               </h1>
-              <h1 className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">
-                {applicant.username}#{applicant.discriminator}
+              <h1 className="text-sm">
+              <UserGradient user={applicant} />
               </h1>
             </div>
           </div>
@@ -70,7 +71,7 @@ const InterviewBar: React.FC<InterviewProps> = ({ interview, applicant, staffMem
                       )}
                     </h1>
                     <h1 className="text-sm text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">
-                      {staffMember?.username}#{staffMember?.discriminator}
+                      <UserGradient user={staffMember!!} />
                     </h1>
                   </div>
                   <div

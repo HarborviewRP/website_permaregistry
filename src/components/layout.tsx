@@ -14,8 +14,8 @@ import {
   HiDocumentText,
   HiLibrary,
   HiUserGroup,
-  HiX,
 } from "react-icons/hi";
+import UserGradient from "./user/UserGradient";
 
 interface LayoutProps {
   user: User | null;
@@ -109,7 +109,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     />
                   </div>
 
-                  <p className="text-sm break-words text-transparent bg-clip-text bg-gradient-to-r from-purple-400 via-indigo-500 to-blue-600">{`${user.username}#${user.discriminator}`}</p>
+                  <p className="text-sm break-words"><UserGradient user={user} /></p>
                 </div>
               </Link>
             ) : (

@@ -79,21 +79,25 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
 
     let accessLevel = 0;
 
+    const userExt = {
+      email: user.email,
+      username: user.username,
+      discriminator: user.discriminator,
+      accent_color: user.accent_color,
+      banner_color: user.banner_color,
+      banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
+      avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
+      roles: discordData.roles || [],
+      nick: discordData.nick || null,
+      access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins?.includes(user.id) ? 1 : 0
+    }
+
     if (exists) {
       await db.collection("users").updateOne(
         { _id: user.id },
         {
           $set: {
-            email: user.email,
-            username: user.username,
-            discriminator: user.discriminator,
-            accent_color: user.accent_color,
-            banner_color: user.banner_color,
-            banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
-            avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
-            roles: discordData.roles || [],
-            nick: discordData.nick || null,
-            access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins?.includes(user.id) ? 1 : 0
+            ...userExt
           },
           $addToSet: {
             ip: req.headers["cf-connecting-ip"],
@@ -105,18 +109,9 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     } else {
       db.collection("users").insertOne({
         _id: user.id,
-        email: user.email,
-        username: user.username,
-        discriminator: user.discriminator,
-        accent_color: user.accent_color,
-        banner_color: user.banner_color,
-        banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
-        avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
         ip: [req.headers["cf-connecting-ip"]],
-        roles: discordData.roles || [],
-        access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins?.includes(user.id) ? 1 : 0,
         token: encrypt(user.id),
-        nick: discordData.nick || null
+        ...userExt
       });
     }
 

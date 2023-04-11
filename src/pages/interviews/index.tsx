@@ -11,6 +11,7 @@ import { Application, DISCORD, Interview, User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import { isStaff as isStaffUtil } from "src/util/permission";
+import PageSelector from "src/components/PageSector";
 
 interface Props {
   user?: User;
@@ -29,6 +30,15 @@ export default function MainPage({ user }: Props) {
   const [sortStatus, setSortStatus] = useState<string | null>("asc");
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
   const [total, setTotal] = useState(0);
+  
+  const onPageClick = (pageNumber: number) => {
+    setPage(pageNumber);
+  
+    const queryParams = new URLSearchParams(window.location.search);
+    queryParams.set("page", pageNumber.toString());
+    const newUrl = window.location.pathname + "?" + queryParams.toString();
+    window.history.pushState({ path: newUrl }, "", newUrl);
+  };
 
   useEffect(() => {
     if (!user) router.push("/");
@@ -152,23 +162,12 @@ export default function MainPage({ user }: Props) {
             ))}
           </div>
           <div className="mx-48 my-4 flex justify-between">
-            <button
-              onClick={prevPage}
-              className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
-              disabled={page === 1}
-            >
-              Previous
-            </button>
-            <p className="text-white">
-              Page {page} of {Math.round(total / PAGE_LENGTH)}
-            </p>
-            <button
-              onClick={nextPage}
-              className={`text-white ${!hasNextPage ? "text-gray-600" : ""}`}
-              disabled={!hasNextPage}
-            >
-              Next
-            </button>
+            <PageSelector
+              currentPage={page}
+              totalPages={Math.ceil(total / PAGE_LENGTH)}
+              adjacentPages={2}
+              onPageClick={onPageClick}
+            />
           </div>
         </>
       ) : (
