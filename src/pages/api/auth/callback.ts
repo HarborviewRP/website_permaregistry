@@ -87,9 +87,9 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
       banner_color: user.banner_color,
       banner: `https://cdn.discordapp.com/banners/${user.id}/${user.banner}`,
       avatar: `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}`,
-      roles: discordData.roles || [],
-      nick: discordData.nick || null,
-      access_level: discordData.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins?.includes(user.id) ? 1 : 0
+      roles: discordData?.roles || [],
+      nick: discordData?.nick || null,
+      access_level: discordData?.roles?.includes(DISCORD.SUPERADMIN_ROLE) ? 1 : superadmins?.includes(user.id) ? 1 : 0
     }
 
     if (exists) {
@@ -131,7 +131,7 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
 
     await req.session.set("user", {
       ...user,
-      roles: discordData.roles || [],
+      roles: discordData?.roles || [],
       token: encrypt(user.id),
       access_level: accessLevel,
       member: !!discordData,
