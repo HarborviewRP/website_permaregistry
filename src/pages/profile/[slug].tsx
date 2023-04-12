@@ -1,12 +1,10 @@
 import { GetServerSideProps } from "next";
-import Head from "next/head";
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Loader from "src/components/Loader";
 import { User } from "src/types";
-import { isAdmin, isStaff } from "src/util/permission";
+import { isStaff } from "src/util/permission";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 
@@ -36,9 +34,10 @@ export default function MainPage({ user }: Props) {
   });
 
   const bannerStyle = {
-    backgroundImage: `url(${otherUser?.banner}?size=4096)`,
+    backgroundImage: !otherUser?.banner?.endsWith('null') ? `url(${otherUser?.banner}?size=4096)` : `url(${otherUser?.avatar})`,
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
+    backgroundPosition: "center",
     backgroundBlendMode: "multiply",
   };
 
