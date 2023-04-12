@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Application, convertStatus, Interview, User } from "src/types";
 import moment from "moment";
 import UserGradient from "../user/UserGradient";
+import Container from "../Container";
 
 interface ApplicationProps {
   form: {
@@ -25,7 +26,7 @@ const RecentBar: React.FC<ApplicationProps> = ({ form, applicant }) => {
 
   return (
     <>
-      <div className="p-4 my-3 bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white rounded-xl shadow-lg items-center space-x-1 backdrop-blur">
+      <Container className="p-4 my-3 rounded-xl shadow-lg items-center space-x-1">
         <div className="flex flex-row justify-between">
           <div className="flex flex-row items-center p-1 w-64">
             <div
@@ -72,7 +73,7 @@ const RecentBar: React.FC<ApplicationProps> = ({ form, applicant }) => {
             </p>
           </div>
         </div>
-      </div>
+      </Container>
     </>
   );
 };

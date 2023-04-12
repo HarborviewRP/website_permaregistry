@@ -1,5 +1,6 @@
 import React from "react";
 import { IconType } from "react-icons"; // Import the IconType from react-icons
+import Container from "./Container";
 
 interface StatsCardProps {
   title: string;
@@ -16,7 +17,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
   icon,
   iconColor = "",
 }) => (
-  <div className="bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white p-4 rounded-lg flex items-center">
+  <Container className="p-4 rounded-lg flex items-center">
     <div className="flex items-center">
       {icon && (
         <div className={`text-4xl mr-2  ${iconColor}`}>
@@ -35,7 +36,7 @@ const StatsCard: React.FC<StatsCardProps> = ({
         </div>
       </div>
     </div>
-  </div>
+  </Container>
 );
 
 export default StatsCard;

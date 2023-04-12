@@ -16,6 +16,7 @@ import {
   HiUserGroup,
 } from "react-icons/hi";
 import UserGradient from "./user/UserGradient";
+import Container from "./Container";
 
 interface LayoutProps {
   user: User | null;
@@ -92,7 +93,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   return (
     <div className="min-h-screen flex">
-      <aside className="fixed top-0 left-0 z-40 w-64 h-screen w-50 bg-slate-900 backdrop-blur-3xl bg-opacity-50">
+      <Container className="fixed top-0 left-0 z-40 w-64 h-screen w-50">
         <nav className="flex flex-col h-full justify-between p-6 text-center text-white">
           <div>
             <h1 className="text-3xl">PGN ATS</h1>
@@ -192,7 +193,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </p>
           </div>
         </nav>
-      </aside>
+      </Container>
       {/* Child Content */}
       <main className="flex-1 mx-auto ml-60">{children}</main>
     </div>
