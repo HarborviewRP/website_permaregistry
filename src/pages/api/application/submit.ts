@@ -20,6 +20,10 @@ const twoWeeksAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000); // 14 days 
 const get = async (req: any, res: any) => {
   const user = req.session.get("user");
 
+  if (!user.member) {
+    return res.status(403).json({ message: 'You must be a member of the Discord before applying...' })
+  }
+
   const applicantId = user.id;
 
   // Check if user has rejected or pending application in the last 14 days
