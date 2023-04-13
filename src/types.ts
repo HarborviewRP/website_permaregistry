@@ -109,6 +109,11 @@ export interface Interview {
   recording_path: string | undefined;
 }
 
+export enum FormType {
+  INTERVIEW,
+  APPLICATION,
+}
+
 export interface ChangeLog {
   userId: string;
   form: FormType;
@@ -128,11 +133,6 @@ export interface FormActionChange {
   index?: number;
   previous: string;
   change: string;
-}
-
-export enum FormType {
-  INTERVIEW,
-  APPLICATION,
 }
 
 export enum STATUS {

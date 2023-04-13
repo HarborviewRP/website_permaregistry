@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import { Application, Interview, Note, User } from "src/types";
+import { Application, FormType, Interview, Note, User } from "src/types";
 import Loader from "../Loader";
 import moment from "moment";
 import { useRouter } from "next/router";
@@ -12,12 +12,14 @@ import UserGradient from "../user/UserGradient";
 
 interface CommentProps {
   obj: Application | Interview;
+  type: FormType;
   author: User;
   text?: string | undefined;
 }
 
 const CommentBox: React.FC<CommentProps> = ({
   obj,
+  type,
   author,
   text = undefined,
 }) => {
@@ -44,6 +46,7 @@ const CommentBox: React.FC<CommentProps> = ({
           for (const [id, user] of usersArray) {
             map.set(id, user);
           }
+          map.set(author.id, author)
         }
         setCommentUsers(map);
         setLoading(false);
@@ -79,7 +82,7 @@ const CommentBox: React.FC<CommentProps> = ({
     try {
       const response = await fetch(
         `/api/${
-          (obj as any).applicationId ? "interview" : "application"
+          (type === FormType.INTERVIEW) ? "interview" : "application"
         }/update`,
         {
           method: "POST",
@@ -87,7 +90,7 @@ const CommentBox: React.FC<CommentProps> = ({
             "Content-Type": "application/json",
           },
           body: JSON.stringify(
-            (obj as any).applicationId
+            (type === FormType.INTERVIEW)
               ? {
                   interview: postForm,
                   interviewId: (obj as any)._id,
@@ -124,7 +127,7 @@ const CommentBox: React.FC<CommentProps> = ({
         {obj!!.notes.filter((note) => note.authorId).map((note: any) => (
           <div key={note!!.noteId} className="my-2">
             <Link
-              href={`/profile/${(commentUsers?.get(note!!.authorId!!)!! as any)._id}`}
+              href={`/profile/${(commentUsers?.get(note!!.authorId!!) as any)?._id}`}
               passHref={true}
             >
               <div className="flex flex-row items-center p-1">
@@ -133,7 +136,7 @@ const CommentBox: React.FC<CommentProps> = ({
                   style={{ width: 24, height: 24 }}
                 >
                   <Image
-                    src={commentUsers!!.get(note!!.authorId!!)!!.avatar}
+                    src={commentUsers!!.get(note!!.authorId!!)?.avatar || ''}
                     alt="User Avatar"
                     height={24}
                     width={24}

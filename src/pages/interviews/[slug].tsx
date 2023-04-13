@@ -4,6 +4,7 @@ import {
   Application,
   convertStatus,
   DISCORD,
+  FormType,
   Interview,
   User,
 } from "src/types";
@@ -455,6 +456,7 @@ export default function Home({ user }: Props) {
           <div className="max-w-lg w-3/6">
             <CommentBox
               obj={interview!!}
+              type={FormType.INTERVIEW}
               author={user as User}
               text="Interview Notes"
             />
