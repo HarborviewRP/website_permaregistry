@@ -48,7 +48,7 @@ const CommentBox: React.FC<CommentProps> = ({
           for (const [id, user] of usersArray) {
             map.set(id, user);
           }
-          map.set(author.id, author);
+          map.set(author.id, {...author, _id: author.id} as any);
         }
         setCommentUsers(map);
         setLoading(false);
