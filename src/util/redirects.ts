@@ -15,7 +15,7 @@ export async function developerRoute(
 
   if (user) {
     return {
-      props: user ? { user } : {},
+      props: { user, session: ctx.req.session.get("user") },
     };
   }
 }

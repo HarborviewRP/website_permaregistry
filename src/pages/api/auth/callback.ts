@@ -18,6 +18,8 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     return;
   }
 
+  
+
   try {
     const { data } = await axios.post(
       "https://discordapp.com/api/v9/oauth2/token",
@@ -140,12 +142,13 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     });
   } catch (e) {
     console.log(e)
-    res.redirect("/discord?r=false");
+    res.redirect('/?r=false')
     return;
   }
+  const redirectUrl = req.query.state ? decodeURIComponent(req.query.state as string) : '/discord?r=true';
 
   await req.session.save();
-  res.redirect("/discord?r=true");
+  res.redirect(redirectUrl)
 };
 
 export default withSession(handler);

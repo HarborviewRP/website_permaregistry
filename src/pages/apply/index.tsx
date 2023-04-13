@@ -10,12 +10,47 @@ import { User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import { Application, STATUS } from "src/types";
+import { isUndefined } from "util";
+import Loader from "src/components/Loader";
 
 interface Props {
   user?: User;
+  session?: any;
 }
 
-export default function DiscordAuth({ user }: Props) {
+export default function DiscordAuth({ session }: Props) {
+  const [user, setUser] = useState<User | undefined>(undefined);
+  const [checked, setChecked] = useState<boolean>(false);
+
+  const fetchSession = async () => {
+    if (user) return; // prevent spamming API
+    try {
+      const res = await fetch("/api/auth/session");
+      const userData = await res.json();
+      if (userData.id) {
+        setUser(userData);
+        try {
+          const response = await fetch(
+            `/api/application/submit?applicantId=${userData.id}`,
+            {}
+          );
+          if (!response.ok) {
+            setStatusMessage((await response.json()).message);
+          }
+        } catch (err: any) {
+          console.log(err);
+        }
+        setChecked(true);
+      }
+    } catch (err) {
+      console.error("Failed to fetch session:", err);
+    }
+  };
+
+  useEffect(() => {
+    fetchSession();
+  }, []);
+
   const router = useRouter();
   type FormField = {
     label: string;
@@ -231,13 +266,11 @@ export default function DiscordAuth({ user }: Props) {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Check for any validation errors
     if (hasValidationErrors()) {
-      setStatusMessage(
-        "Please fill out each form correctly then try again..."
-      );
+      setStatusMessage("Please fill out each form correctly then try again...");
       return;
     }
 
@@ -304,7 +337,8 @@ export default function DiscordAuth({ user }: Props) {
     for (const section of Object.values(formStructure)) {
       const questions = [];
       for (const field of section.fields) {
-        if (field.name === "agreement1" || field.name === "agreement2") continue; 
+        if (field.name === "agreement1" || field.name === "agreement2")
+          continue;
         questions.push({
           questionId: field.name,
           questionText: field.label,
@@ -334,15 +368,15 @@ export default function DiscordAuth({ user }: Props) {
   };
 
   const validateField = (name: any, value: any) => {
-    if (name === 'age') {
+    if (name === "age") {
       if (isNaN(value)) return false;
       if (value < 0) return false;
       if (value > 99) return false;
       if (value % 1 != 0) return false;
     }
 
-    if (name === 'acknowledgement') {
-      if (value.toLowerCase() !== 'acknowledged') return false;
+    if (name === "acknowledgement") {
+      if (value.toLowerCase() !== "acknowledged") return false;
     }
     if (value.trim() === "") {
       return false;
@@ -442,13 +476,15 @@ export default function DiscordAuth({ user }: Props) {
           <div className="p-6 max-w-sm bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md items-center space-x-1 backdrop-blur">
             <div className="flex-shrink-0 flex justify-center items-center">
               <Image
-                src={`https://brandlogos.net/wp-content/uploads/2021/11/discord-logo.png`}
-                height={56}
-                width={56}
+                // src={`https://brandlogos.net/wp-content/uploads/2021/11/discord-logo.png`}1
+                className="pb-10"
+                src="/pgn.webp"
+                height={128}
+                width={128}
                 alt="Discord Logo"
               ></Image>
             </div>
-            <Link href="/api/auth/login" passHref>
+            <Link href="/api/auth/login?next=apply" passHref>
               <button className="px-6 py-2 text-sm justify-start items-start text-white bg-indigo-500 backdrop-blur-3xl bg-opacity-50 font-bold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
                 Login with Discord to Apply
               </button>
@@ -490,54 +526,61 @@ export default function DiscordAuth({ user }: Props) {
                 <h1 className="text-white text-2xl font-bold mb-6">
                   PGN: Underground - Staff Application
                 </h1>
+                {!checked ? <Loader center={false}/> : <>
                 {statusMessage ? (
-                  <p className="text-sm text-red-500 font-thin">
-                    {statusMessage}
-                  </p>
+                  <div className="flex flex-col text-center">
+                    <h1 className="text-lg font-semibold text-red-700">
+                      You are ineligible to apply!
+                    </h1>
+                    <p className="text-sm text-red-500 font-thin">
+                      {statusMessage}
+                    </p>
+                  </div>
                 ) : (
-                  <></>
-                )}
-                <form onSubmit={handleSubmit}>
-                  <div className="flex flex-col items-center w-full">
-                    {renderStep(currentStep)}
-                    <div className="flex items-center justify-between w-full">
-                      <button
-                        type="button"
-                        onClick={prevStep}
-                        disabled={currentStep === 1}
-                        className={`py-2 px-4 rounded text-white ${
-                          currentStep === 1
-                            ? "bg-slate-700 text-gray-500"
-                            : "bg-slate-500 hover:bg-slate-400"
-                        }`}
-                      >
-                        Previous Page
-                      </button>
-                      {currentStep === 4 ? (
-                        <button
-                          type="submit"
-                          className="py-2 px-4 bg-green-500 hover:bg-green-400 text-white rounded"
-                          disabled={isSubmitting}
-                        >
-                          Submit Application
-                        </button>
-                      ) : (
+                  <form onSubmit={handleSubmit}>
+                    <div className="flex flex-col items-center w-full">
+                      {renderStep(currentStep)}
+                      <div className="flex items-center justify-between w-full">
                         <button
                           type="button"
-                          onClick={nextStep}
-                          disabled={hasValidationErrors()}
-                          className={`py-2 px-4 bg-blue-500 ${
-                            hasValidationErrors()
-                              ? "bg-opacity-50 cursor-not-allowed text-gray-500"
-                              : "hover:bg-blue-400"
-                          } text-white rounded`}
+                          onClick={prevStep}
+                          disabled={currentStep === 1}
+                          className={`py-2 px-4 rounded text-white ${
+                            currentStep === 1
+                              ? "bg-slate-700 text-gray-500"
+                              : "bg-slate-500 hover:bg-slate-400"
+                          }`}
                         >
-                          Next Page
+                          Previous Page
                         </button>
-                      )}
+                        {currentStep === 4 ? (
+                          <button
+                            type="submit"
+                            className="py-2 px-4 bg-green-500 hover:bg-green-400 text-white rounded"
+                            disabled={isSubmitting}
+                          >
+                            Submit Application
+                          </button>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={nextStep}
+                            disabled={
+                              hasValidationErrors() || statusMessage !== null
+                            }
+                            className={`py-2 px-4 bg-blue-500 ${
+                              hasValidationErrors() || statusMessage !== null
+                                ? "bg-opacity-50 cursor-not-allowed text-gray-500"
+                                : "hover:bg-blue-400"
+                            } text-white rounded`}
+                          >
+                            Next Page
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </form>
+                  </form>
+                )}</>}
               </div>
             </div>
           </div>

@@ -20,9 +20,9 @@ export type NextRoute = (
 
 export function withSession(handler: NextIronHandler | NextRoute) {
   return withIronSession(handler, {
-    password: process.env.COOKIE_SECRET as
-      | string
-      | "owosecretneedstobelongeruwuhaha123412341234",
+    password:
+      (process.env.COOKIE_SECRET as string) ||
+      "owosecretneedstobelongeruwuhaha123412341234",
     cookieName: "session",
     ttl: 43200,
     cookieOptions: {
