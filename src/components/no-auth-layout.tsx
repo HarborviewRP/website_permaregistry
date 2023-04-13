@@ -9,12 +9,21 @@ import { withSession } from "src/util/session";
 interface Props {
   user?: User;
   children: any;
+  background?: boolean;
 }
 
-export default function NoAuthLayout({ children, user }: Props) {
+export default function NoSidebar({ children, user, background = true }: Props) {
+
+  const style = {
+    backgroundImage: `url(/bg.png)`,
+    backgroundRepeat: "no-repeat",
+    backgroundPosition: "center",
+    backgroundBlendMode: "multiply",
+  }
+  
   return (
-    <>
+    <div style={background ? style : {}}>
       <main className="flex-1">{children}</main>
-    </>
+    </div>
   );
 }

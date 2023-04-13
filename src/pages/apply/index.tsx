@@ -12,6 +12,7 @@ import { withSession } from "src/util/session";
 import { Application, STATUS } from "src/types";
 import { isUndefined } from "util";
 import Loader from "src/components/Loader";
+import LoginBox from "src/components/user/login";
 
 interface Props {
   user?: User;
@@ -472,25 +473,7 @@ export default function DiscordAuth({ session }: Props) {
   return (
     <>
       {!user && (
-        <div className="w-screen h-screen flex justify-center items-center">
-          <div className="p-6 max-w-sm bg-slate-900 backdrop-blur-3xl bg-opacity-50 rounded-xl shadow-md items-center space-x-1 backdrop-blur">
-            <div className="flex-shrink-0 flex justify-center items-center">
-              <Image
-                // src={`https://brandlogos.net/wp-content/uploads/2021/11/discord-logo.png`}1
-                className="pb-10"
-                src="/pgn.webp"
-                height={128}
-                width={128}
-                alt="Discord Logo"
-              ></Image>
-            </div>
-            <Link href="/api/auth/login?next=apply" passHref>
-              <button className="px-6 py-2 text-sm justify-start items-start text-white bg-indigo-500 backdrop-blur-3xl bg-opacity-50 font-bold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2">
-                Login with Discord to Apply
-              </button>
-            </Link>
-          </div>
-        </div>
+        <LoginBox message="Login with Discord to Apply" />
       )}
       {user && (
         <>
@@ -526,7 +509,7 @@ export default function DiscordAuth({ session }: Props) {
                 <h1 className="text-white text-2xl font-bold mb-6">
                   PGN: Underground - Staff Application
                 </h1>
-                {!checked ? <Loader center={false}/> : <>
+                {!checked ? <div><Loader center={false}/> </div>: <>
                 {statusMessage ? (
                   <div className="flex flex-col text-center">
                     <h1 className="text-lg font-semibold text-red-700">
@@ -591,7 +574,7 @@ export default function DiscordAuth({ session }: Props) {
 }
 
 DiscordAuth.getLayout = function (page: any) {
-  return <NoSidebar>{page}</NoSidebar>;
+  return <NoSidebar background={false}>{page}</NoSidebar>;
 };
 
 export const getServerSideProps: GetServerSideProps =

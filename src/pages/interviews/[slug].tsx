@@ -19,6 +19,7 @@ import { Menu } from "@headlessui/react";
 import AudioPlayer from "src/components/AudioPlayer";
 import { isAdmin, isStaff as isStaffUtil } from "src/util/permission";
 import { randomUUID } from "crypto";
+import Container from "src/components/Container";
 
 interface Props {
   user?: User;
@@ -371,14 +372,14 @@ export default function Home({ user }: Props) {
 
             {interview?.recording_path ? (
               <>
-                <div
-                  className={`max-w-lg w-3/6 p-2 mt-2 bg-slate-900 text-white bg-opacity-50 mb-4 rounded-xl`}
+                <Container
+                  className={`max-w-lg w-3/6 p-2 mt-2 mb-4 rounded-xl`}
                 >
                   <h1 className="text-white pl-2 font-semibold mb-3">
                     Interview Recording
                   </h1>
                   <AudioPlayer src={fileUrl} />
-                </div>
+                </Container>
               </>
             ) : (
               user!.id === interview.claimedById && (

@@ -19,7 +19,7 @@ import UserGradient from "./user/UserGradient";
 import Container from "./Container";
 
 interface LayoutProps {
-  user: User | null;
+  user: User | null | undefined;
   children?: React.ReactNode;
 }
 
@@ -96,7 +96,11 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Container className="fixed top-0 left-0 z-40 w-64 h-screen w-50">
         <nav className="flex flex-col h-full justify-between p-6 text-center text-white">
           <div>
-            <h1 className="text-3xl">PGN ATS</h1>
+            <Link href="/" passHref>
+              <div className="flex flex-col justify-center items-center mt-3">
+                <h1 className="text-white font-semibold text-3xl">PGN:U</h1>
+              </div>
+            </Link>
             {user ? (
               <Link href="/profile" passHref>
                 <div className="flex justify-center mt-3">
@@ -110,41 +114,46 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
                     />
                   </div>
 
-                  <p className="text-sm break-words"><UserGradient user={user} /></p>
+                  <p className="text-sm break-words">
+                    <UserGradient user={user} />
+                  </p>
                 </div>
               </Link>
             ) : (
               <p>Not logged in</p>
             )}
           </div>
-          <div>
-            <ul>
-              <>
-                {(isStaff ? menuItems : guestMenu).map(
-                  ({ href, title, icon: Icon }) => (
-                    <li
-                      className={`text-left flex flex-row items-center rounded-xl px-4 ${
-                        router.pathname === href
-                          ? "bg-slate-500/25 backdrop-blur-3xl"
-                          : "hover:backdrop-blur-3xl hover:bg-opacity-50 hover:text-gray-500"
-                      } `}
-                      key={title}
-                      id={title}
-                    >
-                      <Icon className="text-2xl" />
-
-                      <Link
-                        href={href}
-                        className={`p-3 w-full hover:text-gray-500 cursor-pointer text-white`}
+          {user && (
+            <div>
+              <ul>
+                <>
+                  {(isStaff ? menuItems : guestMenu).map(
+                    ({ href, title, icon: Icon }) => (
+                      <li
+                        className={`text-left flex flex-row items-center rounded-xl px-4 ${
+                          router.pathname === href
+                            ? "bg-slate-500/25 backdrop-blur-3xl"
+                            : "hover:backdrop-blur-3xl hover:bg-opacity-50 hover:text-gray-500"
+                        } `}
+                        key={title}
+                        id={title}
                       >
-                        {title}
-                      </Link>
-                    </li>
-                  )
-                )}
-              </>
-            </ul>
-          </div>
+                        <Icon className="text-2xl" />
+
+                        <Link
+                          href={href}
+                          className={`p-3 w-full hover:text-gray-500 cursor-pointer text-white`}
+                        >
+                          {title}
+                        </Link>
+                      </li>
+                    )
+                  )}
+                </>
+              </ul>
+            </div>
+          )}
+
           <div>
             {user ? (
               <>

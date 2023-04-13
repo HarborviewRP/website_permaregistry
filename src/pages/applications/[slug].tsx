@@ -252,22 +252,28 @@ export default function MainPage({ user }: Props) {
             name="statusReason"
             onChange={(e) => (formData["statusReason"] = e.target.value)}
             placeholder="Decision reasoning..."
-            className={`max-w-lg w-1/4 p-2 mt-2 bg-slate-700 text-white bg-opacity-50 mb-4 rounded`}
+            className={`max-w-lg w-1/4 p-2 mt-2 bg-slate-700 text-white backdrop-blur-xl bg-opacity-50 mb-4 rounded`}
             rows={4}
           />
           <div className="pt-2 px-12 flex flex-col">
             <div>
               <Menu>
-                <Menu.Button className="py-1 bg-slate-700 bg-opacity-50 text-white font-thin text-sm p-1 px-4 py-3 rounded">
+                <Menu.Button className="py-1 bg-slate-700 backdrop-blur-xl bg-opacity-50 text-white font-thin text-sm p-1 px-4 py-3 rounded">
                   Rejection Messages
                 </Menu.Button>
-                <Menu.Items className="text-white z-50 flex flex-col py-6 px-3 my-4 absolute bg-slate-700 backdrop-blur-sm bg-opacity-25 text-white rounded-xl space-y-2 font-thin transition-all duration-300  transform -translate-x-4">
+                <Menu.Items
+                  className={({ open }) =>
+                    `text-white z-50 flex flex-col py-6 my-2 absolute bg-slate-900 backdrop-blur-3xl bg-opacity-30 text-white rounded-xl space-y-2 font-thin transition-all duration-300 ease-in-out transform -translate-x-4 ${
+                      open ? "opacity-100 scale-100" : "opacity-0 scale-95"
+                    } origin-top`
+                  }
+                >
                   {rejectionOptions.map((option) => (
                     <Menu.Item key={option.reason}>
                       {({ active }) => (
                         <button
-                          className={`flex items-center text-left w-full ${
-                            active && "text-gray-400"
+                          className={`flex items-center text-left w-full px-4 ${
+                            active && "text-gray-200 bg-blue-500 bg-opacity-50"
                           }`}
                           onClick={() => {
                             statusReasonRef.current!!.value = option.reason;

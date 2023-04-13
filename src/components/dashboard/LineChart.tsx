@@ -22,8 +22,8 @@ const LineChart: React.FC<LineChartProps> = ({ data, label }) => {
         backgroundColor: (context: ScriptableContext<"line">) => {
           const ctx = context.chart.ctx;
           const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-          gradient.addColorStop(0, "rgba(89, 86, 148,0.5)");
-          gradient.addColorStop(1, "rgba(89, 86, 148,0)");
+          gradient.addColorStop(0, "rgba(89, 86, 148,0.8)");
+          gradient.addColorStop(1, "rgba(89, 86, 148,0.1)");
           return gradient;
         },
         pointBorderColor: "rgba(136,132,216,0.0)",
