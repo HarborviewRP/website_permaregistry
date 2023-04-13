@@ -31,9 +31,7 @@ const get = async (req: any, res: any) => {
     submissionDate: { $gte: twoWeeksAgo.getTime() },
   });
 
-  console.log(rejectedOrPending)
-
-  if (rejectedOrPending) {
+  if (rejectedOrPending && !isStaff(user)) {
     res.status(400).json({
       message: `You have a pending or rejected application in the last 14 days.`,
     });
