@@ -386,8 +386,8 @@ export default function Home({ user }: Props) {
               user!.id === interview.claimedById && (
                 <>
                   <form onSubmit={uploadFile}>
-                    <div
-                      className={`max-w-lg w-3/6 p-2 p-4 mt-2 bg-slate-900 text-white bg-opacity-50 mb-4 rounded-xl`}
+                    <Container
+                      className={`max-w-lg w-3/6 p-2 p-4 mt-2 text-whitemb-4 rounded-xl`}
                     >
                       <h1 className="text-white font-semibold">
                         Interview Recording
@@ -415,7 +415,7 @@ export default function Home({ user }: Props) {
                           </>
                         )}
                       </div>
-                    </div>
+                    </Container>
                     <div className="pl-2">
                       <button
                         className={`max-w-lg text-red-500 bg-opacity-50 mb-4 rounded-xl`}

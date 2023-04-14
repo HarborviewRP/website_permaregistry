@@ -50,6 +50,13 @@ export default function DiscordAuth({ session }: Props) {
 
   useEffect(() => {
     fetchSession();
+    if (localStorage.getItem('formData')) {
+      try {
+        setFormData(JSON.parse(localStorage.getItem("formData")!))
+      } catch (err) {
+        // ignore
+      }
+    }
   }, []);
 
   const router = useRouter();
@@ -251,6 +258,7 @@ export default function DiscordAuth({ session }: Props) {
   const handleChange = (event: any) => {
     const { name, value } = event.target;
     setFormData((prevState) => ({ ...prevState, [name]: value }));
+    localStorage.setItem('formData', JSON.stringify(formData))
     handleValidation(event); // Call handleValidation function here
   };
 
@@ -308,6 +316,7 @@ export default function DiscordAuth({ session }: Props) {
 
       if (response.ok) {
         router.push(`/applications/${(await response.json()).application._id}`);
+        localStorage.setItem('formData', '{}') // clear local storage
       } else {
         setStatusMessage((await response.json()).message);
       }
