@@ -118,7 +118,7 @@ export default function MainPage({ user }: Props) {
   <div className="mx-2 sm:mx-32 my-4 flex text-black justify-between">
     <PageSelector
       currentPage={page}
-      totalPages={Math.ceil(total / 12)}
+      totalPages={Math.ceil(total / 18)}
       adjacentPages={2}
       onPageClick={onPageClick}
     />
