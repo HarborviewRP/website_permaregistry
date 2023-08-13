@@ -82,19 +82,6 @@ export default function MainPage({ user }: Props) {
     setPage((prevPage) => Math.max(prevPage - 1, 1));
   };
 
-  const sortedApplications = useMemo(() => {
-    if (!sortStatus) {
-      return applications;
-    }
-
-    return [...applications].sort((a, b) => {
-      if (sortStatus === "asc") {
-        return a.status - b.status;
-      } else {
-        return b.status - a.status;
-      }
-    });
-  }, [applications, sortStatus]);
 
   return (
     <>
@@ -112,7 +99,7 @@ export default function MainPage({ user }: Props) {
           <div className="flex flex-wrap">
             {applications.map((reg: DeathReg) => (
               <div className="w-half mb-4 mx-2" style={{ width: "24vw", maxWidth: "24vw" }}>
-                <Link href={`/registry/${reg._id}`} key={reg._id} passHref={true}>
+                <Link href={`/registry/${(reg as any)._id}`} key={(reg as any)._id} passHref={true}>
                   <div className="cursor-pointer px-4 py-2 bg-black bg-opacity-20 w-full flex justify-between items-center">
                     <div className="flex flex-col">
                       <h1 className="text-black font-bold">Name: {reg.name}</h1>
