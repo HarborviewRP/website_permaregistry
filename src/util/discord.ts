@@ -7,6 +7,9 @@ export const ENDPOINT = {
 };
 export const TOKEN = process.env.BOT_TOKEN || "";
 
+export const INFRA_SECRET = process.env.INFRA_SECRET;
+export const INFRA_URL = process.env.INFRA_URL || "";
+
 /**
  const response = await fetch("/api/application/update", {
     method: "POST",

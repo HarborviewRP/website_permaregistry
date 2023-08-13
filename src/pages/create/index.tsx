@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { ChangeEvent, useEffect, useState } from "react";
 import NoSidebar from "src/components/no-auth-layout";
-import { DeathReg, User } from "src/types";
+import { DISCORD, DeathReg, User } from "src/types";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 import { Application, STATUS } from "src/types";
@@ -15,6 +15,7 @@ import Loader from "src/components/Loader";
 import LoginBox from "src/components/user/login";
 import { isStaff } from "src/util/permission";
 import axios from "axios";
+import { INFRA_SECRET, INFRA_URL } from "src/util/discord";
 
 interface Props {
   user?: User;
@@ -183,7 +184,6 @@ export default function DiscordAuth({ session }: Props) {
 
     // Submit the application
     try {
-
       const filename = `${reg.csn}_deathcert_${Date.now()}`;
       const newfile = new File([deathCertFile], filename, { type: `${deathCertFile.type}` });
       let { data } = await axios.post("/api/registry/upload", {
@@ -193,7 +193,6 @@ export default function DiscordAuth({ session }: Props) {
       });
 
       const url = data.url;
-      console.log(url)
       await fetch(url, {
         method: "PUT",
         headers: {
@@ -347,7 +346,7 @@ export default function DiscordAuth({ session }: Props) {
                 {statusMessage ? (
                   <div className="flex flex-col text-center">
                     <h1 className="text-lg font-semibold text-red-700">
-                      You are ineligible to submit a death registration!
+                      You are unable to submit a death registration!
                     </h1>
                     <p className="text-sm text-red-500 font-thin">
                       {statusMessage}

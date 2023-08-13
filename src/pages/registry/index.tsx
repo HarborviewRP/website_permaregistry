@@ -108,7 +108,7 @@ export default function MainPage({ user }: Props) {
                       <p className="text-black text-sm">Date of Death: {new Date(reg.dod).toLocaleDateString()}</p>
                     </div>
                     <div className="flex flex-col items-end">
-                      <p className="text-black text-sm">Certificate: CLICK TO OPEN</p>
+                      <p className="text-black text-sm">Certificate: CLICK TO VIEW</p>
                     </div>
                   </div>
                 </Link>
