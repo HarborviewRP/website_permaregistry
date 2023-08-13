@@ -115,7 +115,7 @@ export default function MainPage({ user }: Props) {
               </div>
             ))}
           </div>
-          <div className="mx-32 my-4 flex justify-between">
+          <div className="mx-32 my-4 flex text-black justify-between">
             <PageSelector
               currentPage={page}
               totalPages={Math.ceil(total / 12)}

@@ -37,7 +37,7 @@ const PageSelector: React.FC<Props> = ({
       pageButtons.push(
         <button
           key={1}
-          className="text-white mx-1 hover:text-blue-500"
+          className="text-black mx-1 hover:text-blue-500"
           onClick={() => onPageClick(1)}
         >
           1
@@ -46,7 +46,7 @@ const PageSelector: React.FC<Props> = ({
 
       if (currentPage > 2) {
         pageButtons.push(
-          <span key="dot-dot" className="text-white mx-1">
+          <span key="dot-dot" className="text-black mx-1">
             ...
           </span>
         );
@@ -59,7 +59,7 @@ const PageSelector: React.FC<Props> = ({
         <button
           key={i}
           className={`${
-            isActive ? "text-blue-500" : "text-white hover:text-blue-500"
+            isActive ? "text-blue-500" : "text-black hover:text-blue-500"
           } mx-1`}
           onClick={() => onPageClick(i)}
         >
@@ -73,7 +73,7 @@ const PageSelector: React.FC<Props> = ({
         pageButtons.push(
           <span
             key="dot-dot-dot"
-            className="text-white mx-1 cursor-pointer"
+            className="text-black mx-1 cursor-pointer"
             onClick={() => setShowPageInput(true)}
           >
             ...
@@ -83,7 +83,7 @@ const PageSelector: React.FC<Props> = ({
       pageButtons.push(
         <button
           key={totalPages}
-          className="text-white mx-1 hover:text-blue-500"
+          className="text-black mx-1 hover:text-blue-500"
           onClick={() => onPageClick(totalPages)}
         >
           {totalPages}
@@ -102,7 +102,7 @@ const PageSelector: React.FC<Props> = ({
               onChange={(e) => setPageInputValue(Number(e.target.value))}
             />
             <button
-              className="text-white mx-1 hover:text-blue-500"
+              className="text-black mx-1 hover:text-blue-500"
               onClick={handlePageInputChange}
             >
               Go
@@ -122,7 +122,7 @@ const PageSelector: React.FC<Props> = ({
     <>
       <button
         className={`${
-          isFirstPage ? "text-gray-600 cursor-not-allowed" : "text-white"
+          isFirstPage ? "text-gray-600 cursor-not-allowed" : "text-black"
         } mx-1`}
         disabled={isFirstPage}
         onClick={() => onPageClick(1)}
@@ -132,7 +132,7 @@ const PageSelector: React.FC<Props> = ({
       <div className="flex flex-row">{renderPageButtons()}</div>
       <button
         className={`${
-          isLastPage ? "text-gray-600 cursor-not-allowed" : "text-white"
+          isLastPage ? "text-gray-600 cursor-not-allowed" : "text-black"
         } mx-1`}
         disabled={isLastPage}
         onClick={() => onPageClick(totalPages)}
