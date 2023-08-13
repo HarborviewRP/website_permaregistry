@@ -42,18 +42,10 @@ export const closeConnection = async (client: MongoClient) => {
   }
 };
 
-export const getApplicationCollection = async () => {
+export const getDeathRegistryCollection = async () => {
   const client = await dbConnect();
   return {
-    collection: client.db.collection("applications"),
-    client: client.client,
-  };
-};
-
-export const getInterviewCollection = async () => {
-  const client = await dbConnect();
-  return {
-    collection: client.db.collection("interviews"),
+    collection: client.db.collection("deaths"),
     client: client.client,
   };
 };
@@ -65,11 +57,3 @@ export const getUserCollection = async () => {
     client: client.client,
   };
 };
-
-export const getChangeLogCollection = async () => {
-  const client = await dbConnect();
-  return {
-    collection: client.db.collection("changelog"),
-    client: client.client,
-  }
-}

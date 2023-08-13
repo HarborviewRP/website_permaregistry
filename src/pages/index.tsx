@@ -39,10 +39,7 @@ export default function MainPage({}: Props) {
   }, []);
 
   useEffect(() => {
-    if (user) {
-      if (isStaff(user)) router.push("/dashboard");
-      else router.push("/profile");
-    }
+      router.push("/registry");
   });
 
   return !user ? (

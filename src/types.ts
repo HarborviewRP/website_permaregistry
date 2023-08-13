@@ -61,6 +61,17 @@ export type Note = {
 
 export type ApplicationWithId = WithId<Application>;
 
+export interface DeathReg {
+  name: string;
+  dob: string;
+  csn: string;
+  dod: string;
+  cert: string;
+  inc: string;
+}
+
+export type DeathRegWithId = WithId<DeathReg>;
+
 export interface Application {
   applicantId: string;
   status: STATUS;
@@ -142,9 +153,9 @@ export enum STATUS {
 }
 
 export class DISCORD {
-  static readonly ID = process.env.DISCORD_ID || "605469902152663073";
+  static readonly ID = process.env.DISCORD_ID || "1120887833587109991";
   static readonly STAFF_ROLE_ID =
-    process.env.STAFF_ROLE_ID || "1081002383905136662";
+    process.env.ALLOWED_ROLE || "1123133532999528469";
   static readonly SUPERADMIN_ROLE = process.env.SUPERADMIN__ROLE || "1050767934018035772";
   static readonly VERIFY_ROLE = process.env.VERIFY_ROLE || "995813347767365732";
 }

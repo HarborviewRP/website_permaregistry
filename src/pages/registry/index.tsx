@@ -5,13 +5,12 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ApplicationBar from "src/components/application/ApplicationBar";
-import InterviewBar from "src/components/application/InterviewBar";
 import Loader from "src/components/Loader";
-import { Application, DISCORD, Interview, User } from "src/types";
+import PageSelector from "src/components/PageSector";
+import { Application, DeathReg, DeathRegWithId, DISCORD, User } from "src/types";
+import { isStaff } from "src/util/permission";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
-import { isStaff as isStaffUtil } from "src/util/permission";
-import PageSelector from "src/components/PageSector";
 
 interface Props {
   user?: User;
@@ -19,18 +18,15 @@ interface Props {
 
 export default function MainPage({ user }: Props) {
   const router = useRouter();
-  const PAGE_LENGTH = 6;
-  const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [applications, setReg] = useState<DeathRegWithId[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<Map<String, User>>();
-  const [page, setPage] = useState(
-    router.query.page ? (router.query.page as unknown as number) : 1
-  );
-  const [pageLength, setPageLength] = useState(PAGE_LENGTH);
+  const [page, setPage] = useState(router.query.page ? router.query.page as unknown as number : 1);
+  const [pageLength, setPageLength] = useState(12);
   const [sortStatus, setSortStatus] = useState<string | null>("asc");
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
   const [total, setTotal] = useState(0);
-  
+
   const onPageClick = (pageNumber: number) => {
     setPage(pageNumber);
   
@@ -39,11 +35,6 @@ export default function MainPage({ user }: Props) {
     const newUrl = window.location.pathname + "?" + queryParams.toString();
     window.history.pushState({ path: newUrl }, "", newUrl);
   };
-
-  useEffect(() => {
-    if (!user) router.push("/");
-    if (!isStaffUtil(user!!)) router.push("/");
-  });
 
   const fetchApplications = useCallback(async () => {
     setLoading(true);
@@ -54,42 +45,21 @@ export default function MainPage({ user }: Props) {
       queryParams.append("sortStatus", sortStatus);
     }
     const res = await fetch(
-      `/api/interview/get-interviews?${queryParams.toString()}`
+      `/api/registry/get-registries?${queryParams.toString()}`
     );
     if (res.ok) {
-      const json = await res.json();
-      const interviews: Interview[] = json.interviews;
+      const json = (await res.json());
       const total = json.total;
+      const registries: DeathRegWithId[] = json.registries;
 
-      setInterviews(interviews);
+      setReg(registries);
       setTotal(total);
-      if (page >= total / PAGE_LENGTH) {
+
+      if (page > total / 12) {
         setHasNextPage(false);
       } else {
         setHasNextPage(true);
       }
-      const map = new Map<String, User>();
-      const applicantIds = [
-        ...interviews.map((interview) => interview.applicantId),
-        ...interviews
-          .filter((interview) => interview.claimedById)
-          .map((interview) => interview.claimedById),
-      ];
-
-      const usersResponse = await fetch("/api/user/bulk", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ users: applicantIds }),
-      });
-      if (usersResponse.ok) {
-        const usersArray = await usersResponse.json();
-        for (const [id, user] of usersArray) {
-          map.set(id, user);
-        }
-      }
-      setUsers(map);
       setLoading(false);
     } else {
       setLoading(false);
@@ -114,57 +84,54 @@ export default function MainPage({ user }: Props) {
 
   const sortedApplications = useMemo(() => {
     if (!sortStatus) {
-      return interviews;
+      return applications;
     }
 
-    return [...interviews].sort((a, b) => {
+    return [...applications].sort((a, b) => {
       if (sortStatus === "asc") {
         return a.status - b.status;
       } else {
         return b.status - a.status;
       }
     });
-  }, [interviews, sortStatus]);
+  }, [applications, sortStatus]);
 
   return (
     <>
       <div className="mx-28 my-10">
-        <h1 className="text-white text-3xl">Interviews</h1>
-        <button onClick={toggleSortStatus} className="text-gray-400">
-          Sort by{" "}
-          {sortStatus === "asc" ? (
-            <span className="text-green-500">pending</span>
-          ) : (
-            <span className="text-red-500">reviewed</span>
-          )}
-        </button>
+        <h1 className="text-black text-3xl">Registered Perma Deaths</h1>
       </div>
       {loading ? (
         <>
-          <div className="flex flex-col justify-center items-center">
+          <div className="flex flex-wrap justify-center items-center">
             <Loader center={false} />
           </div>
         </>
-      ) : interviews.length > 0 ? (
+      ) : applications.length > 0 ? (
         <>
-          <div className="flex flex-col justify-center items-center">
-            {interviews.map((interview: any) => (
-              // eslint-disable-next-line react/jsx-key, @next/next/link-passhref
-              <Link href={`/interviews/${(interview as any)._id}`}>
-                <div className="px-2">
-                  <InterviewBar
-                    interview={interview}
-                    applicant={users!!.get(interview.applicantId)!!}
-                    staffMember={users?.get(interview?.claimedById || "")}
-                  />
-                </div>
-              </Link>
+          <div className="flex flex-wrap">
+            {applications.map((reg: DeathReg) => (
+              <div className="w-half mb-4 mx-2" style={{ width: "24vw", maxWidth: "24vw" }}>
+                <Link href={`/registry/${reg._id}`} key={reg._id} passHref={true}>
+                  <div className="cursor-pointer px-4 py-2 bg-black bg-opacity-20 w-full flex justify-between items-center">
+                    <div className="flex flex-col">
+                      <h1 className="text-black font-bold">Name: {reg.name}</h1>
+                      <p className="text-black text-sm">CSN: {reg.csn}</p>
+                      <p className="text-black text-sm">Date of Birth: {new Date(reg.dob).toLocaleDateString()}</p>
+                      <p className="text-black text-sm">Date of Death: {new Date(reg.dod).toLocaleDateString()}</p>
+                    </div>
+                    <div className="flex flex-col items-end">
+                      <p className="text-black text-sm">Certificate: CLICK TO OPEN</p>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
-          <div className="mx-48 my-4 flex justify-between">
+          <div className="mx-32 my-4 flex justify-between">
             <PageSelector
               currentPage={page}
-              totalPages={Math.ceil(total / PAGE_LENGTH)}
+              totalPages={Math.ceil(total / 12)}
               adjacentPages={2}
               onPageClick={onPageClick}
             />
@@ -174,7 +141,7 @@ export default function MainPage({ user }: Props) {
         <>
           <div className="flex flex-wrap mx-28">
             <h1 className="text-gray-400 text-xl font-thin">
-              There are no interviews
+              There are no registered deaths
             </h1>
           </div>
         </>

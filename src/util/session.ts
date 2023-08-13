@@ -33,6 +33,27 @@ export function withSession(handler: NextIronHandler | NextRoute) {
   });
 }
 
+export function noAuth(handler: NextIronHandler | NextRoute) {
+  return withIronSession(
+    async (req: any, res: any) => {
+      handler(req, res);
+    },
+    {
+      password: process.env.COOKIE_SECRET as
+        | string
+        | "owosecretneedstobelongeruwuhaha123412341234",
+      cookieName: "session",
+      ttl: 43200,
+      cookieOptions: {
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        httpOnly: true,
+      },
+    }
+  );
+}
+
+
 export function withAuth(handler: NextIronHandler | NextRoute) {
   return withIronSession(
     async (req: any, res: any) => {

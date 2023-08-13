@@ -23,7 +23,7 @@ export default function App({ Component, pageProps }: AppProps) {
             <link rel="icon" href="/public/vercel.svg" />
             <meta property="og:image:width" content="64" />
             <meta property="og:image:height" content="64" />
-            <title>PGN:U - Applicant Tracking System</title>
+            <title>HRP - Perma Death Registry</title>
             <link rel="icon" type="image/x-icon" href="https://cdn.discordapp.com/attachments/557354039344496669/1091551857224188054/Site-logo.ico" />
           </Head>
           <Layout user={null}>{page}</Layout>

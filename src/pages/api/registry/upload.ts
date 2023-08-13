@@ -1,4 +1,3 @@
-import { getInterview, updateInterview } from "./../../../util/database";
 import { Interview } from "./../../../types";
 import type { NextApiRequest, NextApiResponse } from "next";
 import multer from "multer";
@@ -9,6 +8,7 @@ import { randomUUID } from "crypto";
 import { isStaff } from "src/util/permission";
 import AWS from "aws-sdk";
 import multerS3 from "multer-s3";
+import { updateRegistry } from "src/util/database";
 
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -21,15 +21,6 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
     const user = req.session.get("user");
     if (!isStaff(user)) {
       return res.status(403).json({ message: "Unauthorized" });
-    }
-
-    const interviewCheck = await getInterview(req.body.interviewId);
-    if (!interviewCheck) {
-      return res.status(404).json({ message: "No interview found" });
-    }
-
-    if (interviewCheck.recording_path) {
-      return res.status(400).json({ message: "Interview has recording..." });
     }
 
     try {
@@ -45,12 +36,16 @@ const handler = async (req: NextIronRequest, res: NextApiResponse) => {
   
       const url = await s3.getSignedUrlPromise("putObject", fileParams);
 
-      await updateInterview(req.body.interviewId, {
-        recording_path: fileParams.Key,
-        lastUpdate: Date.now(),
-        updatedById: user._id,
-      });
-  
+      console.log(name)
+      switch(req.body.inctype) {
+        case 'certificate': {
+            await updateRegistry(req.body.regId, {
+                cert: name,
+              });
+              break;
+        };
+        default: return res.status(400).json({ message: "Please enter a valid type" })
+      }
       res.status(200).json({ url });
     } catch (err) {
       console.log(err);
