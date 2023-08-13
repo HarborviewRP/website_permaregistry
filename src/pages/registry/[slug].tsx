@@ -5,7 +5,6 @@ import { HiOutlineExclamationCircle } from "react-icons/hi";
 import moment from "moment";
 import { GetServerSideProps } from "next";
 import { Document } from 'react-pdf';
-import GoogleDocsViewer from 'react-google-docs-viewer';
 
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
