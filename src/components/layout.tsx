@@ -77,56 +77,54 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-  <nav className="fixed top-0 left-0 z-40 w-full h-16 bg-blue-700 text-white flex justify-between items-center p-8">
-    <div className="flex items-center">
+<div className="min-h-screen flex flex-col">
+  <nav className="fixed top-0 left-0 z-40 w-full h-16 bg-blue-700 text-white flex justify-between items-center p-4 sm:p-8">
+    <div className="flex flex-col">
       <Link href="/" passHref>
-        <h1 className="text-white italic font-semibold text-3xl cursor-pointer">San Andreas Death Registry</h1>
-        <p>Harborview Roleplay</p>
+        <h1 className="text-white italic font-semibold text-xl sm:text-3xl cursor-pointer">San Andreas Death Registry</h1>
       </Link>
+      <p className="hidden sm:block">Harborview Roleplay</p>
     </div>
-    <div className="flex items-center">
+    <div className="flex items-center flex-wrap">
       {user ? (
         <>
-          <ul className="flex space-x-4">
+          <ul className="flex space-x-2 sm:space-x-4 flex-wrap">
             {(isStaff ? menuItems : guestMenu).map(({ href, title, icon: Icon }) => (
               <li
-                className={`flex items-center ${
-                  "text-white"
-                }`}
+                className={`flex items-center text-white`}
                 key={title}
                 id={title}
               >
                 <Icon className="text-2xl" />
-                <Link href={href} className="p-3 cursor-pointer text-white">
+                <Link href={href} className="p-1 sm:p-3 cursor-pointer text-white">
                   {title}
                 </Link>
               </li>
             ))}
           </ul>
           <Link href="/api/auth/logout">
-          {user ? (
-          <div className="flex justify-left ">
-            <Image
-              className="rounded-full mr-2"
-              src={user.avatar}
-              alt="User Avatar"
-              height={24}
-              width={24}
-            />
-            <p className="text-sm break-words">
-              <UserGradient user={user} />
-            </p>
-          </div>
-      ) : (
-        <p>Not logged in</p>
-      )}
+            {user ? (
+              <div className="flex justify-left flex-wrap">
+                <Image
+                  className="rounded-full mr-2"
+                  src={user.avatar}
+                  alt="User Avatar"
+                  height={24}
+                  width={24}
+                />
+                <p className="text-sm break-words">
+                  <UserGradient user={user} />
+                </p>
+              </div>
+            ) : (
+              <p>Not logged in</p>
+            )}
           </Link>
         </>
       ) : (
         <>
-          <Link href="/api/auth/login">
-              Login with Discord
+          <Link href="/api/auth/login" className="text-sm sm:text-base">
+            Login with Discord
           </Link>
         </>
       )}

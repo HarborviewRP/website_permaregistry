@@ -22,7 +22,7 @@ export default function MainPage({ user }: Props) {
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<Map<String, User>>();
   const [page, setPage] = useState(router.query.page ? router.query.page as unknown as number : 1);
-  const [pageLength, setPageLength] = useState(12);
+  const [pageLength, setPageLength] = useState(18);
   const [sortStatus, setSortStatus] = useState<string | null>("asc");
   const [hasNextPage, setHasNextPage] = useState<boolean>(true);
   const [total, setTotal] = useState(0);
@@ -85,8 +85,8 @@ export default function MainPage({ user }: Props) {
 
   return (
     <>
-      <div className="mx-28 my-10">
-        <h1 className="text-black text-3xl">Registered Perma Deaths</h1>
+      <div className="md:mx-28 md:my-10 sm:mx-8 sm:my-8">
+        <h1 className="text-black md:text-3xl sm:text-lg">Registered Perma Deaths</h1>
       </div>
       {loading ? (
         <>
@@ -95,35 +95,35 @@ export default function MainPage({ user }: Props) {
           </div>
         </>
       ) : applications.length > 0 ? (
-        <>
-          <div className="flex flex-wrap">
-            {applications.map((reg: DeathReg) => (
-              <div className="w-half mb-4 mx-2" style={{ width: "24vw", maxWidth: "24vw" }}>
-                <Link href={`/registry/${(reg as any)._id}`} key={(reg as any)._id} passHref={true}>
-                  <div className="cursor-pointer px-4 py-2 bg-black bg-opacity-20 w-full flex justify-between items-center">
-                    <div className="flex flex-col">
-                      <h1 className="text-black font-bold">Name: {reg.name}</h1>
-                      <p className="text-black text-sm">CSN: {reg.csn}</p>
-                      <p className="text-black text-sm">Date of Birth: {new Date(reg.dob).toLocaleDateString()}</p>
-                      <p className="text-black text-sm">Date of Death: {new Date(reg.dod).toLocaleDateString()}</p>
-                    </div>
-                    <div className="flex flex-col items-end">
-                      <p className="text-black text-sm">Certificate: CLICK TO VIEW</p>
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            ))}
+<>
+  <div className="flex flex-col justify-center sm:flex-row flex-wrap">
+    {applications.map((reg: DeathReg) => (
+      <div className="w-full sm:w-1/2 mb-4 mx-2 max-w-md sm:max-w-lg" >
+        <Link href={`/registry/${(reg as any)._id}`} key={(reg as any)._id} passHref={true}>
+          <div className="cursor-pointer px-4 py-2 bg-black bg-opacity-20 w-full flex justify-between">
+            <div className="flex flex-col">
+              <h1 className="text-black font-bold">Name: {reg.name}</h1>
+              <p className="text-black text-sm">CSN: {reg.csn}</p>
+              <p className="text-black text-sm">Date of Birth: {new Date(reg.dob).toLocaleDateString()}</p>
+              <p className="text-black text-sm">Date of Death: {new Date(reg.dod).toLocaleDateString()}</p>
+            </div>
+            <div className="flex flex-col items-end mt-2">
+              <p className="text-black text-sm">Certificate: CLICK TO VIEW</p>
+            </div>
           </div>
-          <div className="mx-32 my-4 flex text-black justify-between">
-            <PageSelector
-              currentPage={page}
-              totalPages={Math.ceil(total / 12)}
-              adjacentPages={2}
-              onPageClick={onPageClick}
-            />
-          </div>
-        </>
+        </Link>
+      </div>
+    ))}
+  </div>
+  <div className="mx-2 sm:mx-32 my-4 flex text-black justify-between">
+    <PageSelector
+      currentPage={page}
+      totalPages={Math.ceil(total / 12)}
+      adjacentPages={2}
+      onPageClick={onPageClick}
+    />
+  </div>
+</>
       ) : (
         <>
           <div className="flex flex-wrap mx-28">
