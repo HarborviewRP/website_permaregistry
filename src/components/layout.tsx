@@ -59,8 +59,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   const guestMenu = [
     {
       href: "/registry",
-      title: "My Applications",
-      icon: HiBookmark,
+      title: "Registry",
+      icon: HiLibrary,
     },
   ];
 
