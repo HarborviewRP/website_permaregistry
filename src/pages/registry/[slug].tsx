@@ -77,9 +77,9 @@ export default function MainPage({ user }: Props) {
             <div className="mb-6 bg-white p-4 rounded shadow-lg">
                 <h1 className="text-black font-bold text-xl mb-2">Name: <span className="font-normal">{reg?.name}</span></h1>
                 <p className="text-black text-sm mb-1">CSN: {reg?.csn}</p>
-                <p className="text-black text-sm mb-1">Date of Birth: {new Date(reg?.dob).toLocaleDateString()}</p>
-                <p className="text-black text-sm mb-1">Date of Death: {new Date(reg?.dod).toLocaleDateString()}</p>
-                <p className="text-black text-sm mb-4">Record Number: HRP-PD-{reg?._id}</p>
+                <p className="text-black text-sm mb-1">Date of Birth: {new Date(reg!!.dob).toLocaleDateString()}</p>
+                <p className="text-black text-sm mb-1">Date of Death: {new Date(reg!!.dod).toLocaleDateString()}</p>
+                <p className="text-black text-sm mb-4">Record Number: HRP-PD-{reg!!._id}</p>
                 <h2 className="text-black font-bold text-lg mb-2">Certificate File:</h2>
                     <iframe src={certFile} width="100%" height="1200px" className="border rounded" />
             </div>
