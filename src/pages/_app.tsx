@@ -24,7 +24,7 @@ export default function App({ Component, pageProps }: AppProps) {
             <meta property="og:image:width" content="64" />
             <meta property="og:image:height" content="64" />
             <title>HRP - Perma Death Registry</title>
-            <link rel="icon" type="image/x-icon" href="https://cdn.discordapp.com/attachments/557354039344496669/1091551857224188054/Site-logo.ico" />
+            <link rel="icon" type="image/x-icon" href="https://cdn.discordapp.com/attachments/1050274665962151957/1140371233234489394/favicon.ico" />
           </Head>
           <Layout user={null}>{page}</Layout>
         </>
