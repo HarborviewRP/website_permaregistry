@@ -155,7 +155,7 @@ export enum STATUS {
 export class DISCORD {
   static readonly ID = process.env.DISCORD_ID || "1120887833587109991";
   static readonly STAFF_ROLE_ID =
-    process.env.ALLOWED_ROLE || "1123130758937186324";
+    process.env.ALLOWED_ROLE || "1140386383731626034";
   static readonly SUPERADMIN_ROLE = process.env.SUPERADMIN__ROLE || "1050767934018035772";
   static readonly VERIFY_ROLE = process.env.VERIFY_ROLE || "1123131546136748092";
 }
