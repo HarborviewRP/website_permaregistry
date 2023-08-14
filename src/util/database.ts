@@ -42,12 +42,12 @@ export const getTotalRegistries = async () => {
 
 export const updateRegistry = async (
   id: string,
-  updatedInterview: Partial<DeathReg>
+  updatedRegistry: Partial<DeathReg>
 ) => {
   const interviewCollection = await getDeathRegistryCollection();
   const res = await interviewCollection.collection.updateOne(
     { _id: new ObjectId(id) },
-    { $set: updatedInterview }
+    { $set: updatedRegistry }
   );
 
   return res;

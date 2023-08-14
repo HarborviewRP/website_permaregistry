@@ -8,7 +8,7 @@ import ApplicationBar from "src/components/application/ApplicationBar";
 import Loader from "src/components/Loader";
 import PageSelector from "src/components/PageSector";
 import { Application, DeathReg, DeathRegWithId, DISCORD, User } from "src/types";
-import { isStaff } from "src/util/permission";
+import { isAdmin, isStaff } from "src/util/permission";
 import { developerRoute } from "src/util/redirects";
 import { withSession } from "src/util/session";
 
@@ -18,7 +18,7 @@ interface Props {
 
 export default function MainPage({ user }: Props) {
   const router = useRouter();
-  const [applications, setReg] = useState<DeathRegWithId[]>([]);
+  const [registries, setReg] = useState<DeathRegWithId[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<Map<String, User>>();
   const [page, setPage] = useState(router.query.page ? router.query.page as unknown as number : 1);
@@ -94,26 +94,41 @@ export default function MainPage({ user }: Props) {
             <Loader center={false} />
           </div>
         </>
-      ) : applications.length > 0 ? (
+      ) : registries.length > 0 ? (
 <>
   <div className="flex flex-col justify-center sm:flex-row flex-wrap">
-    {applications.map((reg: DeathReg) => (
-      <div className="w-full sm:w-1/2 mb-4 mx-2 max-w-md sm:max-w-lg" >
-        <Link href={`/registry/${(reg as any)._id}`} key={(reg as any)._id} passHref={true}>
-          <div className="cursor-pointer px-4 py-2 bg-black bg-opacity-20 w-full flex justify-between">
-            <div className="flex flex-col">
-              <h1 className="text-black font-bold">Name: {reg.name}</h1>
-              <p className="text-black text-sm">CSN: {reg.csn}</p>
-              <p className="text-black text-sm">Date of Birth: {new Date(reg.dob).toLocaleDateString()}</p>
-              <p className="text-black text-sm">Date of Death: {new Date(reg.dod).toLocaleDateString()}</p>
-            </div>
-            <div className="flex flex-col items-end mt-2">
-              <p className="text-black text-sm">Certificate: CLICK TO VIEW</p>
-            </div>
+  {registries.map((reg: DeathReg) => {
+  // Check if the registry is reverted and the user is an admin
+  const isReverted = reg.reverted;
+  const isAdminUser = isAdmin(user!!);
+
+  // If the registry is reverted and the user is not an admin, skip rendering
+  if (isReverted && !isAdminUser) return null;
+
+  // Determine the background color based on the reverted status
+  const backgroundColor = isReverted && isAdminUser ? "bg-red-200" : "bg-black bg-opacity-20";
+
+  return (
+    <div className="w-full sm:w-1/2 mb-4 mx-2 max-w-md sm:max-w-lg" key={(reg as any)._id}>
+      <Link href={`/registry/${(reg as any)._id}`} passHref={true}>
+        <div className={`cursor-pointer px-4 py-2 ${backgroundColor} w-full flex justify-between`}>
+          <div className="flex flex-col">
+            <h1 className="text-black font-bold">Name: {reg.name}</h1>
+            <p className="text-black text-sm">CSN: {reg.csn}</p>
+            <p className="text-black text-sm">Date of Birth: {new Date(reg.dob).toLocaleDateString()}</p>
+            <p className="text-black text-sm">Date of Death: {new Date(reg.dod).toLocaleDateString()}</p>
           </div>
-        </Link>
-      </div>
-    ))}
+          <div className="flex flex-col items-end mt-2">
+            <p className="text-black text-sm">Certificate: CLICK TO VIEW</p>
+            {reg.reverted && (
+              <p className="text-red-500 font-bold text-sm">REVERTED BY ADMIN</p>
+            )}
+          </div>
+        </div>
+      </Link>
+    </div>
+  );
+})}
   </div>
   <div className="mx-2 sm:mx-32 my-4 flex text-black justify-between">
     <PageSelector

@@ -68,6 +68,7 @@ export interface DeathReg {
   dod: string;
   cert: string;
   inc: string;
+  reverted?: boolean | undefined;
 }
 
 export type DeathRegWithId = WithId<DeathReg>;
