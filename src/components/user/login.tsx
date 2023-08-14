@@ -24,7 +24,7 @@ const LoginBox: React.FC<Props> = ({
           <div className="w-full flex-grow flex items-center justify-center">
             <div className="w-full flex justify-center">
               <Link href="/api/auth/login?next=apply" passHref>
-                <button className="flex flex-row items-center px-6 py-2 text-sm justify-center rounded-xl items-start text-white bg-indigo-500 backdrop-blur-3xl bg-opacity-50 font-bold  border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent ">
+                <button className="flex flex-row items-center px-6 py-2 text-sm justify-center rounded items-start text-white backdrop-blur-3xl bg-opacity-50 font-bold  border border-indigo-500 hover:text-gray-50 hover:border-transparent ">
                   <Image
                     className="mr-4"
                     src="https://brandlogos.net/wp-content/uploads/2021/11/discord-logo.png"

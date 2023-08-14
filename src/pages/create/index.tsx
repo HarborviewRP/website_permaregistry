@@ -334,9 +334,6 @@ export default function DiscordAuth({ session }: Props) {
 
   return (
     <>
-      {!user && (
-        <LoginBox message="Login with Discord" />
-      )}
       {user && (
         <>
           <div className="flex flex-col items-center p-8">

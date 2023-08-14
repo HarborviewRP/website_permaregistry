@@ -16,8 +16,11 @@ export default function NoSidebar({ children, user, background = true }: Props) 
 
   const style = {
     backgroundImage: `url(/bg.png)`,
-    backgroundRepeat: "no-repeat",
+    backgroundAttachment: "fixed",
     backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    backgroundSize: "cover",
+    minHeight: "100vh",
     backgroundBlendMode: "multiply",
   }
   

@@ -8,7 +8,7 @@ interface Props {
 const Container: React.FC<Props> = ({ className, children }) => {
   return (
     <div
-      className={`bg-slate-900 backdrop-blur-3xl bg-opacity-50 text-white ${className}`}
+      className={`backdrop-blur-3xl bg-opacity-50 text-white ${className}`}
     >
       {children}
     </div>

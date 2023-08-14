@@ -15,24 +15,23 @@ interface Props {
 
 export default function MainPage({ user }: Props) {
   const router = useRouter();
-  useEffect(() => {
-    if (user) router.push("/dashboard");
-  });
 
   return (
     <>
       <div className={styles.content}>
+        <div className="backdrop-blur-lg bg-opacity-50">
         <h1>Uh oh...</h1>
         <h2>You do not have permission to view this page...</h2>
           <div className="flex-shrink-0 flex justify-center items-center">
           </div>
           <Link href="/" passHref>
           <button
-            className="my-10 px-6 py-2 text-sm justify-start items-start text-white bg-indigo-500 backdrop-blur-3xl bg-opacity-50 font-bold rounded-full border border-indigo-500 hover:bg-indigo-500 hover:text-gray-50 hover:border-transparent focus:outline-none focus:ring-2 focus:ring-5555dd-200 focus:ring-offset-2"
+            className="my-10 px-6 py-2 text-sm justify-start items-start text-blue-500 font-bold border border-blue-500 rounded"
           >
             Go Home
           </button>
           </Link>
+          </div>
         </div>
     </>
   );
