@@ -80,6 +80,34 @@ export const getDeathRegistries = async () => {
   return res;
 };
 
+export const getDeathRegistriesSearchByCsnOrName = async (searchStr: string) => {
+  const applicationCollection = await getDeathRegistryCollection();
+  const query = {
+    $or: [
+      { csn: { $regex: searchStr, $options: 'i' } },
+      { name: { $regex: searchStr, $options: 'i' } }
+    ]
+  };
+  const res = await applicationCollection.collection.find(query).toArray();
+
+  return res;
+};
+
+
+export const getDeathRegistriesSearchByCsnOrNameWithPage = async (searchStr: string, page: number, pageLength: number,) => {
+  const applicationCollection = await getDeathRegistryCollection();
+  const query = {
+    $or: [
+      { csn: { $regex: searchStr, $options: 'i' } },
+      { name: { $regex: searchStr, $options: 'i' } }
+    ]
+  };
+  const res = await applicationCollection.collection.find(query).toArray();
+
+  return res;
+};
+
+
 export const getRegistryPage = async (
   page: number,
   pageLength: number,
