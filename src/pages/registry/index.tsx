@@ -165,19 +165,23 @@ export default function MainPage({ user }: Props) {
                           <h1 className="text-black font-bold">
                             Name: {reg.name}
                           </h1>
-                          <p className="text-black text-sm">CSN: {reg.csn}</p>
+                          <p className="text-black text-sm"><span className="font-bold">CSN: </span>{reg.csn}</p>
                           <p className="text-black text-sm">
-                            Date of Birth:{" "}
+                          <span className="font-bold">Date of Birth:{" "}</span>
                             {new Date(reg.dob).toLocaleDateString()}
                           </p>
                           <p className="text-black text-sm">
+                          <span className="font-bold">
                             Date of Death:{" "}
+                            </span>
                             {new Date(reg.dod).toLocaleDateString()}
                           </p>
                         </div>
                         <div className="flex flex-col items-end mt-2">
                           <p className="text-black text-sm">
+                          <span className="font-bold">
                             Certificate: CLICK TO VIEW
+                            </span>
                           </p>
                           {reg.reverted && (
                             <p className="text-red-500 font-bold text-sm">

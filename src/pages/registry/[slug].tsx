@@ -100,17 +100,17 @@ export default function MainPage({ user }: Props) {
         <Loader />
       ) : regExists ? (
         <div className="p-10 flex flex-col h-full">
-            <div className="mb-6 bg-white p-4 rounded shadow-lg">
+            <div className="mb-6 bg-white p-4 rounded shadow-2xl">
                 <div className="flex flex-row">
-                <h1 className="text-black font-bold text-xl mb-2">Name: <span className="font-normal">{reg?.name}</span></h1>
+                <h1 className="text-black font-bold text-xl mb-2"><span className="font-bold">{reg?.name}</span></h1>
                 {reg?.reverted && (
                   <p className="text-red-500 font-bold text-xl px-4">REVERTED BY ADMIN</p>
                 )}
                 </div>
-                <p className="text-black text-sm mb-1">CSN: {reg?.csn}</p>
-                <p className="text-black text-sm mb-1">Date of Birth: {new Date(reg!!.dob).toLocaleDateString()}</p>
-                <p className="text-black text-sm mb-1">Date of Death: {new Date(reg!!.dod).toLocaleDateString()}</p>
-                <p className="text-black text-sm mb-4">Record Number: HRP-PD-{(reg!! as any)._id}</p>
+                <p className="text-black text-sm mb-1"><span className="font-bold">CSN:</span> {reg?.csn}</p>
+                <p className="text-black text-sm mb-1"><span className="font-bold">Date of Birth:</span> {new Date(reg!!.dob).toLocaleDateString()}</p>
+                <p className="text-black text-sm mb-1"><span className="font-bold">Date of Death:</span> {new Date(reg!!.dod).toLocaleDateString()}</p>
+                <p className="text-black text-sm mb-4"><span className="font-bold">Record Number:</span> HRP-PD-{(reg!! as any)._id}</p>
                 {isAdmin(user!!) && (
                   <>
                     {!reg?.reverted && (
